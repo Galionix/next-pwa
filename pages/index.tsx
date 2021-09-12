@@ -1,10 +1,18 @@
 import type { NextPage } from 'next'
+import { useSession } from 'next-auth/react';
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.scss'
 import { AuthButton } from './../components/AuthButton';
+import { useUserStore } from './../utils/store';
 
 const Home: NextPage = () => {
+
+  const userStore = useUserStore(
+    state => state
+  )
+  const session = useSession()
+
   return (
     <div className={styles.container}>
       <Head>
@@ -16,6 +24,8 @@ const Home: NextPage = () => {
       <main className={styles.main}>
         Planner
         <AuthButton />
+        <pre>{JSON.stringify(session, null, 2)}</pre>
+
       </main>
 
     </div>

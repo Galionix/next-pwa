@@ -1,5 +1,5 @@
 import NextAuth from 'next-auth'
-import Providers from 'next-auth/providers'
+import GoogleProvider from 'next-auth/providers/google'
 
 // For more information on each option (and a full list of options) go to
 // https://next-auth.js.org/configuration/options
@@ -33,9 +33,13 @@ export default NextAuth({
 		// 	// https://docs.github.com/en/developers/apps/building-oauth-apps/scopes-for-oauth-apps
 		// 	scope: 'read:user',
 		// }),
-		Providers.Google({
-			clientId: process.env.GOOGLE_ID,
-			clientSecret: process.env.GOOGLE_SECRET,
+		GoogleProvider({
+			idToken: true,
+			clientId: process.env.GOOGLE_ID || '',
+			clientSecret:
+				process.env.GOOGLE_SECRET || '',
+			accessTokenUrl:
+				'https://accounts.google.com/o/oauth2/v2/auth?prompt=consent&access_type=offline&response_type=code',
 		}),
 		// Providers.Twitter({
 		// 	clientId: process.env.TWITTER_ID,
@@ -53,7 +57,7 @@ export default NextAuth({
 	// Notes:
 	// * You must install an appropriate node_module for your database
 	// * The Email provider requires a database (OAuth providers do not)
-	database: process.env.DATABASE_URL,
+	// database: process.env.DATABASE_URL || '',
 
 	// The secret should be set to a reasonably long random string.
 	// It is used to sign cookies and to sign and encrypt JSON Web Tokens, unless
@@ -106,10 +110,33 @@ export default NextAuth({
 	// when an action is performed.
 	// https://next-auth.js.org/configuration/callbacks
 	callbacks: {
-		// async signIn(user, account, profile) { return true },
-		// async redirect(url, baseUrl) { return baseUrl },
-		// async session(session, user) { return session },
-		// async jwt(token, user, account, profile, isNewUser) { return token }
+		// async signIn(user, account, profile) {
+		// 	console.log(
+		// 		'%c 🇰🇿: signIn -> user, account, profile ',
+		// 		'font-size:16px;background-color:#7d458b;color:white;',
+		// 		{ user, account, profile }
+		// 	)
+		// 	return true
+		// },
+		// // async redirect(url, baseUrl) { return baseUrl },
+		// async session(session, user) {
+		// 	return { session, user }
+		// },
+		// async jwt(
+		// 	token,
+		// 	user,
+		// 	account,
+		// 	profile,
+		// 	isNewUser
+		// ) {
+		// 	return {
+		// 		token,
+		// 		user,
+		// 		account,
+		// 		profile,
+		// 		isNewUser,
+		// 	}
+		// },
 	},
 
 	// Events are useful for logging
@@ -118,7 +145,7 @@ export default NextAuth({
 
 	// You can set the theme to 'light', 'dark' or use 'auto' to default to the
 	// whatever prefers-color-scheme is set to in the browser. Default is 'auto'
-	theme: 'light',
+	theme: 'auto',
 
 	// Enable debug messages in the console if you are having problems
 	debug: true,
