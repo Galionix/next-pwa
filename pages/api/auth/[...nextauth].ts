@@ -110,6 +110,19 @@ export default NextAuth({
 	// when an action is performed.
 	// https://next-auth.js.org/configuration/callbacks
 	callbacks: {
+		async session({ session, token, user }) {
+			// Send properties to the client, like an access_token from a provider.
+			session.token = token
+			session.user = user
+			return session
+		},
+		async jwt({ token, account }) {
+			// Persist the OAuth access_token to the token right after signin
+			if (account) {
+				token.accessToken = account.access_token
+			}
+			return { token, account }
+		},
 		// async signIn(user, account, profile) {
 		// 	console.log(
 		// 		'%c 🇰🇿: signIn -> user, account, profile ',
