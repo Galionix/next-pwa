@@ -1,10 +1,21 @@
+// import { db, app } from '@/utils/fire';
 import type { NextPage } from 'next'
 import { useSession } from 'next-auth/react';
 import Head from 'next/head'
 import Image from 'next/image'
+import { useEffect } from 'react';
 import styles from '../styles/Home.module.scss'
 import { AuthButton } from './../components/AuthButton';
 import { useUserStore } from './../utils/store';
+import { app } from './../utils/fire';
+import { doc, setDoc, getFirestore } from "firebase/firestore";
+// import { getDatabase, ref, set } from "firebase/database";
+import { initializeApp } from 'firebase/app';
+import { firebaseConfig } from './../utils/fire';
+import { initUser } from '@/utils/fire';
+
+
+// const db = getFirestore(app)
 
 const Home: NextPage = () => {
 
@@ -12,6 +23,17 @@ const Home: NextPage = () => {
     state => state
   )
   const session = useSession()
+
+  useEffect(() => {
+    if (session.status === 'authenticated' && session.data.token != undefined) {
+      //@ts-ignore
+      const { name, email, picture } = session.data?.token;
+      initUser(name, email, picture)
+
+
+    }
+  }, [session])
+
 
   return (
     <div className={styles.container}>
@@ -24,7 +46,7 @@ const Home: NextPage = () => {
       <main className={styles.main}>
         Planner
         <AuthButton />
-        <pre>{JSON.stringify(session, null, 2)}</pre>
+        <pre>{JSON.stringify(session.data?.token, null, 2)}</pre>
 
       </main>
 
