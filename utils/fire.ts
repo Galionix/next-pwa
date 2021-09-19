@@ -38,23 +38,37 @@ export const firebaseConfig = {
 export const app = initializeApp(firebaseConfig)
 export const db = getFirestore(app)
 
-const isUserNew = async (email: string) => {
-	const citiesRef = collection(db, 'users')
+export const user = async (email: string) => {
+	const userRef = collection(db, 'users')
 
 	const q = query(
-		citiesRef,
+		userRef,
 		where('email', '==', email)
 	)
 	const querySnapshot = await getDocs(q)
-	// console.log(
-	// 	'%c 🐍: isUserRegistered ',
-	// 	'font-size:16px;background-color:#324d09;color:white;',
-	// 	querySnapshot.empty
-	// )
-	// querySnapshot.forEach(doc => {
-	// 	// doc.data() is never undefined for query doc snapshots
-	// 	console.log(doc.id, ' => ', doc.data())
-	// })
+	return querySnapshot.docs[0]
+}
+
+// const taskGroup = async (email: string) => {
+// 	const userRef = collection(db, 'users')
+
+// 	const q = query(
+// 		userRef,
+// 		where('email', '==', email)
+// 	)
+// 	const querySnapshot = await getDocs(q)
+// 	return querySnapshot.docs[0]
+// }
+
+const isUserNew = async (email: string) => {
+	const userRef = collection(db, 'users')
+
+	const q = query(
+		userRef,
+		where('email', '==', email)
+	)
+	const querySnapshot = await getDocs(q)
+
 	return querySnapshot.empty
 }
 
@@ -81,12 +95,47 @@ export const initUser = async (
 	} catch (e) {
 		console.error('Error adding document: ', e)
 	}
-	// const app = initializeApp(firebaseConfig)
-	// const db = getDatabase();
-	// set(ref(db, 'users/' + userId), {
-	//   username: name,
-	//   email: email,
-	//   profile_picture: imageUrl
-	// });
 }
 // initUser()
+
+export const newTaskGroup = async (
+	email: string,
+	title?: string
+) => {
+	const userdoc = await user(email)
+	const docRef = await addDoc(
+		collection(
+			db,
+			`users/${userdoc.id}/taskGroups`
+		),
+		{
+			title: title || 'new taskGroup',
+		}
+	)
+	console.log(
+		'newTaskGroup written with ID: ',
+		docRef.id
+	)
+	// userdoc.
+}
+
+export const addTask = async (
+	email: string,
+	taskGroup: string,
+	task: { text: string }
+) => {
+	const { id: userid } = await user(email)
+	const docRef = await addDoc(
+		collection(
+			db,
+			`users/${userid}/taskGroups/${taskGroup}/tasks`
+		),
+		{
+			...task,
+		}
+	)
+	console.log(
+		'addTask written with ID: ',
+		docRef.id
+	)
+}
