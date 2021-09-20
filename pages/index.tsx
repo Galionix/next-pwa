@@ -15,12 +15,14 @@ import { firebaseConfig } from './../utils/fire';
 import { initUser } from '@/utils/fire';
 import { getTaskGroups, getTasks, notification, requestNotificationPermission } from '@/utils/apputils';
 import { addTask } from './../utils/fire';
-
+import { useRouter } from 'next/dist/client/router';
+import useTranslation from 'next-translate/useTranslation'
 
 // const db = getFirestore(app)
 
 const Home: NextPage = () => {
-
+  const router = useRouter()
+  const { t } = useTranslation('common');
   const [email, setEmail] = useState('')
   const [selectedTaskGroup, setSelectedTaskGroup] = useState(0)
   const [taskGroups, setTaskGroups] = useState<{ id: string; data: any }[]>([])
@@ -64,7 +66,7 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={s.main}>
-        Planner
+        <h1>{t('user.profile')}</h1>
         <AuthButton />
         <pre>{JSON.stringify(session.data?.token, null, 2)}</pre>
         <button
@@ -100,7 +102,7 @@ const Home: NextPage = () => {
         <ul>
           {tasks.map(task => <li key={task.id}>{task.data.text}</li>)}
         </ul>
-        {/* <pre>{JSON.stringify(tasks, null, 2)}</pre> */}
+        <pre>{JSON.stringify(router, null, 2)}</pre>
       </main>
 
     </div>

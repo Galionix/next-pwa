@@ -11,6 +11,9 @@ import { useUserStore } from 'utils/store'
 
 import { useSession, signIn, signOut, SessionProvider }
   from "next-auth/react"
+// import { appWithTranslation } from 'next-i18next'
+
+
 
 function MyApp({ Component,
   pageProps: { session, ...pageProps }, }: AppProps) {
