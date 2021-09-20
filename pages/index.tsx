@@ -37,14 +37,22 @@ const Home: NextPage = () => {
       setEmail(email)
       initUser(name, email, picture)
       requestNotificationPermission()
-      getTaskGroups(email).then(res => setTaskGroups(res))
+      getTaskGroups(email).then(res => {
+        setTaskGroups(res)
+
+        if (res.length > 0)
+          getTasks(email, res[selectedTaskGroup].id)
+            .then(res => setTasks(res))
+      })
+
       // getTasks(email, 'GZL5Sph9QdnpfM853hMb').then(res => setTasks(res))
       // setTaskGroups()
     }
   }, [session])
   useEffect(() => {
     if (taskGroups.length > 0)
-      getTasks(email, taskGroups[selectedTaskGroup].id).then(res => setTasks(res))
+      getTasks(email, taskGroups[selectedTaskGroup].id)
+        .then(res => setTasks(res))
   }, [selectedTaskGroup])
 
   return (
@@ -63,7 +71,9 @@ const Home: NextPage = () => {
           onClick={() => notification('this is test')}
         >notification</button>
         <button
-          onClick={() => newTaskGroup(email, 'this is test')}
+          onClick={() => newTaskGroup(email, 'this is test').then(() => {
+            getTaskGroups(email).then(res => setTaskGroups(res))
+          })}
         >newTaskGroup</button>
         <ul
           className={` ${s.taskGroups} `}
@@ -81,7 +91,11 @@ const Home: NextPage = () => {
         </ul>
         {/* <pre>{JSON.stringify(taskGroups, null, 2)}</pre> */}
         <button
-          onClick={() => addTask(email, taskGroups[selectedTaskGroup].id, { text: 'test task' })}
+          onClick={() => addTask(email, taskGroups[selectedTaskGroup].id, { text: 'test task' })
+            .then(() => {
+              getTasks(email, taskGroups[selectedTaskGroup].id)
+                .then(res => setTasks(res))
+            })}
         >addTask</button>
         <ul>
           {tasks.map(task => <li key={task.id}>{task.data.text}</li>)}
