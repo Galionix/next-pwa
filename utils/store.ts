@@ -7,7 +7,11 @@ export const useUserStore = create<Store>(
 		set => ({
 			user: { info: null },
 			setUser: (user: any) => set({ user }),
-			sessionLoading: false,
+			// sessionLoading: false,
+			taskGroupIndex: 0,
+			setTaskGroupIndex: (
+				taskGroupIndex: number
+			) => set({ taskGroupIndex }),
 			// setSessionLoading: (sessionLoading: any) =>
 			// 	set({ sessionLoading }),
 		}),

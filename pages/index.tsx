@@ -24,10 +24,10 @@ const Home: NextPage = () => {
   const router = useRouter()
   const { t } = useTranslation('common');
   const [email, setEmail] = useState('')
-  const [selectedTaskGroup, setSelectedTaskGroup] = useState(0)
+  // const [selectedTaskGroup, setSelectedTaskGroup] = useState(0)
   const [taskGroups, setTaskGroups] = useState<{ id: string; data: any }[]>([])
   const [tasks, setTasks] = useState<{ id: string; data: any }[]>([])
-  const userStore = useUserStore(
+  const { setTaskGroupIndex, taskGroupIndex } = useUserStore(
     state => state
   )
   const session = useSession()
@@ -43,7 +43,7 @@ const Home: NextPage = () => {
         setTaskGroups(res)
 
         if (res.length > 0)
-          getTasks(email, res[selectedTaskGroup].id)
+          getTasks(email, res[taskGroupIndex].id)
             .then(res => setTasks(res))
       })
 
@@ -53,9 +53,9 @@ const Home: NextPage = () => {
   }, [session])
   useEffect(() => {
     if (taskGroups.length > 0)
-      getTasks(email, taskGroups[selectedTaskGroup].id)
+      getTasks(email, taskGroups[taskGroupIndex].id)
         .then(res => setTasks(res))
-  }, [selectedTaskGroup])
+  }, [taskGroupIndex])
 
   return (
     <div className={s.container}>
@@ -84,18 +84,18 @@ const Home: NextPage = () => {
 
           {taskGroups.map((group, index) => <li
             key={group.id}
-            className={selectedTaskGroup === index ? s.selected : ''}
+            className={taskGroupIndex === index ? s.selected : ''}
             onClick={() => {
               console.log(index)
-              setSelectedTaskGroup(index)
+              setTaskGroupIndex(index)
             }}
           >{group.data.title}</li>)}
         </ul>
         {/* <pre>{JSON.stringify(taskGroups, null, 2)}</pre> */}
         <button
-          onClick={() => addTask(email, taskGroups[selectedTaskGroup].id, { text: 'test task' })
+          onClick={() => addTask(email, taskGroups[taskGroupIndex].id, { text: 'test task' })
             .then(() => {
-              getTasks(email, taskGroups[selectedTaskGroup].id)
+              getTasks(email, taskGroups[taskGroupIndex].id)
                 .then(res => setTasks(res))
             })}
         >addTask</button>
