@@ -10,22 +10,22 @@ export const AuthButton = () => {
     const { t } = useTranslation('common');
     return (<>{
         session.status !== 'authenticated' ?
-        <button
-            onClick={e => {
-                e.preventDefault()
+            <button
+                onClick={e => {
+                    e.preventDefault()
 
-                    signIn()
-            }}
-        >
+                    signIn('google')
+                }}
+            >
                 {t('buttons.auth')}
             </button> :
-        <button
-            onClick={e => {
-                e.preventDefault()
+            <button
+                onClick={e => {
+                    e.preventDefault()
                     signOut()
                     reset()
-            }}
-        >
+                }}
+            >
                 {t('buttons.sign_out')}
             </button>}
     </>
