@@ -5,4 +5,5 @@ export interface Store {
 	setTaskGroupIndex: (
 		taskGroupIndex: number
 	) => void
+	reset: () => void
 }

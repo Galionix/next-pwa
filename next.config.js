@@ -43,6 +43,12 @@ module.exports = withPlugins([
 	],
 	[nextTranslate],
 	{
+		images: {
+			domains: [
+				'lh3.googleusercontent.com',
+				'googleusercontent.com',
+			],
+		},
 		i18n: {
 			locales: ['en', 'ru'],
 			defaultLocale: 'ru',

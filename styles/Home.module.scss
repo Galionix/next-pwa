@@ -1,5 +1,24 @@
-.taskGroups{
-    .selected{
-        background: #ccc;
+.main {
+	display: grid;
+	grid-template-columns: [sidebar] 200px [main] 1fr;
+	grid-template-rows: [userpanel] 100px [main] 1fr [footer] 200px;
+	height: 100%;
+    .taskPanel{
+        grid-area: userpanel / main;
     }
+    .notLogged{
+        grid-area: main / main;
+    }
+	.taskGroups {
+		grid-area: main / sidebar;
+		li {
+			cursor: pointer;
+			&.selected {
+				background: #ccc;
+			}
+		}
+	}
+	.tasks {
+		grid-area: main / main;
+	}
 }

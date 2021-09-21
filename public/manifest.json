@@ -1,6 +1,6 @@
 {
-	"name": "PWA App",
-	"short_name": "App",
+	"name": "Dimas planner",
+	"short_name": "Planenr",
 	"icons": [
 		{
 			"src": "/icons/android-chrome-192x192.png",

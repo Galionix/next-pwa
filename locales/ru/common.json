@@ -1,3 +1,9 @@
 {
-	"user": { "profile": "Профиль" }
+	"user": { "profile": "Профиль" },
+	"buttons": {
+		"auth": "Войти",
+		"sign_out": "Выйти",
+		"add_task_group": "Добавить группу"
+	},
+	"messages": { "not_logged": "Войти с Google" }
 }
