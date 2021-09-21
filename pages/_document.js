@@ -24,7 +24,7 @@ class MyDocument extends Document {
 				<Head>
 					<meta
 						name='application-name'
-						content='PWA App'
+						content='Dimas Planner'
 					/>
 					<meta
 						name='apple-mobile-web-app-capable'
@@ -36,11 +36,11 @@ class MyDocument extends Document {
 					/>
 					<meta
 						name='apple-mobile-web-app-title'
-						content='PWA App'
+						content='Dimas Planner'
 					/>
 					<meta
 						name='description'
-						content='Best PWA App in the world'
+						content='Best Planner in the world'
 					/>
 					<meta
 						name='format-detection'
@@ -127,11 +127,11 @@ class MyDocument extends Document {
 					/>
 					<meta
 						name='twitter:title'
-						content='PWA App'
+						content='Dimas Planner'
 					/>
 					<meta
 						name='twitter:description'
-						content='Best PWA App in the world'
+						content='Best Planner in the world'
 					/>
 					<meta
 						name='twitter:image'
@@ -139,7 +139,7 @@ class MyDocument extends Document {
 					/>
 					<meta
 						name='twitter:creator'
-						content='@DavidWShadow'
+						content='@example'
 					/>
 					<meta
 						property='og:type'
@@ -147,15 +147,15 @@ class MyDocument extends Document {
 					/>
 					<meta
 						property='og:title'
-						content='PWA App'
+						content='Dimas Planner'
 					/>
 					<meta
 						property='og:description'
-						content='Best PWA App in the world'
+						content='Best Planner in the world'
 					/>
 					<meta
 						property='og:site_name'
-						content='PWA App'
+						content='Dimas Planner'
 					/>
 					<meta
 						property='og:url'
