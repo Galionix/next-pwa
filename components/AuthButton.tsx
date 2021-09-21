@@ -14,7 +14,10 @@ export const AuthButton = () => {
                 onClick={e => {
                     e.preventDefault()
 
-                    signIn('google')
+                    signIn('google').then(msg => {
+                        console.log("%c 🔛: AuthButton -> msg ", "font-size:16px;background-color:#84693e;color:white;", msg)
+
+                    })
                 }}
             >
                 {t('buttons.auth')}
