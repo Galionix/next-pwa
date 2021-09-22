@@ -41,6 +41,7 @@ import { deleteTaskGroup } from './../utils/fire';
 import { isValidText } from './../utils/apputils';
 import { Loader } from './../components/Loader/Loader';
 import { AddTasks } from './../components/AddTasks/AddTasks';
+import { f_updateTask } from './../utils/fire';
 
 // const db = getFirestore(app)
 
@@ -58,6 +59,8 @@ const Home: NextPage = () => {
   const [updateTaskGroupTitle, setUpdateTaskGroupTitle] = useState('')
   const [newTaskText, setNewTaskText] = useState('')
   const [settingNewTask, setSettingNewTask] = useState(false)
+  const [editingTaskIndex, setEditingTaskIndex] = useState('')
+  const [editingTaskText, setEditingTaskText] = useState('')
 	// const [selectedTaskGroup, setSelectedTaskGroup] = useState(0)
   const [taskGroups, setTaskGroups] = useState<
     { id: string; data: any }[]
@@ -120,7 +123,23 @@ const Home: NextPage = () => {
     }
   }, [taskGroupIndex])
 
+  const updateTask = ({ id, data }: { id: string, data: any }) => {
+    f_updateTask(
+      user.id,
+      taskGroups[taskGroupIndex].id,
+      id,
+      data).then(() => {
+        getTasks(
+          user.id,
+          taskGroups[taskGroupIndex].id
+        ).then(res => {
 
+          setTasks(res)
+        })
+      })
+    // setTasks(tasks.map((task, i) => task.id === id ? { id, data } : task))
+
+  }
   return (
     <>
       <Head>
@@ -132,7 +151,7 @@ const Home: NextPage = () => {
 
       <main className={`${s.main} ${folded ? s.folded : ''}`}>
         {session.status === 'authenticated' && <UserPanel />}
-        {session.status === 'authenticated' && <TaskPanel />}
+        {/* {session.status === 'authenticated' && <TaskPanel />} */}
 
         {session.status === 'authenticated' && <ul className={` ${s.taskGroups} `}>
           {settingNewTaskGroup ? <input
@@ -278,8 +297,66 @@ const Home: NextPage = () => {
           }}
           className={` ${s.tasks} `}>
           {!settingNewTaskGroup && tasks.map(task => (
-            <li key={task.id}>
-              {task.data.text}
+            <li key={task.id}
+              onDoubleClick={(e) => {
+                // updateTask({
+                //   id: task.id,
+                //   data: { ...task.data, checked: !task.data.checked },
+                // })
+                e.stopPropagation()
+                setEditingTaskIndex(task.id)
+                setEditingTaskText(task.data.text)
+                setSettingNewTask(true)
+              }}
+              onClick={() => {
+                // console.log('ipdate ' + task.id)
+                updateTask({
+                  id: task.id,
+                  data: { ...task.data, checked: !task.data.checked },
+                })
+              }}
+            >
+
+              {settingNewTask && editingTaskIndex === task.id ? <input
+                type='text'
+                autoFocus
+                onBlur={() => {
+                  if (!isValidText(editingTaskText)) return
+                  setSettingNewTask(false)
+                  updateTask({
+                    id: task.id, data: {
+                      ...task.data, text: editingTaskText
+                    }
+                  })
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    if (!isValidText(editingTaskText)) return
+                    setSettingNewTask(false)
+                    updateTask({
+                      id: task.id, data: {
+                        ...task.data, text: editingTaskText
+                      }
+                    })
+                  }
+                }}
+                placeholder=''
+                value={editingTaskText}
+                onChange={e => {
+                  setEditingTaskText(e.target.value)
+                }}
+              /> :
+                <>
+                  <p
+                  >
+                    {task.data.text}
+                  </p>
+                  <input type="checkbox"
+                    readOnly
+                    name="" id="" checked={task.data.checked} />
+
+                </>}
+
             </li>
           ))}
           {tasks.length === 0 && <AddTasks />}
@@ -301,7 +378,7 @@ const Home: NextPage = () => {
                 addTask(
                   user.id,
                   taskGroups[taskGroupIndex].id,
-                  { text: newTaskTitle }
+                  { text: newTaskTitle, checkable: true }
                 ).then(() => {
                   getTasks(
                     user.id,
@@ -318,7 +395,7 @@ const Home: NextPage = () => {
                   addTask(
                     user.id,
                     taskGroups[taskGroupIndex].id,
-                    { text: newTaskTitle }
+                    { text: newTaskTitle, checkable: true }
                   ).then(() => {
                     getTasks(
                       user.id,

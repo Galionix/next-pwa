@@ -90,7 +90,11 @@ export const getTasks = async (
 	querySnapshot.forEach(doc => {
 		// doc.data() is never undefined for query doc snapshots
 		// console.log(doc.id, ' => ', doc.data())
-		res.push({ id: doc.id, data: doc.data() })
+		res.push({
+			id: doc.id,
+			data: doc.data(),
+			// checked: doc.checked,
+		})
 	})
 
 	return res

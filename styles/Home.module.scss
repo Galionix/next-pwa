@@ -92,6 +92,9 @@
 		grid-area: main / sidebar;
 
 		li {
+			input{
+				 width: 100%;
+			}
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
@@ -153,6 +156,26 @@ z-index: -1;
 
 	.tasks {
 		grid-area: main / main;
+		li{
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 10px;
+			border-bottom: 1px solid rgba(204, 204, 204, 0.3);
+			p{
+				cursor:default;
+			}
+			input{
+				&:only-child{
+
+					width: 100%;
+				}
+				&:checked{
+					accent-color: #395faa;
+				}
+				margin-right: 10px;
+			}
+
+		}
 	}
 
 	.newTask {
@@ -214,6 +237,20 @@ z-index: -1;
 				// );
 			}
 		}
+	}
+	.notasks{
+		// margin: 0 auto;
+		height: 100%;
+		//  margin: auto 0;
+		display: flex;
+		align-items: center;
+		text-align: center;
+		font-size: 40px;
+		font-weight: bold;
+		 font-family: 'Open Sans Condensed', sans-serif;
+		 color:rgba(0, 0, 0, 0.5);
+		 user-select: none;
+
 	}
 }
 

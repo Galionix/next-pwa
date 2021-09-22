@@ -121,7 +121,7 @@ export const newTaskGroup = async (
 export const addTask = async (
 	userid: string,
 	taskGroup: string,
-	task: { text: string }
+	task: { text: string; checkable: boolean }
 ) => {
 	// const { id: userid } = await user(email)
 	const docRef = await addDoc(
@@ -132,6 +132,7 @@ export const addTask = async (
 		{
 			...task,
 			timestamp: serverTimestamp(),
+			checked: false,
 
 			// app.FieldValue.serverTimestamp(),
 		}
@@ -149,6 +150,31 @@ export const f_updateTaskGroupTitle = async (
 			`users/${userid}/taskGroups/${taskId}`
 		),
 		{ title }
+	)
+}
+
+/**
+ *
+ *
+ * @param {string} userid: The user ID
+ * @param {string} taskGroupId: The task group ID
+ * @param {string} taskId: The task ID
+ * @param {*} data:Task data
+ * @return {Promise}
+ */
+export const f_updateTask = async (
+	userid: string,
+	taskGroupId: string,
+	taskId: string,
+	data: any
+): Promise<any> => {
+	// console.log('updating')
+	return await updateDoc(
+		doc(
+			db,
+			`users/${userid}/taskGroups/${taskGroupId}/tasks/${taskId}`
+		),
+		{ ...data }
 	)
 }
 

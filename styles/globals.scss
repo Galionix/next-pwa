@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Rubik&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@400&display=swap');
 // font-family: , sans-serif;
 html,
 body,#__next {
@@ -8,7 +9,9 @@ body,#__next {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
     height: 100%;
 }
-
+button{
+  font-family: 'Open Sans Condensed', sans-serif;
+}
 a {
   color: inherit;
   text-decoration: none;
@@ -28,8 +31,19 @@ img{
 }
 ul{
   list-style: none;
+  li{
+    word-break: break-word;
+  }
 }
-
+input{
+ 
+  font: inherit;
+  &:focus{
+    outline: none;
+    border: 1px dashed rgb(82, 82, 82);
+    border-radius: 2px;
+  }
+}
 :root{
 
   --accent-bg: linear-gradient(30deg, #0c3483 0%, #a2b6df 100%, #6b8cce 100%, #a2b6df 100%);
