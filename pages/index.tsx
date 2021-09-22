@@ -78,7 +78,7 @@ const Home: NextPage = () => {
       initUser(name, email, picture).then((id) => {
         setUser({ name, email, picture, id })
         setEmail(email)
-        console.log("%c 🇸🇮: Home:NextPage -> id ", "font-size:16px;background-color:#3b9399;color:white;", id)
+        // console.log("%c 🇸🇮: Home:NextPage -> id ", "font-size:16px;background-color:#3b9399;color:white;", id)
         // setUser(id)
         requestNotificationPermission()
         getTaskGroups(id).then(res => {
@@ -138,6 +138,7 @@ const Home: NextPage = () => {
             value={newTaskGroupTitle}
             onChange={(e) => setNewTaskGroupTitle(e.target.value)}
             onBlur={(e) => {
+              // console.log("%c 🍗: Home:NextPage -> e ", "font-size:16px;background-color:#ed502f;color:white;", e)
               if (isValidText(newTaskGroupTitle))
                 newTaskGroup(
                   user.id,
@@ -153,6 +154,8 @@ const Home: NextPage = () => {
                 })
             }}
             onKeyDown={(e) => {
+              console.log("%c 😹: Home:NextPage -> e ", "font-size:16px;background-color:#815707;color:white;", e)
+
               if (e.key === 'Enter') {
                 if (isValidText(newTaskGroupTitle))
                   newTaskGroup(
@@ -201,7 +204,7 @@ const Home: NextPage = () => {
               {index === taskGroupIndex && editingTaskTitle ? <input
                 autoFocus
                 onBlur={() => {
-                  if (isValidText(updateTaskGroupTitle)) return
+                  if (!isValidText(updateTaskGroupTitle)) return
                   f_updateTaskGroupTitle(user.id, taskGroups[taskGroupIndex].id, updateTaskGroupTitle).then(() => {
                     console.log('updated')
 
@@ -215,7 +218,7 @@ const Home: NextPage = () => {
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
-                    if (isValidText(updateTaskGroupTitle)) return
+                    if (!isValidText(updateTaskGroupTitle)) return
                     f_updateTaskGroupTitle(user.id, taskGroups[taskGroupIndex].id, updateTaskGroupTitle).then(() => {
                       console.log('updated')
 
