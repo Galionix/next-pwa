@@ -34,7 +34,7 @@
 				opacity: 0;
 			}
 
-			&.control{
+			&.control,&.selected{
 						svg {
 					opacity: 1;
 				}
