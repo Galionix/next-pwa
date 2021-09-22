@@ -124,7 +124,7 @@ const Home: NextPage = () => {
         <UserPanel />
         <TaskPanel />
 
-        <ul className={` ${s.taskGroups} `}>
+        {session.status === 'authenticated' && <ul className={` ${s.taskGroups} `}>
           {taskGroups.map((group, index) => (
             <li
               key={group.id}
@@ -251,7 +251,7 @@ const Home: NextPage = () => {
               <p>{t("buttons.add_task_group")}</p>
               <IoAddCircleOutline />
             </></li>}
-        </ul>
+        </ul>}
         {session.status === 'authenticated' ? <ul className={` ${s.tasks} `}>
           {!settingNewTaskGroup && tasks.map(task => (
             <li key={task.id}>
