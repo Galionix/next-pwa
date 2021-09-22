@@ -24,3 +24,12 @@ img{
 ul{
   list-style: none;
 }
+
+:root{
+
+  --accent-bg: linear-gradient(30deg, #0c3483 0%, #a2b6df 100%, #6b8cce 100%, #a2b6df 100%);
+  // --accent-bg: linear-gradient(to top, #accbee 0%, #e7f0fd 100%);
+  // background-image: linear-gradient(to top, #9890e3 0%, #b1f4cf 100%);
+// --accent-bg: linear-gradient(180deg, #2af598 0%, #009efd 100%);
+// : red;
+}

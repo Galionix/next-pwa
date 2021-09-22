@@ -101,3 +101,29 @@ export const isValidText = (text: string) => {
 	if (text.trim().length < 3) return false
 	return true
 }
+export const extractCapitals = (text: string) => {
+	if (text.trim().length < 5)
+		return `${text.trim()[0].toUpperCase()}${text
+			.trim()[1]
+			.toUpperCase()}`
+	if (text.split(' ').length > 2)
+		return `${text
+			.split(' ')[0][0]
+			.toUpperCase()}${text
+			.split(' ')[1][0]
+			.toUpperCase()}${text
+			.split(' ')[2][0]
+			.toUpperCase()}`
+	if (text.split(' ').length > 1)
+		return `${text
+			.split(' ')[0][0]
+			.toUpperCase()}${text
+			.split(' ')[1][0]
+			.toUpperCase()}`
+
+	return `${text.trim()[0].toUpperCase()}${text
+		.trim()[1]
+		.toUpperCase()}${text
+		.trim()[2]
+		.toUpperCase()}`
+}

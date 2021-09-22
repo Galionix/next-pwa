@@ -71,11 +71,6 @@ const isUserNew = async (email: string) => {
 		where('email', '==', email)
 	)
 	const querySnapshot = await getDocs(q)
-	// console.log(
-	// 	'%c ⛈️: isUserNew -> querySnapshot ',
-	// 	'font-size:16px;background-color:#e869e9;color:white;',
-	// 	querySnapshot.docs[0].id
-	// )
 
 	return querySnapshot
 	// querySnapshot.empty ||
@@ -98,10 +93,7 @@ export const initUser = async (
 				imageUrl,
 			}
 		)
-		console.log(
-			'Document written with ID: ',
-			docRef.id
-		)
+
 		return docRef.id
 	} else return querySnapshot.docs[0].id
 	// } catch (e) {
@@ -122,10 +114,7 @@ export const newTaskGroup = async (
 			timestamp: serverTimestamp(),
 		}
 	)
-	console.log(
-		'newTaskGroup written with ID: ',
-		docRef.id
-	)
+
 	// userdoc.
 }
 
@@ -146,10 +135,6 @@ export const addTask = async (
 
 			// app.FieldValue.serverTimestamp(),
 		}
-	)
-	console.log(
-		'addTask written with ID: ',
-		docRef.id
 	)
 }
 export const f_updateTaskGroupTitle = async (

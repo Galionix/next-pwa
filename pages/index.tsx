@@ -25,6 +25,7 @@ import { initializeApp } from 'firebase/app'
 import { firebaseConfig } from './../utils/fire'
 import { initUser } from '@/utils/fire'
 import {
+  extractCapitals,
   getTaskGroups,
   getTasks,
   notification,
@@ -39,6 +40,7 @@ import { TaskPanel } from './../components/TaskPanel';
 import { deleteTaskGroup } from './../utils/fire';
 import { isValidText } from './../utils/apputils';
 import { Loader } from './../components/Loader/Loader';
+import { AddTasks } from './../components/AddTasks/AddTasks';
 
 // const db = getFirestore(app)
 
@@ -48,6 +50,7 @@ const Home: NextPage = () => {
   const { t } = useTranslation('common')
   const [email, setEmail] = useState('')
   const [userId, setUserId] = useState('')
+  const [folded, setFolded] = useState(false)
   const [newTaskTitle, setNewTaskTitle] = useState('')
   const [editingTaskTitle, setEditingTaskTitle] = useState(false)
   const [settingNewTaskGroup, setSettingNewTaskGroup] = useState(false)
@@ -127,9 +130,9 @@ const Home: NextPage = () => {
 
       {/* <pre>{JSON.stringify(user, null, 2)}</pre> */}
 
-      <main className={s.main}>
-        <UserPanel />
-        <TaskPanel />
+      <main className={`${s.main} ${folded ? s.folded : ''}`}>
+        {session.status === 'authenticated' && <UserPanel />}
+        {session.status === 'authenticated' && <TaskPanel />}
 
         {session.status === 'authenticated' && <ul className={` ${s.taskGroups} `}>
           {settingNewTaskGroup ? <input
@@ -154,7 +157,7 @@ const Home: NextPage = () => {
                 })
             }}
             onKeyDown={(e) => {
-              console.log("%c 😹: Home:NextPage -> e ", "font-size:16px;background-color:#815707;color:white;", e)
+              // console.log("%c 😹: Home:NextPage -> e ", "font-size:16px;background-color:#815707;color:white;", e)
 
               if (e.key === 'Enter') {
                 if (isValidText(newTaskGroupTitle))
@@ -195,10 +198,11 @@ const Home: NextPage = () => {
               onClick={() => {
                 setUpdateTaskGroupTitle(group.data.title)
                 setTaskGroupIndex(index)
+                setFolded(false)
               }}
               onDoubleClick={() => {
                 setEditingTaskTitle(true)
-                console.log(taskGroups[taskGroupIndex].id)
+                // console.log(taskGroups[taskGroupIndex].id)
               }}
             >
               {index === taskGroupIndex && editingTaskTitle ? <input
@@ -206,7 +210,7 @@ const Home: NextPage = () => {
                 onBlur={() => {
                   if (!isValidText(updateTaskGroupTitle)) return
                   f_updateTaskGroupTitle(user.id, taskGroups[taskGroupIndex].id, updateTaskGroupTitle).then(() => {
-                    console.log('updated')
+                    // console.log('updated')
 
                     getTaskGroups(user.id).then(res => {
                       setNewTaskGroupTitle(`Task group ${res.length + 1}`)
@@ -220,7 +224,6 @@ const Home: NextPage = () => {
                   if (e.key === 'Enter') {
                     if (!isValidText(updateTaskGroupTitle)) return
                     f_updateTaskGroupTitle(user.id, taskGroups[taskGroupIndex].id, updateTaskGroupTitle).then(() => {
-                      console.log('updated')
 
                       getTaskGroups(user.id).then(res => {
                         setNewTaskGroupTitle(`Task group ${res.length + 1}`)
@@ -239,8 +242,9 @@ const Home: NextPage = () => {
                 }}
               />
                 : <>
-                  <p>{group.data.title}</p>
-                  <AiFillDelete
+                  <p> {`${folded ? extractCapitals(group.data.title) : group.data.title}`}
+                  </p>
+                  {!folded && <AiFillDelete
                     onClick={(e) => {
                       e.stopPropagation()
                       // console.log({ index, taskGroupIndex })
@@ -257,31 +261,55 @@ const Home: NextPage = () => {
                         })
                       })
                     }}
-                  />
+                  />}
                 </>
               }
             </li>
           ))}
 
         </ul>}
-        {session.status === 'authenticated' ? <ul className={` ${s.tasks} `}>
+        {session.status === 'authenticated' ? <ul
+          onClick={() => {
+            setFolded(!folded)
+          }}
+          className={` ${s.tasks} `}>
           {!settingNewTaskGroup && tasks.map(task => (
             <li key={task.id}>
               {task.data.text}
             </li>
           ))}
-          <li
-            className={` ${s.newTask} `}
+          {tasks.length === 0 && <AddTasks />}
+        </ul> : <NotLogged />}
+        <Loader loading={session.status === 'loading'} />
+        {session.status === 'authenticated' && <div
+          className={` ${s.newTask} `}
 
-          >
-            <input
-              type='text'
-              placeholder={t("buttons.new_task")}
-              value={newTaskTitle}
-              onChange={e => {
-                setNewTaskTitle(e.target.value)
-              }}
-              onBlur={() => {
+        >
+          <input
+            type='text'
+            placeholder={t("buttons.new_task")}
+            value={newTaskTitle}
+            onChange={e => {
+              setNewTaskTitle(e.target.value)
+            }}
+            onBlur={() => {
+              if (isValidText(newTaskTitle))
+                addTask(
+                  user.id,
+                  taskGroups[taskGroupIndex].id,
+                  { text: newTaskTitle }
+                ).then(() => {
+                  getTasks(
+                    user.id,
+                    taskGroups[taskGroupIndex].id
+                  ).then(res => {
+                    setTasks(res)
+                    setNewTaskTitle('')
+                  })
+                })
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
                 if (isValidText(newTaskTitle))
                   addTask(
                     user.id,
@@ -296,30 +324,11 @@ const Home: NextPage = () => {
                       setNewTaskTitle('')
                     })
                   })
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  if (isValidText(newTaskTitle))
-                    addTask(
-                      user.id,
-                      taskGroups[taskGroupIndex].id,
-                      { text: newTaskTitle }
-                    ).then(() => {
-                      getTasks(
-                        user.id,
-                        taskGroups[taskGroupIndex].id
-                      ).then(res => {
-                        setTasks(res)
-                        setNewTaskTitle('')
-                      })
-                    })
-                }
-              }}
-            />
+              }
+            }}
+          />
 
-          </li>
-        </ul> : <NotLogged />}
-        <Loader loading={session.status === 'loading'} />
+        </div>}
       </main>
     </>
   )

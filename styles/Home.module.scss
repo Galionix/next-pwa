@@ -1,3 +1,5 @@
+@use './_m';
+
 .main {
 	display: grid;
 
@@ -5,15 +7,85 @@
 
 	grid-template-columns: [sidebar] 200px [main] 1fr;
 	grid-template-rows: [userpanel] 100px [main] 1fr [footer] 200px;
-.userPanel{
-	grid-area: userpanel / sidebar;
-}
+
+	.userPanel {
+		display: flex;
+		align-items: center;
+		justify-content: space-around;
+
+		grid-area: userpanel / sidebar;
+
+		img {
+			border-radius: 50%;
+		}
+
+		button {
+			color: rgba(0, 0, 0, 0.7);
+			background: snow;
+
+			@include m.btn;
+
+			&:hover {
+				color: snow;
+				background: var(--accent-bg);
+
+				// @include m.btn;
+			}
+		}
+
+	}
+
 	.taskPanel {
 		grid-area: userpanel / main;
 	}
 
 	.notLogged {
-		grid-area: main / main;
+		// display: grid;
+
+		display: flex;
+
+		// height: 100%;
+
+		flex-direction: column;
+
+		// display: block;
+		// grid-area:   1 / -1/ main / main ;
+
+		grid-column: 1/-1;
+		grid-row: main;
+
+		// justify-content: center;
+
+		place-self: center;
+
+		button {
+			margin-top: 50px;
+
+			@include m.btn;
+
+			// cursor: pointer;
+			// // margin: 0 auto;
+			// padding:5px;
+			// border: 1px solid #ccc;
+			// border-radius: 2px;
+			// background: var(--accent-bg);
+			// color: snow;
+			// &:hover {
+			// // &.control{
+			// // 	color:white;
+			// // }
+			// // svg {
+			// // 	opacity: 1;
+			// // }
+			// position: relative;
+			// &::after{
+			// content: "";
+			// position: absolute;
+			// inset: 0;
+			// background: rgba(180, 180, 180, 0.2);
+			// }
+			// }
+		}
 	}
 
 	.taskGroups {
@@ -21,13 +93,18 @@
 
 		li {
 			display: flex;
-			justify-content: space-between;
 			align-items: center;
+			justify-content: space-between;
+
+			margin: 0px 10px;
+			padding: 5px;
 
 			cursor: pointer;
 
+			border-radius: 2px;
+
 			&.selected {
-				background: #ccc;
+				background: rgba(180, 180, 180, 0.3);
 			}
 
 			svg {
@@ -36,14 +113,39 @@
 				opacity: 0;
 			}
 
-			&.control,&.selected{
-						svg {
+			&.control,
+			&.selected {
+				svg {
 					opacity: 1;
 				}
 			}
+
+			&.control {
+				margin-bottom: 20px;
+
+				color: snow;
+				background: var(--accent-bg);
+			}
+
 			&:hover {
+				position: relative;
+
+				// &.control{
+				// color:white;
+				// }
+
 				svg {
 					opacity: 1;
+				}
+
+				&::after {
+					position: absolute;
+
+					content: '';
+
+					background: rgba(180, 180, 180, 0.2);
+
+					inset: 0;
 				}
 			}
 		}
@@ -52,53 +154,69 @@
 	.tasks {
 		grid-area: main / main;
 	}
-	.loader{
-		pointer-events: none;
-		z-index: 100;
-		width: 100%;
-		height: 100%;
-		grid-row: 1/-1;
-		grid-column: 1/-1;
-		background: rgba(255, 255, 255, 0.418);
-		display: grid;
 
-	.base,.orbit{
-		width: 100%;
-		grid-row: 1/-1;
-		grid-column: 1/-1;
-		place-self:center;
-	}
-	.base{
-		width: 290px;
-		height: 290px;
+	.newTask {
+		grid-area: footer / main;
 
-		
-
-		background: linear-gradient(
-			300.11deg, 
-		#4154FF 15.78%, 
-		rgba(255, 0, 0, 0.219) 87.39%
-		);
-		background-size: 1000% 1000%;
-		background-position: bottom right;
-		border-radius: 50%;
-		animation: move 3s linear infinite alternate;
-	}
-	@keyframes move {
-		to{		
-			background-position: top left;
-			
-			
-			
-			
-			
-		// 	background: linear-gradient(
-		// 	0deg, 
-		// #4154FF 15.78%, 
-		// rgba(255, 0, 0, 0.219) 87.39%
-		// );
-
+		input {
+			width: 100%;
 		}
 	}
+
+	.loader {
+		z-index: 100;
+
+		display: grid;
+
+		width: 100%;
+		height: 100%;
+
+		pointer-events: none;
+
+		background: rgba(255, 255, 255, 0.418);
+
+		grid-row: 1/-1;
+		grid-column: 1/-1;
+
+		.base,
+		.orbit {
+			width: 100%;
+
+			grid-row: 1/-1;
+			grid-column: 1/-1;
+			place-self: center;
+		}
+
+		.base {
+			width: 290px;
+			height: 290px;
+
+			animation: move 3s linear infinite alternate;
+
+			border-radius: 50%;
+			background: linear-gradient(
+				300.11deg,
+				#4154ff 15.78%,
+				rgba(255, 0, 0, 0.219) 87.39%
+			);
+			background-position: bottom right;
+			background-size: 1000% 1000%;
+		}
+
+		@keyframes move {
+			to {
+				background-position: top left;
+
+				// background: linear-gradient(
+				// 0deg,
+				// #4154FF 15.78%,
+				// rgba(255, 0, 0, 0.219) 87.39%
+				// );
+			}
+		}
 	}
+}
+
+.main.folded{
+@include m.folded;
 }

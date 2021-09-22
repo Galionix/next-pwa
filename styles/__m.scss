@@ -1,0 +1,53 @@
+@mixin btn {
+	cursor: pointer;
+	padding: 5px;
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	background: var(--accent-bg);
+	color: snow;
+
+	&:hover {
+		position: relative;
+		svg {
+			opacity: 1;
+		}
+
+		&::after {
+			position: absolute;
+
+			content: '';
+
+			background: rgba(180, 180, 180, 0.2);
+
+			inset: 0;
+		}
+	}
+}
+
+@mixin folded {
+		grid-template-columns: [sidebar] 2fr [main] 10fr;
+		 .userPanel{
+ 
+			 button{
+				 display: none;
+				}
+			}
+			.control{
+				height: 35px;
+				justify-content: center;
+				p{
+					display: none;
+				}
+				svg{
+					width: 100%;
+					height: 100%;
+				}
+			}
+			.taskGroups{
+				li{
+					svg{
+					}
+				}
+			}
+	 
+}
