@@ -5,7 +5,9 @@
 
 	grid-template-columns: [sidebar] 200px [main] 1fr;
 	grid-template-rows: [userpanel] 100px [main] 1fr [footer] 200px;
-
+.userPanel{
+	grid-area: userpanel / sidebar;
+}
 	.taskPanel {
 		grid-area: userpanel / main;
 	}
@@ -49,5 +51,54 @@
 
 	.tasks {
 		grid-area: main / main;
+	}
+	.loader{
+		pointer-events: none;
+		z-index: 100;
+		width: 100%;
+		height: 100%;
+		grid-row: 1/-1;
+		grid-column: 1/-1;
+		background: rgba(136, 136, 136, 0.418);
+		display: grid;
+
+	.base,.orbit{
+		width: 100%;
+		grid-row: 1/-1;
+		grid-column: 1/-1;
+		place-self:center;
+	}
+	.base{
+		width: 290px;
+		height: 290px;
+
+		
+
+		background: linear-gradient(
+			300.11deg, 
+		#4154FF 15.78%, 
+		rgba(255, 0, 0, 0.219) 87.39%
+		);
+		background-size: 1000% 1000%;
+		background-position: bottom right;
+		border-radius: 50%;
+		animation: move 3s linear infinite alternate;
+	}
+	@keyframes move {
+		to{		
+			background-position: top left;
+			
+			
+			
+			
+			
+		// 	background: linear-gradient(
+		// 	0deg, 
+		// #4154FF 15.78%, 
+		// rgba(255, 0, 0, 0.219) 87.39%
+		// );
+
+		}
+	}
 	}
 }
