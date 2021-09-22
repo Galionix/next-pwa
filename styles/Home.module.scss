@@ -140,7 +140,7 @@
 
 				&::after {
 					position: absolute;
-
+z-index: -1;
 					content: '';
 
 					background: rgba(180, 180, 180, 0.2);

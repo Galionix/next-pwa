@@ -270,7 +270,11 @@ const Home: NextPage = () => {
         </ul>}
         {session.status === 'authenticated' ? <ul
           onClick={() => {
-            setFolded(!folded)
+            // console.log("%c 🏍️: window.screen.width ",
+            //   "font-size:16px;background-color:#90af2e;color:white;",
+            //   window.innerWidth)
+            if (window.innerWidth < 800)
+              setFolded(true)
           }}
           className={` ${s.tasks} `}>
           {!settingNewTaskGroup && tasks.map(task => (
