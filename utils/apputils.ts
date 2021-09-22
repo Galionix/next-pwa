@@ -1,6 +1,8 @@
 import {
 	collection,
 	getDocs,
+	orderBy,
+	query,
 } from '@firebase/firestore'
 import { db, user } from './fire'
 
@@ -31,8 +33,22 @@ export const getTaskGroups = async (
 
 	const { id: userid } = await user(email)
 
+	const taskGroupsRef = collection(
+		db,
+		`users/${userid}/taskGroups`
+	)
+	const q = query(
+		taskGroupsRef,
+		orderBy('timestamp', 'asc')
+	)
 	const querySnapshot = await getDocs(
-		collection(db, `users/${userid}/taskGroups`)
+		q
+		// collection(db, `users/${userid}/taskGroups`)
+	)
+	console.log(
+		'%c 🐥: querySnapshot ',
+		'font-size:16px;background-color:#426695;color:white;',
+		querySnapshot.size
 	)
 	const res: { id: string; data: any }[] = []
 	querySnapshot.forEach(doc => {
@@ -55,12 +71,20 @@ export const getTasks = async (
 	)
 
 	const { id: userid } = await user(email)
-
+	const tasksRef = collection(
+		db,
+		`users/${userid}/taskGroups/${taskGroup}/tasks`
+	)
+	const q = query(
+		tasksRef,
+		orderBy('timestamp', 'asc')
+	)
 	const querySnapshot = await getDocs(
-		collection(
-			db,
-			`users/${userid}/taskGroups/${taskGroup}/tasks`
-		)
+		q
+		// collection(
+		// 	db,
+		// 	`users/${userid}/taskGroups/${taskGroup}/tasks`
+		// )
 	)
 	const res: { id: string; data: any }[] = []
 	querySnapshot.forEach(doc => {
@@ -70,4 +94,10 @@ export const getTasks = async (
 	})
 
 	return res
+}
+
+export const isValidText = (text: string) => {
+	if (text.trim() === '') return false
+	if (text.trim().length < 3) return false
+	return true
 }

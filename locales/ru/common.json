@@ -3,7 +3,11 @@
 	"buttons": {
 		"auth": "Войти",
 		"sign_out": "Выйти",
-		"add_task_group": "Добавить группу"
+		"add_task_group": "Добавить группу",
+		"new_task": "Добавить задачу"
 	},
-	"messages": { "not_logged": "Войти с Google" }
+	"messages": {
+		"not_logged": "Войти с Google",
+		"task_group_title_placeholder": "Введите название..."
+	}
 }

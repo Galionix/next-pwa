@@ -1,23 +1,52 @@
 .main {
 	display: grid;
+
+	height: 100%;
+
 	grid-template-columns: [sidebar] 200px [main] 1fr;
 	grid-template-rows: [userpanel] 100px [main] 1fr [footer] 200px;
-	height: 100%;
-    .taskPanel{
-        grid-area: userpanel / main;
-    }
-    .notLogged{
-        grid-area: main / main;
-    }
+
+	.taskPanel {
+		grid-area: userpanel / main;
+	}
+
+	.notLogged {
+		grid-area: main / main;
+	}
+
 	.taskGroups {
 		grid-area: main / sidebar;
+
 		li {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+
 			cursor: pointer;
+
 			&.selected {
 				background: #ccc;
 			}
+
+			svg {
+				transition: opacity 0.5 ease;
+
+				opacity: 0;
+			}
+
+			&.control{
+						svg {
+					opacity: 1;
+				}
+			}
+			&:hover {
+				svg {
+					opacity: 1;
+				}
+			}
 		}
 	}
+
 	.tasks {
 		grid-area: main / main;
 	}

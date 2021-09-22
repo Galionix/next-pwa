@@ -3,13 +3,17 @@ import type { NextPage } from 'next'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import s from '../styles/Home.module.scss'
 import { AuthButton } from './../components/AuthButton'
 import { useUserStore } from './../utils/store'
+import { AiFillDelete } from "react-icons/ai";
+import { IoAddCircleOutline } from "react-icons/io5";
+
 import {
   app,
   newTaskGroup,
+  f_updateTaskGroupTitle,
 } from './../utils/fire'
 import {
   doc,
@@ -32,6 +36,8 @@ import useTranslation from 'next-translate/useTranslation'
 import { UserPanel } from './../components/UserPanel'
 import { NotLogged } from './../components/NotLogged';
 import { TaskPanel } from './../components/TaskPanel';
+import { deleteTaskGroup } from './../utils/fire';
+import { isValidText } from './../utils/apputils';
 
 // const db = getFirestore(app)
 
@@ -39,6 +45,13 @@ const Home: NextPage = () => {
   const router = useRouter()
   const { t } = useTranslation('common')
   const [email, setEmail] = useState('')
+  const [newTaskTitle, setNewTaskTitle] = useState('')
+  const [editingTaskTitle, setEditingTaskTitle] = useState(false)
+  const [settingNewTaskGroup, setSettingNewTaskGroup] = useState(false)
+  const [newTaskGroupTitle, setNewTaskGroupTitle] = useState(`Task group 1`)
+  const [updateTaskGroupTitle, setUpdateTaskGroupTitle] = useState('')
+  const [newTaskText, setNewTaskText] = useState('')
+  const [settingNewTask, setSettingNewTask] = useState(false)
 	// const [selectedTaskGroup, setSelectedTaskGroup] = useState(0)
   const [taskGroups, setTaskGroups] = useState<
     { id: string; data: any }[]
@@ -64,25 +77,41 @@ const Home: NextPage = () => {
       requestNotificationPermission()
       getTaskGroups(email).then(res => {
         setTaskGroups(res)
-
+        setNewTaskGroupTitle(`Task group ${res.length + 1}`)
         if (res.length > 0)
+        {
+          // console.log("%c 👜: Home:NextPage -> res ",
+          //   "font-size:16px;background-color:#8dd53b;color:black;",
+          //   taskGroupIndex)
+
           getTasks(
             email,
             res[taskGroupIndex].id
-          ).then(res => setTasks(res))
+          ).then(res => {
+
+            setTasks(res)
+          })
+        }
       })
 
       // getTasks(email, 'GZL5Sph9QdnpfM853hMb').then(res => setTasks(res))
       // setTaskGroups()
     }
   }, [session])
+
   useEffect(() => {
     if (taskGroups.length > 0)
+    {
       getTasks(
         email,
         taskGroups[taskGroupIndex].id
-      ).then(res => setTasks(res))
+      ).then(res => {
+
+        setTasks(res)
+      })
+    }
   }, [taskGroupIndex])
+
 
   return (
     <>
@@ -119,6 +148,9 @@ const Home: NextPage = () => {
         <ul className={` ${s.taskGroups} `}>
           {taskGroups.map((group, index) => (
             <li
+              // ref={ref}
+
+              // contentEditable={index === taskGroupIndex && editingTaskTitle}
               key={group.id}
               className={
                 taskGroupIndex === index
@@ -126,14 +158,137 @@ const Home: NextPage = () => {
                   : ''
               }
               onClick={() => {
-                console.log(index)
+                setUpdateTaskGroupTitle(group.data.title)
                 setTaskGroupIndex(index)
               }}
+              onDoubleClick={() => {
+                setEditingTaskTitle(true)
+                console.log(taskGroups[taskGroupIndex].id)
+                // updateTaskTitle(email, taskGroups[taskGroupIndex].id, '').then(() => { console.log('updated') })
+              }}
             >
-              {group.data.title}
+              {index === taskGroupIndex && editingTaskTitle ? <input
+                autoFocus
+                onBlur={() => {
+                  if (isValidText(updateTaskGroupTitle)) return
+                  f_updateTaskGroupTitle(email, taskGroups[taskGroupIndex].id, updateTaskGroupTitle).then(() => {
+                    console.log('updated')
+
+                    getTaskGroups(email).then(res => {
+                      setNewTaskGroupTitle(`Task group ${res.length + 1}`)
+                      setTaskGroups(res)
+                      setEditingTaskTitle(false)
+                    })
+                  })
+
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    if (isValidText(updateTaskGroupTitle)) return
+                    f_updateTaskGroupTitle(email, taskGroups[taskGroupIndex].id, updateTaskGroupTitle).then(() => {
+                      console.log('updated')
+
+                      getTaskGroups(email).then(res => {
+                        setNewTaskGroupTitle(`Task group ${res.length + 1}`)
+                        setTaskGroups(res)
+                        setEditingTaskTitle(false)
+                      })
+                    })
+
+                  }
+                }}
+                type='text'
+                placeholder={t("messages.task_group_title_placeholder")}
+                value={updateTaskGroupTitle}
+                onChange={e => {
+                  setUpdateTaskGroupTitle(e.target.value)
+                }}
+              />
+                : <>
+                  <p>{group.data.title}</p>
+                  <AiFillDelete
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      console.log({ index, taskGroupIndex })
+                      deleteTaskGroup(email, taskGroups[index].id).then(() => {
+                        // if (index === taskGroupIndex) {
+                        if (index <= taskGroupIndex) {
+                          if (taskGroupIndex > 0)
+                            setTaskGroupIndex(taskGroupIndex - 1)
+                          else setTaskGroupIndex(0)
+
+                        }
+                        // }
+                        // else {
+                        //   if (index > 0)
+                        //     setTaskGroupIndex(taskGroupIndex - 1)
+                        //   else setTaskGroupIndex(0)
+                        // }
+                        getTaskGroups(email).then(res => {
+                          setNewTaskGroupTitle(`Task group ${res.length + 1}`)
+                          setTaskGroups(res)
+                        })
+                      })
+                    }}
+                  />
+                </>
+              }
             </li>
           ))}
-          <li>{t("buttons.add_task_group")}</li>
+          {settingNewTaskGroup ? <input
+            // ref={new_task_group_ref}
+            autoFocus
+            type="text"
+            value={newTaskGroupTitle}
+            // on
+            onChange={(e) => setNewTaskGroupTitle(e.target.value)}
+            onBlur={(e) => {
+              if (isValidText(newTaskGroupTitle))
+                newTaskGroup(
+                  email,
+                  newTaskGroupTitle
+                ).then(() => {
+                  getTaskGroups(email).then(res => {
+                    setTaskGroups(res)
+                    setNewTaskGroupTitle(`Task group ${taskGroups.length + 1}`)
+                    setSettingNewTaskGroup(false)
+                    // setTasks(res)
+                    setTaskGroupIndex(res.length - 1)
+                  }
+                  )
+                })
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                // console.log("%c 👦: Home:NextPage -> e ", "font-size:16px;background-color:#bc6d2d;color:white;", e)
+                if (isValidText(newTaskGroupTitle))
+                  newTaskGroup(
+                    email,
+                    newTaskGroupTitle
+                  ).then(() => {
+                    getTaskGroups(email).then(res => {
+                      setTaskGroups(res)
+                      setNewTaskGroupTitle(`Task group ${taskGroups.length + 1}`)
+                      setSettingNewTaskGroup(false)
+                      // setTasks(res)
+                      setTaskGroupIndex(res.length - 1)
+                    }
+                    )
+                  })
+
+              }
+            }}
+          /> : <li
+            className={` ${s.control} `}
+
+            onClick={() => {
+              setSettingNewTaskGroup(true)
+              // ref.current.setf
+            }}
+          ><>
+              <p>{t("buttons.add_task_group")}</p>
+              <IoAddCircleOutline />
+            </></li>}
         </ul>
         {/* <button
           onClick={() =>
@@ -152,11 +307,60 @@ const Home: NextPage = () => {
           addTask
         </button> */}
         {session.status === 'authenticated' ? <ul className={` ${s.tasks} `}>
-          {tasks.map(task => (
+          {!settingNewTaskGroup && tasks.map(task => (
             <li key={task.id}>
               {task.data.text}
             </li>
           ))}
+          <li
+            className={` ${s.newTask} `}
+
+          >
+            <input
+              // ref={new_task_ref}
+              type='text'
+              placeholder={t("buttons.new_task")}
+              value={newTaskTitle}
+              onChange={e => {
+                setNewTaskTitle(e.target.value)
+              }}
+              onBlur={() => {
+                if (isValidText(newTaskTitle))
+                  addTask(
+                    email,
+                    taskGroups[taskGroupIndex].id,
+                    { text: newTaskTitle }
+                  ).then(() => {
+                    getTasks(
+                      email,
+                      taskGroups[taskGroupIndex].id
+                    ).then(res => {
+                      setTasks(res)
+                      setNewTaskTitle('')
+                    })
+                  })
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  if (isValidText(newTaskTitle))
+                    addTask(
+                      email,
+                      taskGroups[taskGroupIndex].id,
+                      { text: newTaskTitle }
+                    ).then(() => {
+                      getTasks(
+                        email,
+                        taskGroups[taskGroupIndex].id
+                      ).then(res => {
+                        setTasks(res)
+                        setNewTaskTitle('')
+                      })
+                    })
+                }
+              }}
+            />
+
+          </li>
         </ul> : <NotLogged />}
 
       </main>

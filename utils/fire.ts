@@ -5,12 +5,15 @@ import { initializeApp } from 'firebase/app'
 import {
 	doc,
 	addDoc,
+	deleteDoc,
 	getFirestore,
 	collection,
 	getDocs,
 	getDoc,
+	updateDoc,
 	query,
 	where,
+	serverTimestamp,
 } from 'firebase/firestore'
 // import {
 // 	getDatabase,
@@ -110,6 +113,7 @@ export const newTaskGroup = async (
 		),
 		{
 			title: title || 'new taskGroup',
+			timestamp: serverTimestamp(),
 		}
 	)
 	console.log(
@@ -132,10 +136,40 @@ export const addTask = async (
 		),
 		{
 			...task,
+			timestamp: serverTimestamp(),
+
+			// app.FieldValue.serverTimestamp(),
 		}
 	)
 	console.log(
 		'addTask written with ID: ',
 		docRef.id
+	)
+}
+export const f_updateTaskGroupTitle = async (
+	email: string,
+	taskId: string,
+	title: string
+) => {
+	const { id: userid } = await user(email)
+	return await updateDoc(
+		doc(
+			db,
+			`users/${userid}/taskGroups/${taskId}`
+		),
+		{ title }
+	)
+}
+
+export const deleteTaskGroup = async (
+	email: string,
+	taskId: string
+) => {
+	const { id: userid } = await user(email)
+	return await deleteDoc(
+		doc(
+			db,
+			`users/${userid}/taskGroups/${taskId}`
+		)
 	)
 }
