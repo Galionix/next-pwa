@@ -47,6 +47,7 @@ const Home: NextPage = () => {
   const router = useRouter()
   const { t } = useTranslation('common')
   const [email, setEmail] = useState('')
+  const [userId, setUserId] = useState('')
   const [newTaskTitle, setNewTaskTitle] = useState('')
   const [editingTaskTitle, setEditingTaskTitle] = useState(false)
   const [settingNewTaskGroup, setSettingNewTaskGroup] = useState(false)
@@ -61,7 +62,7 @@ const Home: NextPage = () => {
   const [tasks, setTasks] = useState<
     { id: string; data: any }[]
   >([])
-  const { setTaskGroupIndex, taskGroupIndex, setUser } =
+  const { setTaskGroupIndex, taskGroupIndex, setUser, user } =
     useUserStore(state => state)
   const session = useSession()
 
@@ -73,28 +74,32 @@ const Home: NextPage = () => {
 			//@ts-ignore
       const { name, email, picture } =
         session.data?.token
-      setUser({ name, email, picture })
-      setEmail(email)
-      initUser(name, email, picture)
-      requestNotificationPermission()
-      getTaskGroups(email).then(res => {
-        setTaskGroups(res)
-        setNewTaskGroupTitle(`Task group ${res.length + 1}`)
-        if (res.length > 0)
-        {
-          // console.log("%c 👜: Home:NextPage -> res ",
-          //   "font-size:16px;background-color:#8dd53b;color:black;",
-          //   taskGroupIndex)
 
-          getTasks(
-            email,
-            res[taskGroupIndex].id
-          ).then(res => {
+      initUser(name, email, picture).then((id) => {
+        setUser({ name, email, picture, id })
+        setEmail(email)
+        console.log("%c 🇸🇮: Home:NextPage -> id ", "font-size:16px;background-color:#3b9399;color:white;", id)
+        // setUser(id)
+        requestNotificationPermission()
+        getTaskGroups(id).then(res => {
+          setTaskGroups(res)
+          setNewTaskGroupTitle(`Task group ${res.length + 1}`)
+          if (res.length > 0) {
+            // console.log("%c 👜: Home:NextPage -> res ",
+            //   "font-size:16px;background-color:#8dd53b;color:black;",
+            //   taskGroupIndex)
 
-            setTasks(res)
-          })
-        }
+            getTasks(
+              id,
+              res[taskGroupIndex].id
+            ).then(res => {
+
+              setTasks(res)
+            })
+          }
+        })
       })
+
 
     }
   }, [session])
@@ -103,7 +108,7 @@ const Home: NextPage = () => {
     if (taskGroups.length > 0)
     {
       getTasks(
-        email,
+        user.id,
         taskGroups[taskGroupIndex].id
       ).then(res => {
 
@@ -120,11 +125,62 @@ const Home: NextPage = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
+      {/* <pre>{JSON.stringify(user, null, 2)}</pre> */}
+
       <main className={s.main}>
         <UserPanel />
         <TaskPanel />
 
         {session.status === 'authenticated' && <ul className={` ${s.taskGroups} `}>
+          {settingNewTaskGroup ? <input
+            autoFocus
+            type="text"
+            value={newTaskGroupTitle}
+            onChange={(e) => setNewTaskGroupTitle(e.target.value)}
+            onBlur={(e) => {
+              if (isValidText(newTaskGroupTitle))
+                newTaskGroup(
+                  user.id,
+                  newTaskGroupTitle
+                ).then(() => {
+                  getTaskGroups(user.id).then(res => {
+                    setTaskGroups(res)
+                    setNewTaskGroupTitle(`Task group ${taskGroups.length + 1}`)
+                    setSettingNewTaskGroup(false)
+                    setTaskGroupIndex(0)
+                  }
+                  )
+                })
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                if (isValidText(newTaskGroupTitle))
+                  newTaskGroup(
+                    user.id,
+                    newTaskGroupTitle
+                  ).then(() => {
+                    getTaskGroups(user.id).then(res => {
+                      setTaskGroups(res)
+                      setNewTaskGroupTitle(`Task group ${taskGroups.length + 1}`)
+                      setSettingNewTaskGroup(false)
+                      setTaskGroupIndex(0)
+                    }
+                    )
+                  })
+
+              }
+            }}
+          /> : <li
+            className={` ${s.control} `}
+
+            onClick={() => {
+              setSettingNewTaskGroup(true)
+            }}
+          ><>
+              <p>{t("buttons.add_task_group")}</p>
+              <IoAddCircleOutline />
+            </></li>}
+
           {taskGroups.map((group, index) => (
             <li
               key={group.id}
@@ -146,10 +202,10 @@ const Home: NextPage = () => {
                 autoFocus
                 onBlur={() => {
                   if (isValidText(updateTaskGroupTitle)) return
-                  f_updateTaskGroupTitle(email, taskGroups[taskGroupIndex].id, updateTaskGroupTitle).then(() => {
+                  f_updateTaskGroupTitle(user.id, taskGroups[taskGroupIndex].id, updateTaskGroupTitle).then(() => {
                     console.log('updated')
 
-                    getTaskGroups(email).then(res => {
+                    getTaskGroups(user.id).then(res => {
                       setNewTaskGroupTitle(`Task group ${res.length + 1}`)
                       setTaskGroups(res)
                       setEditingTaskTitle(false)
@@ -160,10 +216,10 @@ const Home: NextPage = () => {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     if (isValidText(updateTaskGroupTitle)) return
-                    f_updateTaskGroupTitle(email, taskGroups[taskGroupIndex].id, updateTaskGroupTitle).then(() => {
+                    f_updateTaskGroupTitle(user.id, taskGroups[taskGroupIndex].id, updateTaskGroupTitle).then(() => {
                       console.log('updated')
 
-                      getTaskGroups(email).then(res => {
+                      getTaskGroups(user.id).then(res => {
                         setNewTaskGroupTitle(`Task group ${res.length + 1}`)
                         setTaskGroups(res)
                         setEditingTaskTitle(false)
@@ -184,15 +240,15 @@ const Home: NextPage = () => {
                   <AiFillDelete
                     onClick={(e) => {
                       e.stopPropagation()
-                      console.log({ index, taskGroupIndex })
-                      deleteTaskGroup(email, taskGroups[index].id).then(() => {
+                      // console.log({ index, taskGroupIndex })
+                      deleteTaskGroup(user.id, taskGroups[index].id).then(() => {
                         if (index <= taskGroupIndex) {
                           if (taskGroupIndex > 0)
                             setTaskGroupIndex(taskGroupIndex - 1)
                           else setTaskGroupIndex(0)
 
                         }
-                        getTaskGroups(email).then(res => {
+                        getTaskGroups(user.id).then(res => {
                           setNewTaskGroupTitle(`Task group ${res.length + 1}`)
                           setTaskGroups(res)
                         })
@@ -203,54 +259,7 @@ const Home: NextPage = () => {
               }
             </li>
           ))}
-          {settingNewTaskGroup ? <input
-            autoFocus
-            type="text"
-            value={newTaskGroupTitle}
-            onChange={(e) => setNewTaskGroupTitle(e.target.value)}
-            onBlur={(e) => {
-              if (isValidText(newTaskGroupTitle))
-                newTaskGroup(
-                  email,
-                  newTaskGroupTitle
-                ).then(() => {
-                  getTaskGroups(email).then(res => {
-                    setTaskGroups(res)
-                    setNewTaskGroupTitle(`Task group ${taskGroups.length + 1}`)
-                    setSettingNewTaskGroup(false)
-                    setTaskGroupIndex(res.length - 1)
-                  }
-                  )
-                })
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                if (isValidText(newTaskGroupTitle))
-                  newTaskGroup(
-                    email,
-                    newTaskGroupTitle
-                  ).then(() => {
-                    getTaskGroups(email).then(res => {
-                      setTaskGroups(res)
-                      setNewTaskGroupTitle(`Task group ${taskGroups.length + 1}`)
-                      setSettingNewTaskGroup(false)
-                      setTaskGroupIndex(res.length - 1)
-                    }
-                    )
-                  })
 
-              }
-            }}
-          /> : <li
-            className={` ${s.control} `}
-
-            onClick={() => {
-              setSettingNewTaskGroup(true)
-            }}
-          ><>
-              <p>{t("buttons.add_task_group")}</p>
-              <IoAddCircleOutline />
-            </></li>}
         </ul>}
         {session.status === 'authenticated' ? <ul className={` ${s.tasks} `}>
           {!settingNewTaskGroup && tasks.map(task => (
@@ -272,12 +281,12 @@ const Home: NextPage = () => {
               onBlur={() => {
                 if (isValidText(newTaskTitle))
                   addTask(
-                    email,
+                    user.id,
                     taskGroups[taskGroupIndex].id,
                     { text: newTaskTitle }
                   ).then(() => {
                     getTasks(
-                      email,
+                      user.id,
                       taskGroups[taskGroupIndex].id
                     ).then(res => {
                       setTasks(res)
@@ -289,12 +298,12 @@ const Home: NextPage = () => {
                 if (e.key === 'Enter') {
                   if (isValidText(newTaskTitle))
                     addTask(
-                      email,
+                      user.id,
                       taskGroups[taskGroupIndex].id,
                       { text: newTaskTitle }
                     ).then(() => {
                       getTasks(
-                        email,
+                        user.id,
                         taskGroups[taskGroupIndex].id
                       ).then(res => {
                         setTasks(res)

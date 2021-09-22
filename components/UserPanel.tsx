@@ -18,7 +18,7 @@ export const UserPanel = () => {
             <Image
                 width={50}
                 height={50}
-                src={user.picture} />
+                src={user?.picture || '/image/user.png'} />
             {
                 user.name &&
                 <AuthButton />

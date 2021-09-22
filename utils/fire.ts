@@ -71,8 +71,15 @@ const isUserNew = async (email: string) => {
 		where('email', '==', email)
 	)
 	const querySnapshot = await getDocs(q)
+	// console.log(
+	// 	'%c ⛈️: isUserNew -> querySnapshot ',
+	// 	'font-size:16px;background-color:#e869e9;color:white;',
+	// 	querySnapshot.docs[0].id
+	// )
 
-	return querySnapshot.empty
+	return querySnapshot
+	// querySnapshot.empty ||
+	// querySnapshot.docs[0].id
 }
 
 export const initUser = async (
@@ -80,37 +87,36 @@ export const initUser = async (
 	email: string,
 	imageUrl: string
 ) => {
-	try {
-		if (await isUserNew(email)) {
-			const docRef = await addDoc(
-				collection(db, 'users'),
-				{
-					name,
-					email,
-					imageUrl,
-				}
-			)
-			console.log(
-				'Document written with ID: ',
-				docRef.id
-			)
-		} else console.log('already registered')
-	} catch (e) {
-		console.error('Error adding document: ', e)
-	}
+	// try {
+	const querySnapshot = await isUserNew(email)
+	if (querySnapshot.empty) {
+		const docRef = await addDoc(
+			collection(db, 'users'),
+			{
+				name,
+				email,
+				imageUrl,
+			}
+		)
+		console.log(
+			'Document written with ID: ',
+			docRef.id
+		)
+		return docRef.id
+	} else return querySnapshot.docs[0].id
+	// } catch (e) {
+	// 	console.error('Error adding document: ', e)
+	// }
 }
 // initUser()
 
 export const newTaskGroup = async (
-	email: string,
+	userid: string,
 	title?: string
 ) => {
-	const userdoc = await user(email)
+	// const userdoc = await user(email)
 	const docRef = await addDoc(
-		collection(
-			db,
-			`users/${userdoc.id}/taskGroups`
-		),
+		collection(db, `users/${userid}/taskGroups`),
 		{
 			title: title || 'new taskGroup',
 			timestamp: serverTimestamp(),
@@ -124,11 +130,11 @@ export const newTaskGroup = async (
 }
 
 export const addTask = async (
-	email: string,
+	userid: string,
 	taskGroup: string,
 	task: { text: string }
 ) => {
-	const { id: userid } = await user(email)
+	// const { id: userid } = await user(email)
 	const docRef = await addDoc(
 		collection(
 			db,
@@ -147,11 +153,11 @@ export const addTask = async (
 	)
 }
 export const f_updateTaskGroupTitle = async (
-	email: string,
+	userid: string,
 	taskId: string,
 	title: string
 ) => {
-	const { id: userid } = await user(email)
+	// const { id: userid } = await user(email)
 	return await updateDoc(
 		doc(
 			db,
@@ -162,10 +168,10 @@ export const f_updateTaskGroupTitle = async (
 }
 
 export const deleteTaskGroup = async (
-	email: string,
+	userid: string,
 	taskId: string
 ) => {
-	const { id: userid } = await user(email)
+	// const { id: userid } = await user(email)
 	return await deleteDoc(
 		doc(
 			db,

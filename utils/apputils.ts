@@ -23,15 +23,15 @@ export const notification = async (
 }
 
 export const getTaskGroups = async (
-	email: string
+	userid: string
 ) => {
-	console.log(
-		'%c 🧜‍♂️: getTaskGroups ',
-		'font-size:16px;background-color:#409416;color:white;',
-		'getTaskGroups'
-	)
+	// console.log(
+	// 	'%c 🧜‍♂️: getTaskGroups ',
+	// 	'font-size:16px;background-color:#409416;color:white;',
+	// 	'getTaskGroups'
+	// )
 
-	const { id: userid } = await user(email)
+	// const { id: userid } = await user(email)
 
 	const taskGroupsRef = collection(
 		db,
@@ -39,21 +39,21 @@ export const getTaskGroups = async (
 	)
 	const q = query(
 		taskGroupsRef,
-		orderBy('timestamp', 'asc')
+		orderBy('timestamp', 'desc')
 	)
 	const querySnapshot = await getDocs(
 		q
 		// collection(db, `users/${userid}/taskGroups`)
 	)
-	console.log(
-		'%c 🐥: querySnapshot ',
-		'font-size:16px;background-color:#426695;color:white;',
-		querySnapshot.size
-	)
+	// console.log(
+	// 	'%c 🐥: querySnapshot ',
+	// 	'font-size:16px;background-color:#426695;color:white;',
+	// 	querySnapshot.size
+	// )
 	const res: { id: string; data: any }[] = []
 	querySnapshot.forEach(doc => {
 		// doc.data() is never undefined for query doc snapshots
-		console.log(doc.id, ' => ', doc.data())
+		// console.log(doc.id, ' => ', doc.data())
 		res.push({ id: doc.id, data: doc.data() })
 	})
 
@@ -61,16 +61,16 @@ export const getTaskGroups = async (
 }
 
 export const getTasks = async (
-	email: string,
+	userid: string,
 	taskGroup: string
 ) => {
-	console.log(
-		'%c 🇹🇱: getTasks ',
-		'font-size:16px;background-color:#2e6575;color:white;',
-		'getTasks'
-	)
+	// console.log(
+	// 	'%c 🇹🇱: getTasks ',
+	// 	'font-size:16px;background-color:#2e6575;color:white;',
+	// 	'getTasks'
+	// )
 
-	const { id: userid } = await user(email)
+	// const { id: userid } = await user(email)
 	const tasksRef = collection(
 		db,
 		`users/${userid}/taskGroups/${taskGroup}/tasks`
@@ -89,7 +89,7 @@ export const getTasks = async (
 	const res: { id: string; data: any }[] = []
 	querySnapshot.forEach(doc => {
 		// doc.data() is never undefined for query doc snapshots
-		console.log(doc.id, ' => ', doc.data())
+		// console.log(doc.id, ' => ', doc.data())
 		res.push({ id: doc.id, data: doc.data() })
 	})
 
