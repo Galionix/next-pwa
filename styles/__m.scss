@@ -23,7 +23,18 @@
 		}
 	}
 }
+@mixin interactive {
+	user-select: none;
+	cursor: pointer;
+color: rgba(0, 0, 0, 0.7);
+&:hover{
+	color: rgb(0, 0, 0);
 
+}
+&:active{
+	color:rgba(0, 0, 255, 0.39);
+}
+}
 @mixin folded {
 		grid-template-columns: [sidebar] 2fr [main] 10fr;
 		 .userPanel{
@@ -51,6 +62,9 @@
 						white-space: nowrap;
 					}
 				}
+			}
+			.settings p {
+				display: none;
 			}
 	 
 }

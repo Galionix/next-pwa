@@ -39,6 +39,7 @@ import { addTask } from './../utils/fire'
 import { useRouter } from 'next/dist/client/router'
 import useTranslation from 'next-translate/useTranslation'
 import { UserPanel } from './../components/UserPanel'
+import { SettingsPanel } from './../components/SettingsPanel'
 import { NotLogged } from './../components/NotLogged'
 import { TaskPanel } from './../components/TaskPanel'
 import { deleteTaskGroup } from './../utils/fire'
@@ -585,14 +586,16 @@ const Home: NextPage = () => {
         <Loader
           loading={session.status === 'loading'}
         />
-        {session.status === 'authenticated' && (
+          {session.status === 'authenticated' && (<>
+
             <div className={` ${s.newTask} `}>
               <InputPanel
                 taskGroups={taskGroups}
                 setTasks={setTasks}
               />
-
-          </div>
+            </div>
+            <SettingsPanel />
+          </>
         )}
         </main>
       </AnimatePresence>
