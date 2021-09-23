@@ -5,6 +5,8 @@ import {
 	query,
 } from '@firebase/firestore'
 import { db, user } from './fire'
+import { message } from 'antd'
+// import useTranslation from 'next-translate/useTranslation'
 
 export const requestNotificationPermission =
 	async () => {
@@ -130,4 +132,15 @@ export const extractCapitals = (text: string) => {
 		.toUpperCase()}${text
 		.trim()[2]
 		.toUpperCase()}`
+}
+
+export const warn = (text: string) => {
+	// const { t } = useTranslation('common')
+
+	message.warning({
+		content: text,
+		style: {
+			marginTop: '20vh',
+		},
+	})
 }

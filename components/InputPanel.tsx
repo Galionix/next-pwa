@@ -11,6 +11,7 @@ import {
 import {
     isValidText,
     getTasks,
+    warn,
 } from './../utils/apputils'
 import { addTask } from './../utils/fire'
 import { useUserStore } from 'utils/store'
@@ -22,6 +23,15 @@ import {
     IoSend,
 } from 'react-icons/io5'
 import classNames from 'classnames/bind';
+
+
+
+
+
+
+
+
+
 const cn = classNames.bind(s);
 export const InputPanel = ({
     taskGroups,
@@ -74,7 +84,7 @@ export const InputPanel = ({
     return (
         <>
             <button
-			// onClick={() => ()}
+                onClick={() => warn(t('messages.not_implemented_yet'))}
             >
                 <IoPlanet />{' '}
             </button>
@@ -118,7 +128,8 @@ export const InputPanel = ({
 
             {newTaskTitle === '' && (
                 <button
-                // onClick={() => ()}
+                    onClick={() => warn(t('messages.not_implemented_yet'))}
+
                 >
                     <IoAttach />{' '}
                 </button>

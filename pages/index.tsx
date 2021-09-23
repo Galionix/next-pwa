@@ -66,6 +66,7 @@ const cn = classNames.bind(s);
 const { TabPane } = Tabs;
 
 
+
 const Home: NextPage = () => {
   const loading = true
   const router = useRouter()
@@ -232,6 +233,7 @@ const Home: NextPage = () => {
       }
     })
   }
+
   return (
     <>
       <Head>

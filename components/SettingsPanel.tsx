@@ -5,8 +5,11 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { fastTransition } from './anims';
 import { IoSettings } from 'react-icons/io5';
+import { warn } from './../utils/apputils';
 
 export const SettingsPanel = () => {
+    const { t } = useTranslation('common')
+
     return (
         <motion.div
             layout
@@ -16,6 +19,7 @@ export const SettingsPanel = () => {
         >
 
             <button
+                onClick={() => warn(t('messages.not_implemented_yet'))}
             // onClick={() => ()}
             >            <IoSettings size={30} />
                 <p>Настройки</p>

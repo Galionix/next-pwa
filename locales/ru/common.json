@@ -11,6 +11,7 @@
 	"messages": {
 		"not_logged": "Войти с Google",
 		"task_group_title_placeholder": "Введите название...",
-		"add_tasks": "Отлично! Теперь создадим первую задачу."
+		"add_tasks": "Отлично! Теперь создадим первую задачу.",
+		"not_implemented_yet": "Этот функционал ещё не введён."
 	}
 }
