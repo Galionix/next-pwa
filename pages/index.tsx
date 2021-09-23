@@ -139,9 +139,9 @@ const Home: NextPage = () => {
         setFolded(true)
       setPaneIndex(wrap(0, 3, paneIndex + 1))
 
-      console.log("%c 🧞‍♀️: Home:onSwipedLeft -> paneIndex ",
-        "font-size:16px;background-color:#a5b942;color:white;",
-        wrap(0, 3, paneIndex - 1))
+      // console.log("%c 🧞‍♀️: Home:onSwipedLeft -> paneIndex ",
+      //   "font-size:16px;background-color:#a5b942;color:white;",
+      //   wrap(0, 3, paneIndex - 1))
       // console.log("User onSwipedLeft!", eventData)
     },
     onSwipedUp: (eventData) => {
@@ -163,9 +163,9 @@ const Home: NextPage = () => {
 
       setPaneIndex(wrap(0, 3, paneIndex - 1))
 
-      console.log("%c 🧞‍♀️: Home:onSwipedRight -> paneIndex ",
-        "font-size:16px;background-color:#a5b942;color:white;",
-        wrap(0, 3, paneIndex + 1))
+      // console.log("%c 🧞‍♀️: Home:onSwipedRight -> paneIndex ",
+      //   "font-size:16px;background-color:#a5b942;color:white;",
+      //   wrap(0, 3, paneIndex + 1))
       // console.log("User onSwipedRight!", eventData)
     },
     delta: 10,                            // min distance(px) before a swipe starts. *See Notes*
