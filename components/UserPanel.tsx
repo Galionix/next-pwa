@@ -19,7 +19,8 @@ export const UserPanel = () => {
                 layout
             >
 
-            <Image
+                <Image
+
                 width={50}
                 height={50}
                 src={user?.picture || '/image/user.png'} />
