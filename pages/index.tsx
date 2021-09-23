@@ -52,14 +52,11 @@ import { useSwipeable } from 'react-swipeable'
 import { AnimateSharedLayout } from 'framer-motion'
 import { AnimatePresence } from 'framer-motion';
 import { motion } from 'framer-motion';
+import { InputPanel } from './../components/InputPanel';
+import { fastTransition } from './../components/anims';
 
 // const db = getFirestore(app)
-const listAnimation = {
 
-  transition: {
-    ease: [0.7, 0.3, 0, 1], duration: 0.1
-  }
-}
 
 
 const Home: NextPage = () => {
@@ -69,8 +66,7 @@ const Home: NextPage = () => {
   const [email, setEmail] = useState('')
   const [userId, setUserId] = useState('')
   const [folded, setFolded] = useState(false)
-  const [newTaskTitle, setNewTaskTitle] =
-    useState('')
+
   const [editingTaskTitle, setEditingTaskTitle] =
     useState(false)
   const [
@@ -237,7 +233,7 @@ const Home: NextPage = () => {
 
         {(session.status === 'authenticated') && (
             <motion.ul layout
-              {...listAnimation}
+              {...fastTransition}
               className={` ${s.taskGroups} `}>
             {settingNewTaskGroup ? (
               <input
@@ -488,7 +484,7 @@ const Home: NextPage = () => {
         )}
         {session.status === 'authenticated' ? (
             <motion.ul layout
-              {...listAnimation}
+              {...fastTransition}
             // onClick={() => {
             //   if (window.innerWidth < 800)
             //     // setFolded(true)
@@ -589,60 +585,12 @@ const Home: NextPage = () => {
           loading={session.status === 'loading'}
         />
         {session.status === 'authenticated' && (
-          <div className={` ${s.newTask} `}>
-              <motion.input
-                {...listAnimation}
-                layout
-              type='text'
-              placeholder={t('buttons.new_task')}
-              value={newTaskTitle}
-              onChange={e => {
-                setNewTaskTitle(e.target.value)
-              }}
-              onBlur={() => {
-                if (isValidText(newTaskTitle))
-                  addTask(
-                    user.id,
-                    taskGroups[taskGroupIndex].id,
-                    {
-                      text: newTaskTitle,
-                      checkable: true,
-                    }
-                  ).then(() => {
-                    getTasks(
-                      user.id,
-                      taskGroups[taskGroupIndex]
-                        .id
-                    ).then(res => {
-                      setTasks(res)
-                      setNewTaskTitle('')
-                    })
-                  })
-              }}
-              onKeyDown={e => {
-                if (e.key === 'Enter') {
-                  if (isValidText(newTaskTitle))
-                    addTask(
-                      user.id,
-                      taskGroups[taskGroupIndex]
-                        .id,
-                      {
-                        text: newTaskTitle,
-                        checkable: true,
-                      }
-                    ).then(() => {
-                      getTasks(
-                        user.id,
-                        taskGroups[taskGroupIndex]
-                          .id
-                      ).then(res => {
-                        setTasks(res)
-                        setNewTaskTitle('')
-                      })
-                    })
-                }
-              }}
-            />
+            <div className={` ${s.newTask} `}>
+              <InputPanel
+                taskGroups={taskGroups}
+                setTasks={setTasks}
+              />
+
           </div>
         )}
         </main>
