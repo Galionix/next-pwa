@@ -119,6 +119,10 @@ const Home: NextPage = () => {
       setFolded(true)
       // console.log("User onSwipedLeft!", eventData)
     },
+    onSwipedDown: (eventData) => {
+      alert('hack')
+      // console.log("User onSwipedRight!", eventData)
+    },
     onSwipedRight: (eventData) => {
       setFolded(false)
       // console.log("User onSwipedRight!", eventData)
