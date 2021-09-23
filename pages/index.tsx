@@ -46,6 +46,9 @@ import { isValidText } from './../utils/apputils'
 import { Loader } from './../components/Loader/Loader'
 import { AddTasks } from './../components/AddTasks/AddTasks'
 import { f_updateTask } from './../utils/fire'
+import { Session } from 'next-auth'
+import { useLongPress } from 'react-use';
+import { useSwipeable } from 'react-swipeable'
 
 // const db = getFirestore(app)
 
@@ -93,7 +96,40 @@ const Home: NextPage = () => {
     setUser,
     user,
   } = useUserStore(state => state)
+
+  type session_type = {
+    data: Session | null;
+    status: "authenticated" | "unauthenticated" | "loading";
+  }
   const session = useSession()
+
+  const onLongPress = () => {
+    console.log('calls callback after long pressing 300ms');
+  };
+
+  const defaultOptions = {
+    isPreventDefault: true,
+    delay: 300,
+  };
+  const longPressEvent = useLongPress(onLongPress, defaultOptions);
+
+  const swipeHandlers = useSwipeable({
+    // onSwiped: (eventData) => console.log("User Swiped!", eventData),
+    onSwipedLeft: (eventData) => {
+      setFolded(true)
+      // console.log("User onSwipedLeft!", eventData)
+    },
+    onSwipedRight: (eventData) => {
+      setFolded(false)
+      // console.log("User onSwipedRight!", eventData)
+    },
+    delta: 10,                            // min distance(px) before a swipe starts. *See Notes*
+    preventDefaultTouchmoveEvent: false,  // call e.preventDefault *See Details*
+    trackTouch: true,                     // track touch input
+    trackMouse: false,                    // track mouse input
+    rotationAngle: 0,                     // set a rotation angle
+
+  });
 
   useEffect(() => {
     if (
@@ -175,12 +211,13 @@ const Home: NextPage = () => {
       <main
         className={`${s.main} ${folded ? s.folded : ''
           }`}
+        {...swipeHandlers}
       >
         {session.status === 'authenticated' && (
           <UserPanel />
         )}
 
-        {session.status === 'authenticated' && (
+        {(session.status === 'authenticated') && (
           <ul className={` ${s.taskGroups} `}>
             {settingNewTaskGroup ? (
               <input
@@ -280,6 +317,7 @@ const Home: NextPage = () => {
                   setEditingTaskTitle(true)
                   // console.log(taskGroups[taskGroupIndex].id)
                 }}
+                {...longPressEvent}
               >
                 {index === taskGroupIndex &&
                   editingTaskTitle ? (
@@ -506,9 +544,8 @@ const Home: NextPage = () => {
               ))}
             {tasks.length === 0 && <AddTasks />}
           </ul>
-        ) : (
-          <NotLogged />
-        )}
+        ) : session.status !== 'loading' && <NotLogged />
+        }
         <Loader
           loading={session.status === 'loading'}
         />
