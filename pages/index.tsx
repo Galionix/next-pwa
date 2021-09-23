@@ -281,6 +281,7 @@ const Home: NextPage = () => {
                         user.id,
                         newTaskGroupTitle
                       ).then(() => {
+                        setTasks([])
                         getTaskGroups(
                           user.id
                         ).then(res => {
