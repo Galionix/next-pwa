@@ -169,6 +169,7 @@
 		}
 	}
 
+
 	.tasks {
 		// overflow-y: scroll;
 
@@ -219,7 +220,18 @@
 			}
 
 		}
+				&.archived_tasks{
+		li{
+															&.urgent{
+				background:var(--color-orange)
+			}
+			&.warning{
+				background:var(--color-red)
+			}
+		}
 	}
+	}
+
 
 	.newTask {
 		display: flex;
