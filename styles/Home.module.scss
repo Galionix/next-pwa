@@ -162,7 +162,7 @@
 	}
 
 	.tasks {
-		overflow: scroll;
+		overflow-y: scroll;
 
 		grid-area: main / main;
 
@@ -287,9 +287,10 @@ padding: 5px;
 		grid-template-rows: 1fr auto 20px auto 1fr;
 
 		p {
+			width: 100%;
 			font-family: 'Open Sans Condensed',
 				sans-serif;
-			font-size: 40px;
+			font-size: clamp(20px,3vw,40px);
 			font-weight: bold;
 
 			z-index: 100;
@@ -308,10 +309,14 @@ padding: 5px;
 		& > div {
 			display: flex;
 			justify-content: center;
-
-			width: 70%;
+padding: 50px;
+			width: 100%;
+max-width: 300px;
+			// width: 70%;
+			// height: 70%;
 
 			& > div {
+				width: 100%;
 				overflow: visible !important;
 			}
 
@@ -323,9 +328,10 @@ padding: 5px;
 				user-select: none;
 
 				border-radius: 50%;
-				box-shadow: 0px 0px 0px 10px
-						rgba(187, 209, 226, 0.753),
-					0px 0px 0px 20px rgba(34, 60, 80, 0.623);
+				border: 10px solid 	rgba(187, 209, 226, 0.753);
+				// box-shadow: 0px 0px 0px 10px
+				// 		rgba(187, 209, 226, 0.753),
+				// 	0px 0px 0px 20px rgba(34, 60, 80, 0.623);
 
 				// box-shadow: 10px 10px 10px 10px white, 20px 20px 20px 20px #ccc;
 				// border:

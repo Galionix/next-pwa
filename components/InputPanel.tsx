@@ -58,9 +58,9 @@ export const InputPanel = ({ taskGroups, setTasks }:
             onChange={e => {
                 setNewTaskTitle(e.target.value)
             }}
-            onBlur={() => {
-                performAddTask()
-            }}
+            // onBlur={() => {
+            //     performAddTask()
+            // }}
             onKeyDown={e => {
                 if (e.key === 'Enter') {
                     performAddTask()
@@ -74,7 +74,8 @@ export const InputPanel = ({ taskGroups, setTasks }:
 
         {newTaskTitle !== '' && <button
             onClick={() => performAddTask()}
-        ><IoSend /></button>}
+        ><IoSend /></button>
+        }
 
 
     </>

@@ -46,6 +46,7 @@ module.exports = withPlugins([
 		images: {
 			domains: [
 				'thecatapi.com',
+				'placekitten.com',
 				'cdn2.thecatapi.com',
 				'lh3.googleusercontent.com',
 				'googleusercontent.com',
