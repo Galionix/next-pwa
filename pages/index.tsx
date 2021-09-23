@@ -49,8 +49,18 @@ import { f_updateTask } from './../utils/fire'
 import { Session } from 'next-auth'
 import { useLongPress } from 'react-use';
 import { useSwipeable } from 'react-swipeable'
+import { AnimateSharedLayout } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 // const db = getFirestore(app)
+const listAnimation = {
+
+  transition: {
+    ease: [0.7, 0.3, 0, 1], duration: 0.1
+  }
+}
+
 
 const Home: NextPage = () => {
   const loading = true
@@ -122,7 +132,7 @@ const Home: NextPage = () => {
     onSwipedDown: (eventData) => {
       console.log("%c ❔: Home:NextPage -> eventData ", "font-size:16px;background-color:#60f867;color:black;", eventData)
 
-      alert('hack')
+      // alert('hack')
       // console.log("User onSwipedRight!", eventData)
     },
     onSwipedRight: (eventData) => {
@@ -213,6 +223,8 @@ const Home: NextPage = () => {
         <title>Dimas planner</title>
         <link rel='icon' href='/favicon.ico' />
       </Head>
+      <AnimatePresence>
+
 
       <main
         className={`${s.main} ${folded ? s.folded : ''
@@ -224,7 +236,9 @@ const Home: NextPage = () => {
         )}
 
         {(session.status === 'authenticated') && (
-          <ul className={` ${s.taskGroups} `}>
+            <motion.ul layout
+              {...listAnimation}
+              className={` ${s.taskGroups} `}>
             {settingNewTaskGroup ? (
               <input
                 autoFocus
@@ -243,6 +257,7 @@ const Home: NextPage = () => {
                       user.id,
                       newTaskGroupTitle
                     ).then(() => {
+                      setTasks([])
                       getTaskGroups(user.id).then(
                         res => {
                           setTaskGroups(res)
@@ -441,12 +456,26 @@ const Home: NextPage = () => {
                               getTaskGroups(
                                 user.id
                               ).then(res => {
-                                setNewTaskGroupTitle(
-                                  `Task group ${res.length + 1
-                                  }`
-                                )
                                 setTaskGroups(res)
+                                setNewTaskGroupTitle(
+                                  `Task group ${res.length + 1}`
+                                )
+                                getTasks(
+                                  user.id,
+                                  res[taskGroupIndex].id
+                                ).then(res => {
+                                  setTasks(res)
+                                })
                               })
+                              // getTaskGroups(
+                              //   user.id
+                              // ).then(res => {
+                              //   setNewTaskGroupTitle(
+                              //     `Task group ${res.length + 1
+                              //     }`
+                              //   )
+                              //   setTaskGroups(res)
+                              // })
                             })
                           }}
                         />
@@ -455,10 +484,11 @@ const Home: NextPage = () => {
                 )}
               </li>
             ))}
-          </ul>
+            </motion.ul>
         )}
         {session.status === 'authenticated' ? (
-          <ul
+            <motion.ul layout
+              {...listAnimation}
             // onClick={() => {
             //   if (window.innerWidth < 800)
             //     // setFolded(true)
@@ -552,7 +582,7 @@ const Home: NextPage = () => {
                 </li>
               ))}
             {tasks.length === 0 && <AddTasks />}
-          </ul>
+            </motion.ul>
         ) : session.status !== 'loading' && <NotLogged />
         }
         <Loader
@@ -560,7 +590,9 @@ const Home: NextPage = () => {
         />
         {session.status === 'authenticated' && (
           <div className={` ${s.newTask} `}>
-            <input
+              <motion.input
+                {...listAnimation}
+                layout
               type='text'
               placeholder={t('buttons.new_task')}
               value={newTaskTitle}
@@ -613,7 +645,8 @@ const Home: NextPage = () => {
             />
           </div>
         )}
-      </main>
+        </main>
+      </AnimatePresence>
     </>
   )
 }

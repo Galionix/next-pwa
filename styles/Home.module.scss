@@ -3,10 +3,10 @@
 .main {
 	display: grid;
 
-	height: 100%;
+	height: 100vh;
 
 	grid-template-columns: [sidebar] 200px [main] 1fr;
-	grid-template-rows: [userpanel] 100px [main] 1fr [footer] 200px;
+	grid-template-rows: [userpanel] 100px [main] 1fr [footer] auto;
 
 	.userPanel {
 		display: flex;
@@ -90,7 +90,7 @@
 
 	.taskGroups {
 		grid-area: main / sidebar;
-
+overflow: scroll;
 		li {
 			input{
 				 width: 100%;
@@ -128,6 +128,9 @@
 
 				color: snow;
 				background: var(--accent-bg);
+				// position: sticky;
+				// top:0px;
+				// z-index: 100;
 			}
 
 			&:hover {
@@ -155,6 +158,7 @@ z-index: -1;
 	}
 
 	.tasks {
+		overflow: scroll;
 		grid-area: main / main;
 		li{
 			display: flex;

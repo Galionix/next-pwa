@@ -2,6 +2,7 @@ import { signIn, signOut } from 'next-auth/react'
 import { useSession } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation'
 import { useUserStore } from 'utils/store';
+import { motion } from 'framer-motion';
 
 export const AuthButton = () => {
     const session = useSession()
@@ -10,7 +11,8 @@ export const AuthButton = () => {
     const { t } = useTranslation('common');
     return (<>{
         session.status !== 'authenticated' ?
-            <button
+            <motion.button
+                layout
                 onClick={e => {
                     e.preventDefault()
 
@@ -21,8 +23,9 @@ export const AuthButton = () => {
                 }}
             >
                 {t('buttons.auth')}
-            </button> :
-            <button
+            </motion.button> :
+            <motion.button
+                layout
                 onClick={e => {
                     e.preventDefault()
                     signOut()
@@ -30,7 +33,7 @@ export const AuthButton = () => {
                 }}
             >
                 {t('buttons.sign_out')}
-            </button>}
+            </motion.button>}
     </>
     )
 }
