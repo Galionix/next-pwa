@@ -108,7 +108,7 @@ const Home: NextPage = () => {
   };
 
   const defaultOptions = {
-    isPreventDefault: true,
+    isPreventDefault: false,
     delay: 300,
   };
   const longPressEvent = useLongPress(onLongPress, defaultOptions);
@@ -132,7 +132,7 @@ const Home: NextPage = () => {
     delta: 10,                            // min distance(px) before a swipe starts. *See Notes*
     preventDefaultTouchmoveEvent: false,  // call e.preventDefault *See Details*
     trackTouch: true,                     // track touch input
-    trackMouse: true,                    // track mouse input
+    trackMouse: false,                    // track mouse input
     rotationAngle: 0,                     // set a rotation angle
 
   });
