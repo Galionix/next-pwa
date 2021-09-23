@@ -8,11 +8,14 @@ import {
   useRef,
   useState,
 } from 'react'
+import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
 import s from '../styles/Home.module.scss'
 import { AuthButton } from './../components/AuthButton'
 import { useUserStore } from './../utils/store'
 import { AiFillDelete } from 'react-icons/ai'
-import { IoAddCircleOutline } from 'react-icons/io5'
+import { IoAddCircleOutline, IoArchive, IoArchiveOutline } from 'react-icons/io5'
+import { Checkbox, Divider, Tabs } from 'antd';
+
 
 import {
   app,
@@ -55,9 +58,12 @@ import { AnimatePresence } from 'framer-motion';
 import { motion } from 'framer-motion';
 import { InputPanel } from './../components/InputPanel';
 import { fastTransition } from './../components/anims';
+import classNames from 'classnames/bind';
 
+const cn = classNames.bind(s);
 // const db = getFirestore(app)
 
+const { TabPane } = Tabs;
 
 
 const Home: NextPage = () => {
@@ -213,6 +219,18 @@ const Home: NextPage = () => {
       })
     })
 		// setTasks(tasks.map((task, i) => task.id === id ? { id, data } : task))
+  }
+  const onArchive = (id: string, value: boolean) => {
+    const task = tasks.find((item) => item.id === id)
+    // console.log("%c 👶: onArchive -> task ",
+    //   "font-size:16px;background-color:#328181;color:white;",
+    //   task)
+    updateTask({
+      id, data: {
+        ...task,
+        archived: value
+      }
+    })
   }
   return (
     <>
@@ -485,88 +503,114 @@ const Home: NextPage = () => {
             </motion.ul>
         )}
         {session.status === 'authenticated' ? (
-            <motion.ul layout
-              {...fastTransition}
-            // onClick={() => {
-            //   if (window.innerWidth < 800)
-            //     // setFolded(true)
-            // }}
-            className={` ${s.tasks} `}
-          >
-            {!settingNewTaskGroup &&
-              tasks.map(task => (
-                <li
-                  key={task.id}
-                  onDoubleClick={e => {
-                    e.stopPropagation()
-                    setEditingTaskIndex(task.id)
-                    setEditingTaskText(
-                      task.data.text
-                    )
-                    setSettingNewTask(true)
-                  }}
-                  onClick={() => {
-                    updateTask({
-                      id: task.id,
-                      data: {
-                        ...task.data,
-                        checked:
-                          !task.data.checked,
-                      },
-                    })
-                  }}
+
+
+            <Tabs defaultActiveKey="1"
+              className={` ${s.tasks} `}
+              style={{ overflowY: 'scroll', padding: '10px' }}
+            // onChange={callback}
+            >
+              <TabPane tab={t('buttons.active_tasks')} key="1">
+                <motion.ul layout
+                  {...fastTransition}
+                  // onClick={() => {
+                  //   if (window.innerWidth < 800)
+                  //     // setFolded(true)
+                  // }}
+                  className={` ${s.tasks} `}
                 >
-                  {settingNewTask &&
-                    editingTaskIndex === task.id ? (
-                    <input
-                      type='text'
-                      autoFocus
-                      onBlur={() => {
-                        if (
-                          !isValidText(
-                            editingTaskText
-                          )
-                        )
-                          return
-                        setSettingNewTask(false)
-                        updateTask({
-                          id: task.id,
-                          data: {
-                            ...task.data,
-                            text: editingTaskText,
-                          },
-                        })
-                      }}
-                        onKeyDown={e => {
-                          if (e.key === 'Enter') {
-                            if (
-                              !isValidText(
-                                editingTaskText
+                  {!settingNewTaskGroup &&
+                    tasks.map(task => {
+                      if (!task.data.archived)
+                        return (
+
+                          <li
+                            className={cn({
+                              checked: task.data.checked,
+                              important: task.data.important
+                            })}
+
+                            key={task.id}
+                            onDoubleClick={e => {
+                              e.stopPropagation()
+                              setEditingTaskIndex(task.id)
+                              setEditingTaskText(
+                                task.data.text
                               )
-                            )
-                              return
-                            setSettingNewTask(false)
-                            updateTask({
-                            id: task.id,
-                            data: {
-                              ...task.data,
-                              text: editingTaskText,
-                            },
-                          })
-                          }
-                        }}
-                        placeholder=''
-                        value={editingTaskText}
-                        onChange={e => {
-                          setEditingTaskText(
-                            e.target.value
-                          )
-                        }}
-                    />
-                  ) : (
-                    <>
-                        <p>{task.data.text}</p>
-                        <input
+                              setSettingNewTask(true)
+                            }}
+                            onClick={() => {
+                              updateTask({
+                                id: task.id,
+                                data: {
+                                  ...task.data,
+                                  checked:
+                                    !task.data.checked,
+                                },
+                              })
+                            }}
+                          >
+                            {settingNewTask &&
+                              editingTaskIndex === task.id ? (
+                              <input
+                                type='text'
+                                autoFocus
+                                onBlur={() => {
+                                  if (
+                                    !isValidText(
+                                      editingTaskText
+                                    )
+                                  )
+                                    return
+                                  setSettingNewTask(false)
+                                  updateTask({
+                                    id: task.id,
+                                    data: {
+                                      ...task.data,
+                                      text: editingTaskText,
+                                    },
+                                  })
+                                }}
+                                onKeyDown={e => {
+                                  if (e.key === 'Enter') {
+                                    if (
+                                      !isValidText(
+                                        editingTaskText
+                                      )
+                                    )
+                                      return
+                                    setSettingNewTask(false)
+                                    updateTask({
+                                      id: task.id,
+                                      data: {
+                                        ...task.data,
+                                        text: editingTaskText,
+                                      },
+                                    })
+                                  }
+                                }}
+                                placeholder=''
+                                value={editingTaskText}
+                                onChange={e => {
+                                  setEditingTaskText(
+                                    e.target.value
+                                  )
+                                }}
+                              />
+                            ) : (
+                              <>
+                                <p>{task.data.text}</p>
+                                  {task.data.checked && <IoArchiveOutline
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onArchive(task.id, true)
+
+                                    }}
+                                    size={25} />}
+                                  {/* <Checkbox
+                                checked={task.data.checked}
+                              /> */}
+                                  {/* <input
                           type='checkbox'
                           readOnly
                         name=''
@@ -574,13 +618,72 @@ const Home: NextPage = () => {
                         checked={
                           task.data.checked
                         }
-                      />
-                    </>
-                  )}
-                </li>
-              ))}
-            {tasks.length === 0 && <AddTasks />}
-            </motion.ul>
+                      /> */}
+                              </>
+                            )}
+                          </li>
+                        )
+                    })}
+                  {tasks.length === 0 && <AddTasks />}
+                </motion.ul>
+              </TabPane>
+              <TabPane tab={t('buttons.archived_tasks')} key="2">
+                <motion.ul layout
+                  {...fastTransition}
+                  // onClick={() => {
+                  //   if (window.innerWidth < 800)
+                  //     // setFolded(true)
+                  // }}
+                  className={` ${s.tasks}  ${s.archived_tasks} `}
+                >
+                  {!settingNewTaskGroup &&
+                    tasks.map(task => {
+                      if (task.data.archived)
+                        return (
+
+                          <li
+                            className={cn({
+                              checked: task.data.checked,
+                              important: task.data.important
+                            })}
+
+                            key={task.id}
+                          // onDoubleClick={e => {
+                          //   e.stopPropagation()
+                          //   setEditingTaskIndex(task.id)
+                          //   setEditingTaskText(
+                          //     task.data.text
+                          //   )
+                          //   setSettingNewTask(true)
+                          // }}
+                          // onClick={() => {
+                          //   updateTask({
+                          //     id: task.id,
+                          //     data: {
+                          //       ...task.data,
+                          //       checked:
+                          //         !task.data.checked,
+                          //     },
+                          //   })
+                          // }}
+                          >
+                            <p>{task.data.text}</p>
+                            <IoArchiveOutline
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onArchive(task.id, false)
+
+                              }}
+                              size={25} />
+                          </li>
+                        )
+                    })}
+                  {tasks.length === 0 && <AddTasks />}
+                </motion.ul>
+              </TabPane>
+
+            </Tabs>
+
         ) : session.status !== 'loading' && <NotLogged />
         }
         <Loader

@@ -4,7 +4,9 @@
 		"auth": "Войти",
 		"sign_out": "Выйти",
 		"add_task_group": "Добавить группу",
-		"new_task": "Добавить задачу"
+		"new_task": "Добавить задачу",
+		"archived_tasks": "Архив",
+		"active_tasks": "Активные"
 	},
 	"messages": {
 		"not_logged": "Войти с Google",
