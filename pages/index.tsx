@@ -146,10 +146,10 @@ const Home: NextPage = () => {
       // console.log("User onSwipedLeft!", eventData)
     },
     onSwipedUp: (eventData) => {
-      warn(t('messages.not_implemented_yet'))
+      // warn(t('messages.not_implemented_yet'))
     },
     onSwipedDown: (eventData) => {
-      warn(t('messages.not_implemented_yet'))
+      // warn(t('messages.not_implemented_yet'))
 
       // console.log("%c ❔: Home:NextPage -> eventData ", "font-size:16px;background-color:#60f867;color:black;", eventData)
 
