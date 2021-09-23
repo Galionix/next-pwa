@@ -15,6 +15,7 @@ import { useUserStore } from './../utils/store'
 import { AiFillDelete } from 'react-icons/ai'
 import { IoAddCircleOutline, IoArchive, IoArchiveOutline } from 'react-icons/io5'
 import { Checkbox, Divider, Tabs } from 'antd';
+import { RiInboxUnarchiveLine } from "react-icons/ri";
 
 
 import {
@@ -533,6 +534,12 @@ const Home: NextPage = () => {
 
 
             <Tabs
+              onTabClick={e => {
+                setPaneIndex(parseInt(e))
+                if (window.innerWidth < 800)
+                  setFolded(true)
+                // console.log(e)
+              }}
               defaultActiveKey="1"
               activeKey={
                 (wrap(0, 3, paneIndex) > 0 ? wrap(0, 3, paneIndex) : 1).toString()
@@ -708,7 +715,7 @@ const Home: NextPage = () => {
                           // }}
                           >
                             <p>{task.data.text}</p>
-                            <IoArchiveOutline
+                            <RiInboxUnarchiveLine
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onArchive(task.id, false)
