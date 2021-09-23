@@ -317,7 +317,7 @@ const Home: NextPage = () => {
                     group.data.title
                   )
                   setTaskGroupIndex(index)
-                  setFolded(false)
+                  // setFolded(false)
                 }}
                 onDoubleClick={() => {
                   setEditingTaskTitle(true)
@@ -456,10 +456,10 @@ const Home: NextPage = () => {
         )}
         {session.status === 'authenticated' ? (
           <ul
-            onClick={() => {
-              if (window.innerWidth < 800)
-                setFolded(true)
-            }}
+            // onClick={() => {
+            //   if (window.innerWidth < 800)
+            //     // setFolded(true)
+            // }}
             className={` ${s.tasks} `}
           >
             {!settingNewTaskGroup &&
