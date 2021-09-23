@@ -534,6 +534,8 @@ const Home: NextPage = () => {
 
 
             <Tabs
+              centered
+              size="small"
               onTabClick={e => {
                 setPaneIndex(parseInt(e))
                 if (window.innerWidth < 800)
@@ -546,6 +548,9 @@ const Home: NextPage = () => {
               }
               className={` ${s.tasks} `}
               style={{ overflowY: 'scroll', padding: '10px' }}
+              animated={
+                { inkBar: true, tabPane: true }
+              }
             // onChange={callback}
             >
               <TabPane
