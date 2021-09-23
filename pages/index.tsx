@@ -59,6 +59,8 @@ import { motion } from 'framer-motion';
 import { InputPanel } from './../components/InputPanel';
 import { fastTransition } from './../components/anims';
 import classNames from 'classnames/bind';
+import { wrap } from 'popmotion'
+import { warn } from './../utils/apputils';
 
 const cn = classNames.bind(s);
 // const db = getFirestore(app)
@@ -75,6 +77,7 @@ const Home: NextPage = () => {
   const [userId, setUserId] = useState('')
   const [folded, setFolded] = useState(false)
 
+  const [paneIndex, setPaneIndex] = useState(0)
   const [editingTaskTitle, setEditingTaskTitle] =
     useState(false)
   const [
@@ -130,17 +133,39 @@ const Home: NextPage = () => {
   const swipeHandlers = useSwipeable({
     // onSwiped: (eventData) => console.log("User Swiped!", eventData),
     onSwipedLeft: (eventData) => {
-      setFolded(true)
+      if (wrap(0, 3, paneIndex + 1) === 0)
+        setFolded(false)
+      else
+        setFolded(true)
+      setPaneIndex(wrap(0, 3, paneIndex + 1))
+
+      console.log("%c 🧞‍♀️: Home:onSwipedLeft -> paneIndex ",
+        "font-size:16px;background-color:#a5b942;color:white;",
+        wrap(0, 3, paneIndex - 1))
       // console.log("User onSwipedLeft!", eventData)
     },
+    onSwipedUp: (eventData) => {
+      warn(t('messages.not_implemented_yet'))
+    },
     onSwipedDown: (eventData) => {
-      console.log("%c ❔: Home:NextPage -> eventData ", "font-size:16px;background-color:#60f867;color:black;", eventData)
+      warn(t('messages.not_implemented_yet'))
+
+      // console.log("%c ❔: Home:NextPage -> eventData ", "font-size:16px;background-color:#60f867;color:black;", eventData)
 
       // alert('hack')
       // console.log("User onSwipedRight!", eventData)
     },
     onSwipedRight: (eventData) => {
-      setFolded(false)
+      if (wrap(0, 3, paneIndex - 1) === 0)
+        setFolded(false)
+      else
+        setFolded(true)
+
+      setPaneIndex(wrap(0, 3, paneIndex - 1))
+
+      console.log("%c 🧞‍♀️: Home:onSwipedRight -> paneIndex ",
+        "font-size:16px;background-color:#a5b942;color:white;",
+        wrap(0, 3, paneIndex + 1))
       // console.log("User onSwipedRight!", eventData)
     },
     delta: 10,                            // min distance(px) before a swipe starts. *See Notes*
@@ -507,12 +532,22 @@ const Home: NextPage = () => {
         {session.status === 'authenticated' ? (
 
 
-            <Tabs defaultActiveKey="1"
+            <Tabs
+              defaultActiveKey="1"
+              activeKey={
+                (wrap(0, 3, paneIndex) > 0 ? wrap(0, 3, paneIndex) : 1).toString()
+              }
               className={` ${s.tasks} `}
               style={{ overflowY: 'scroll', padding: '10px' }}
             // onChange={callback}
             >
-              <TabPane tab={t('buttons.active_tasks')} key="1">
+              <TabPane
+                tab={t('buttons.active_tasks')}
+                key={'1'}
+              // activeKey={
+              //   wrap(0, 3, paneIndex) > 0 ? wrap(0, 3, paneIndex) : 1
+              // }
+              >
                 <motion.ul layout
                   {...fastTransition}
                   // onClick={() => {
