@@ -293,6 +293,9 @@ const Home: NextPage = () => {
                 className={` ${s.control} `}
                   onClick={() => {
                     setSettingNewTaskGroup(true)
+                    if (window.innerWidth < 800)
+                      setFolded(false)
+
                   }}
                 >
                   <>
