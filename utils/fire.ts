@@ -121,7 +121,11 @@ export const newTaskGroup = async (
 export const addTask = async (
 	userid: string,
 	taskGroup: string,
-	task: { text: string; checkable: boolean }
+	task: {
+		text: string
+		checkable: boolean
+		urgency: string
+	}
 ) => {
 	// const { id: userid } = await user(email)
 	const docRef = await addDoc(

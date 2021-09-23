@@ -527,7 +527,9 @@ const Home: NextPage = () => {
                           <li
                             className={cn({
                               checked: task.data.checked,
-                              important: task.data.important
+                              normal: task.data.urgency === 'normal',
+                              urgent: task.data.urgency === 'urgent',
+                              warning: task.data.urgency === 'warning',
                             })}
 
                             key={task.id}

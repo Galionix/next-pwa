@@ -175,6 +175,12 @@
 		grid-area: userpanel / main / footer / main;
 
 		li {
+												&.urgent{
+				background:var(--color-orange)
+			}
+			&.warning{
+				background:var(--color-red)
+			}
 			border-radius: 3px;
 			svg{
 				
@@ -211,6 +217,7 @@
 					accent-color: #395faa;
 				}
 			}
+
 		}
 	}
 
@@ -231,6 +238,7 @@
 		}
 
 		button {
+
 			width: 30px;
 			height: 30px;
 			margin: 0;
@@ -242,6 +250,12 @@
 			svg {
 				width: 100%;
 				height: 100%;
+			}
+						&.urgent{
+				color:var(--color-orange)
+			}
+			&.warning{
+				color:var(--color-red)
 			}
 		}
 	}
