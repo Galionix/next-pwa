@@ -16,7 +16,11 @@ import { AiFillDelete } from 'react-icons/ai'
 import { IoAddCircleOutline, IoArchive, IoArchiveOutline } from 'react-icons/io5'
 import { Checkbox, Divider, Tabs } from 'antd';
 import { RiInboxUnarchiveLine } from "react-icons/ri";
+import {
 
+  getDoc,
+
+} from 'firebase/firestore'
 
 import {
   app,
@@ -38,6 +42,7 @@ import {
   getTasks,
   notification,
   requestNotificationPermission,
+  setTheme,
 } from '@/utils/apputils'
 import { addTask } from './../utils/fire'
 import { useRouter } from 'next/dist/client/router'
@@ -81,6 +86,8 @@ const Home: NextPage = () => {
   const [paneIndex, setPaneIndex] = useState(0)
   const [editingTaskTitle, setEditingTaskTitle] =
     useState(false)
+
+
   const [
     settingNewTaskGroup,
     setSettingNewTaskGroup,
@@ -186,11 +193,21 @@ const Home: NextPage = () => {
       const { name, email, picture } =
         session.data?.token
 
-      initUser(name, email, picture).then(id => {
-        setUser({ name, email, picture, id })
-        setEmail(email)
+      initUser(name, email, picture).then(async (userDoc) => {
+        const { id } = userDoc
+        const user_document = await getDoc(userDoc)
+        //@ts-ignore
+        const { data } = user_document.data()
+
+        console.log("%c 👩‍💼: Home:NextPage -> userDoc ",
+          "font-size:16px;background-color:#26a60f;color:white;",
+          data)
+        if (data?.theme !== '')
+          setTheme(data.theme)
+        setUser({ name, email, picture, id, data })
+        // setEmail(email)
         // console.log("%c 🇸🇮: Home:NextPage -> id ", "font-size:16px;background-color:#3b9399;color:white;", id)
-        // setUser(id)
+
         requestNotificationPermission()
         getTaskGroups(id).then(res => {
           setTaskGroups(res)

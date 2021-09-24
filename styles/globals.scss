@@ -62,3 +62,13 @@ input{
 // --accent-bg: linear-gradient(180deg, #2af598 0%, #009efd 100%);
 // : red;
 }
+
+body{
+  &.dark{
+    background: #000;
+    *,*::after,*::before {
+color:white;
+      
+}
+  }
+}

@@ -94,8 +94,8 @@ export const initUser = async (
 			}
 		)
 
-		return docRef.id
-	} else return querySnapshot.docs[0].id
+		return docRef
+	} else return querySnapshot.docs[0].ref
 	// } catch (e) {
 	// 	console.error('Error adding document: ', e)
 	// }
@@ -193,4 +193,13 @@ export const deleteTaskGroup = async (
 			`users/${userid}/taskGroups/${taskId}`
 		)
 	)
+}
+export const updateUser = async (
+	id: string,
+	data: any
+) => {
+	return await updateDoc(doc(db, `users/${id}`), {
+		id,
+		...data,
+	})
 }

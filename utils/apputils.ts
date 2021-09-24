@@ -144,3 +144,20 @@ export const warn = (text: string) => {
 		},
 	})
 }
+
+export const setTheme = (theme: string) => {
+	// window.document.classlist.add(theme)
+	if (theme === 'light') {
+		window.document.body.classList.add('light')
+		window.document.body.classList.remove('dark')
+	} else {
+		window.document.body.classList.add('dark')
+		window.document.body.classList.remove('light')
+	}
+
+	// console.log(
+	// 	'%c 🧐: setTheme -> window.document ',
+	// 	'font-size:16px;background-color:#939ac8;color:white;',
+	// 	window.document.body
+	// )
+}

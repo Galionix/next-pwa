@@ -6,6 +6,8 @@ import Document, {
 	NextScript,
 } from 'next/document'
 
+// import { useUserStore } from './../utils/store'
+
 class MyDocument extends Document {
 	// static async getInitialProps(ctx: DocumentContext):
 	//     Promise<DocumentInitialProps> {
@@ -18,6 +20,8 @@ class MyDocument extends Document {
 		return { ...initialProps }
 	}
 	render() {
+ 
+
 		return (
 			<Html>
 				{/* <Head > */}

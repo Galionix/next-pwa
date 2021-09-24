@@ -414,3 +414,10 @@
 .main.folded {
 	@include m.folded;
 }
+
+.settings_modal{
+	section{
+		display: flex;
+		justify-content: space-between;
+	}
+}

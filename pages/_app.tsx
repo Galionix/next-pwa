@@ -18,12 +18,12 @@ import { useSession, signIn, signOut, SessionProvider }
 function MyApp({ Component,
   pageProps: { session, ...pageProps }, }: AppProps) {
   // const session = useSession()
-  const userStore = useUserStore(
-    state => state.user
-  )
-  const setUser = useUserStore(
-    state => state.setUser
-  )
+  // const userStore = useUserStore(
+  //   state => state.user
+  // )
+  // const setUser = useUserStore(
+  //   state => state.setUser
+  // )
 
 
   // useEffect(() => {
