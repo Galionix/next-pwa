@@ -203,3 +203,7 @@ export const updateUser = async (
 		...data,
 	})
 }
+
+export const deleteUser = async (id: string) => {
+	return await deleteDoc(doc(db, `users/${id}`))
+}

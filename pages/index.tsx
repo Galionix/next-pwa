@@ -202,7 +202,7 @@ const Home: NextPage = () => {
         console.log("%c 👩‍💼: Home:NextPage -> userDoc ",
           "font-size:16px;background-color:#26a60f;color:white;",
           data)
-        if (data?.theme !== '')
+        if (data?.theme !== '' && data?.theme !== undefined)
           setTheme(data.theme)
         setUser({ name, email, picture, id, data })
         // setEmail(email)
@@ -215,10 +215,6 @@ const Home: NextPage = () => {
             `Task group ${res.length + 1}`
           )
           if (res.length > 0) {
-						// console.log("%c 👜: Home:NextPage -> res ",
-						//   "font-size:16px;background-color:#8dd53b;color:black;",
-						//   taskGroupIndex)
-
             getTasks(
               id,
               res[taskGroupIndex].id
@@ -566,7 +562,7 @@ const Home: NextPage = () => {
               className={` ${s.tasks} `}
               style={{ overflowY: 'scroll', padding: '10px' }}
               animated={
-                { inkBar: true, tabPane: true }
+                { inkBar: true }
               }
             // onChange={callback}
             >
@@ -762,6 +758,8 @@ const Home: NextPage = () => {
 
             <div className={` ${s.newTask} `}>
               <InputPanel
+                setTaskGroups={setTaskGroups}
+                setNewTaskGroupTitle={setNewTaskGroupTitle}
                 taskGroups={taskGroups}
                 setTasks={setTasks}
               />

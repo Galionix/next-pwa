@@ -8,16 +8,18 @@ import { IoSettings } from 'react-icons/io5';
 import { setTheme, warn } from './../utils/apputils';
 import { Modal } from 'antd';
 import { useUserStore } from 'utils/store';
-import { updateUser } from './../utils/fire';
+import { deleteUser, updateUser } from './../utils/fire';
 import { Checkbox } from 'antd';
 import { Cascader } from 'antd';
 import { Select } from 'antd';
+import { Button } from 'antd';
+import { signOut } from 'next-auth/react';
+
 const { Option } = Select;
 export const SettingsPanel = () => {
 
     const {
-        // setTaskGroupIndex,
-        // taskGroupIndex,
+        reset,
         setUser,
         user,
     } = useUserStore(state => state)
@@ -29,6 +31,7 @@ export const SettingsPanel = () => {
 
     const { t } = useTranslation('common')
     const [modalOpen, setModalOpen] = useState(false)
+    const [deleteModal, setDeleteModal] = useState(false)
     return (
         <motion.div
             layout
@@ -46,65 +49,59 @@ export const SettingsPanel = () => {
 
             <Modal
                 wrapClassName={` ${s.settings_modal} `}
-
                 okText={t('messages.ok')}
                 cancelText={t('messages.cancel')}
                 title={t('settings.title')}
                 centered
                 visible={modalOpen}
-                onOk={() => {
-                    // try {
-
-
-                    //     await do_user({
-                    //         ...user.data,
-                    //         field: 'value2'
-                    //     })
-
-
-                    setModalOpen(false)
-                    // } catch (error) {
-                    //     warn(JSON.stringify(error))
-                    // }
-
-                }}
+                onOk={() => { setModalOpen(false) }}
                 onCancel={() => setModalOpen(false)}
 
             >
-                {/* <pre>{JSON.stringify(user, null, 2)}</pre> */}
                 <section>
                     <p>{t('settings.theme')}</p>
                     <Select
                         defaultValue={user?.data?.theme || 'light'}
-                        // options={[{
-                        //     value: 'light',
-                        //     label: t('settings.color.light')
-                        // },
-                        // {
-                        //     value: 'black',
-                        //     label: t('settings.color.black')
-                        // }
-                        // ]
-                        // }
                         placeholder={t('settings.theme')}
                         onChange={(e) => {
                             do_user({ ...user, data: { theme: e } })
                             setTheme(e)
-                            // console.log("%c 🙎‍♂️: e ", "font-size:16px;background-color:#a726e5;color:white;", e)
                         }}
                     >
                         <Option value="black">{t('settings.color.black')}</Option>
                         <Option value="light">{t('settings.color.light')}</Option>
-
                     </Select>
+                    <Button danger
+                        onClick={() => setDeleteModal(true)}
+                    >{t('settings.delete_modal.button')}
+
+                    </Button>
+
                 </section>
 
-                {/* <p>Some settings</p>
-                <p>Some settings</p>
-                <p>Some settings</p>
-                <p>Some settings</p> */}
+
             </Modal>
-            {/* SettingsPanel */}
+            <Modal
+                closable={false}
+                okText={t('settings.delete_modal.ok')}
+                cancelText={t('settings.delete_modal.cancel')}
+                title={t('settings.delete_modal.title')}
+                centered
+                visible={deleteModal}
+                onOk={() => {
+                    deleteUser(user.id).then(res => {
+
+                        reset()
+                        signOut()
+                    })
+                }}
+                onCancel={() => setDeleteModal(false)}
+                okButtonProps={{ danger: true }}
+
+            >
+                <p>{t('settings.delete_modal.message')}</p>
+            </Modal>
+
         </motion.div>
     )
 }

@@ -12,8 +12,9 @@ import {
     isValidText,
     getTasks,
     warn,
+    getTaskGroups,
 } from './../utils/apputils'
-import { addTask } from './../utils/fire'
+import { addTask, newTaskGroup } from './../utils/fire'
 import { useUserStore } from 'utils/store'
 import {
     IoAlertCircle,
@@ -35,7 +36,7 @@ import classNames from 'classnames/bind';
 const cn = classNames.bind(s);
 export const InputPanel = ({
     taskGroups,
-    setTasks,
+    setTasks, setTaskGroups, setNewTaskGroupTitle
 }: {
     taskGroups: { id: string; data: any }[]
     setTasks: Dispatch<
@@ -46,40 +47,84 @@ export const InputPanel = ({
             }[]
         >
     >
-}) => {
+        setTaskGroups: Dispatch<SetStateAction<{
+            id: string;
+            data: any;
+        }[]>>
+        setNewTaskGroupTitle: Dispatch<SetStateAction<string>>
+    }) => {
+    const {
+        setTaskGroupIndex,
+        taskGroupIndex,
+        setUser,
+        user,
+    } = useUserStore(state => state)
+
     const urgencies = [
         'normal',
         'urgent',
         'warning',
     ]
     const [urgency, setUrgency] = useState(0)
-    const {
-        taskGroupIndex,
 
-        user,
-    } = useUserStore(state => state)
     const { t } = useTranslation('common')
     const [newTaskTitle, setNewTaskTitle] =
         useState('')
-    const performAddTask = () => {
+    const performAddTask = async () => {
         if (isValidText(newTaskTitle))
-            addTask(
-                user.id,
-                taskGroups[taskGroupIndex].id,
-                {
-                    text: newTaskTitle,
-                    checkable: true,
-                    urgency: urgencies[urgency]
-                }
-            ).then(() => {
-                getTasks(
-                    user.id,
-                    taskGroups[taskGroupIndex].id
-                ).then(res => {
-                    setTasks(res)
-                    setNewTaskTitle('')
+        {
+            if (taskGroups.length === 0) {
+                await newTaskGroup(user.id, t('messages.my_first_group'))
+                await setTaskGroupIndex(0)
+                await getTaskGroups(user.id).then(res => {
+                    setTaskGroups(res)
+
+
+                    setNewTaskGroupTitle(
+                        `Task group ${res.length + 1}`
+                    )
+                    addTask(
+                        user.id,
+                        res[0].id,
+                        {
+                            text: newTaskTitle,
+                            checkable: true,
+                            urgency: urgencies[urgency]
+                        }
+                    ).then(() => {
+                        getTasks(
+                            user.id,
+                            res[0].id
+                        ).then(res => {
+                            setTasks(res)
+                            setNewTaskTitle('')
+                        })
+                    })
                 })
-            })
+            }
+            else {
+                addTask(
+                    user.id,
+                    taskGroups[taskGroupIndex].id,
+                    {
+                        text: newTaskTitle,
+                        checkable: true,
+                        urgency: urgencies[urgency]
+                    }
+                ).then(() => {
+                    getTasks(
+                        user.id,
+                        taskGroups[taskGroupIndex].id
+                    ).then(res => {
+                        setTasks(res)
+                        setNewTaskTitle('')
+                    })
+                })
+            }
+
+
+
+        }
     }
     return (
         <>
