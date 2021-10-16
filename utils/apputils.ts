@@ -5,7 +5,9 @@ import {
 	query,
 } from '@firebase/firestore'
 import { db, user } from './fire'
-import { message } from 'antd'
+import { notification } from 'antd'
+import { MutableRefObject, useRef } from 'react'
+import { IconType } from 'antd/lib/notification'
 // import useTranslation from 'next-translate/useTranslation'
 
 export const requestNotificationPermission =
@@ -15,7 +17,7 @@ export const requestNotificationPermission =
 		return result
 	}
 
-export const notification = async (
+export const deviceNotification = async (
 	text: string
 ) => {
 	new Notification('To do list', {
@@ -134,17 +136,6 @@ export const extractCapitals = (text: string) => {
 		.toUpperCase()}`
 }
 
-export const warn = (text: string) => {
-	// const { t } = useTranslation('common')
-
-	message.warning({
-		content: text,
-		style: {
-			marginTop: '20vh',
-		},
-	})
-}
-
 export const setTheme = (theme: string) => {
 	// window.document.classlist.add(theme)
 	if (theme === 'light') {
@@ -160,4 +151,29 @@ export const setTheme = (theme: string) => {
 	// 	'font-size:16px;background-color:#939ac8;color:white;',
 	// 	window.document.body
 	// )
+}
+
+export const useFocus = () => {
+	const htmlElRef: MutableRefObject<any> =
+		useRef(null)
+	const setFocus = () => {
+		htmlElRef.current && htmlElRef.current.focus()
+	}
+
+	return [htmlElRef, setFocus]
+}
+
+export const notif = ({
+	type,
+	message,
+	description,
+}: {
+	type: IconType
+	message: string
+	description?: string
+}) => {
+	notification[type]({
+		message,
+		description: description || '',
+	})
 }

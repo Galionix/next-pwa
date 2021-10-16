@@ -5,13 +5,16 @@ import s from '../styles/Home.module.scss'
 import useTranslation from 'next-translate/useTranslation'
 import {
     Dispatch,
+    ForwardedRef,
+    forwardRef,
+    MutableRefObject,
     SetStateAction,
     useState,
 } from 'react'
 import {
     isValidText,
     getTasks,
-    warn,
+    notif,
     getTaskGroups,
 } from './../utils/apputils'
 import { addTask, newTaskGroup } from './../utils/fire'
@@ -26,33 +29,40 @@ import {
 import classNames from 'classnames/bind';
 
 
-
-
-
-
-
-
-
 const cn = classNames.bind(s);
-export const InputPanel = ({
-    taskGroups,
-    setTasks, setTaskGroups, setNewTaskGroupTitle
-}: {
-    taskGroups: { id: string; data: any }[]
-    setTasks: Dispatch<
-        SetStateAction<
-            {
-                id: string
-                data: any
-            }[]
+type Props = {
+    props: {
+        taskGroups: { id: string; data: any }[]
+        setTasks: Dispatch<
+            SetStateAction<
+                {
+                    id: string
+                    data: any
+                }[]
+            >
         >
-    >
         setTaskGroups: Dispatch<SetStateAction<{
             id: string;
             data: any;
         }[]>>
         setNewTaskGroupTitle: Dispatch<SetStateAction<string>>
-    }) => {
+
+    }
+    ref: ForwardedRef<any>
+}
+
+export const InputPanel = (
+    props: Props["props"]
+) => {
+
+    const {
+        taskGroups,
+        setTasks,
+        setTaskGroups,
+        setNewTaskGroupTitle
+    } = props
+
+
     const {
         setTaskGroupIndex,
         taskGroupIndex,
@@ -71,8 +81,7 @@ export const InputPanel = ({
     const [newTaskTitle, setNewTaskTitle] =
         useState('')
     const performAddTask = async () => {
-        if (isValidText(newTaskTitle))
-        {
+        if (isValidText(newTaskTitle)) {
             if (taskGroups.length === 0) {
                 await newTaskGroup(user.id, t('messages.my_first_group'))
                 await setTaskGroupIndex(0)
@@ -129,12 +138,17 @@ export const InputPanel = ({
     return (
         <>
             <button
-                onClick={() => warn(t('messages.not_implemented_yet'))}
+                onClick={() => notif({
+                    type: 'warning',
+                    message: t('messages.not_implemented_yet')
+
+                })}
             >
                 <IoPlanet />{' '}
             </button>
             <motion.input
                 {...fastTransition}
+                autoFocus
                 layout
                 type='text'
                 placeholder={t('buttons.new_task')}
@@ -173,7 +187,11 @@ export const InputPanel = ({
 
             {newTaskTitle === '' && (
                 <button
-                    onClick={() => warn(t('messages.not_implemented_yet'))}
+                    onClick={() => notif({
+                        type: 'warning',
+                        message: t('messages.not_implemented_yet')
+
+                    })}
 
                 >
                     <IoAttach />{' '}

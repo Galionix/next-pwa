@@ -1,72 +1,49 @@
 // import { db, app } from '@/utils/fire';
-import type { NextPage } from 'next'
-import { useSession } from 'next-auth/react'
-import Head from 'next/head'
-import Image from 'next/image'
-import {
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
-import 'antd/dist/antd.css'; // or 'antd/dist/antd.less'
-import s from '../styles/Home.module.scss'
-import { AuthButton } from './../components/AuthButton'
-import { useUserStore } from './../utils/store'
-import { AiFillDelete } from 'react-icons/ai'
-import { IoAddCircleOutline, IoArchive, IoArchiveOutline } from 'react-icons/io5'
-import { Checkbox, Divider, Tabs } from 'antd';
-import { RiInboxUnarchiveLine } from "react-icons/ri";
-import {
-
-  getDoc,
-
-} from 'firebase/firestore'
-
-import {
-  app,
-  newTaskGroup,
-  f_updateTaskGroupTitle,
-} from './../utils/fire'
-import {
-  doc,
-  setDoc,
-  getFirestore,
-} from 'firebase/firestore'
-// import { getDatabase, ref, set } from "firebase/database";
-import { initializeApp } from 'firebase/app'
-import { firebaseConfig } from './../utils/fire'
-import { initUser } from '@/utils/fire'
 import {
   extractCapitals,
   getTaskGroups,
-  getTasks,
-  notification,
-  requestNotificationPermission,
-  setTheme,
+  getTasks, requestNotificationPermission,
+  setTheme
 } from '@/utils/apputils'
-import { addTask } from './../utils/fire'
-import { useRouter } from 'next/dist/client/router'
-import useTranslation from 'next-translate/useTranslation'
-import { UserPanel } from './../components/UserPanel'
-import { SettingsPanel } from './../components/SettingsPanel'
-import { NotLogged } from './../components/NotLogged'
-import { TaskPanel } from './../components/TaskPanel'
-import { deleteTaskGroup } from './../utils/fire'
-import { isValidText } from './../utils/apputils'
-import { Loader } from './../components/Loader/Loader'
-import { AddTasks } from './../components/AddTasks/AddTasks'
-import { f_updateTask } from './../utils/fire'
+import { initUser } from '@/utils/fire'
+import { Tabs } from 'antd'
+import 'antd/dist/antd.css' // or 'antd/dist/antd.less'
+import classNames from 'classnames/bind'
+import {
+
+  getDoc
+} from 'firebase/firestore'
+import { AnimatePresence, motion } from 'framer-motion'
+import type { NextPage } from 'next'
 import { Session } from 'next-auth'
-import { useLongPress } from 'react-use';
-import { useSwipeable } from 'react-swipeable'
-import { AnimateSharedLayout } from 'framer-motion'
-import { AnimatePresence } from 'framer-motion';
-import { motion } from 'framer-motion';
-import { InputPanel } from './../components/InputPanel';
-import { fastTransition } from './../components/anims';
-import classNames from 'classnames/bind';
+import { useSession } from 'next-auth/react'
+import useTranslation from 'next-translate/useTranslation'
+import { useRouter } from 'next/dist/client/router'
+import Head from 'next/head'
 import { wrap } from 'popmotion'
-import { warn } from './../utils/apputils';
+import {
+  useEffect,
+  useRef,
+  useState
+} from 'react'
+import { AiFillDelete } from 'react-icons/ai'
+import { IoAddCircleOutline, IoArchiveOutline } from 'react-icons/io5'
+import { RiInboxUnarchiveLine } from "react-icons/ri"
+import { useSwipeable } from 'react-swipeable'
+import { useLongPress, useWindowSize } from 'react-use'
+import s from '../styles/Home.module.scss'
+import { AddTasks } from './../components/AddTasks/AddTasks'
+import { fastTransition } from './../components/anims'
+import { InputPanel } from './../components/InputPanel'
+import { Loader } from './../components/Loader/Loader'
+import { NotLogged } from './../components/NotLogged'
+import { SettingsPanel } from './../components/SettingsPanel'
+import { UserPanel } from './../components/UserPanel'
+import { isValidText } from './../utils/apputils'
+import { deleteTaskGroup, f_updateTask, f_updateTaskGroupTitle, newTaskGroup } from './../utils/fire'
+import { useUserStore } from './../utils/store'
+import { Button } from './../components/Button/Button';
+
 
 const cn = classNames.bind(s);
 // const db = getFirestore(app)
@@ -82,7 +59,7 @@ const Home: NextPage = () => {
   const [email, setEmail] = useState('')
   const [userId, setUserId] = useState('')
   const [folded, setFolded] = useState(false)
-
+  const textInputRef = useRef(null)
   const [paneIndex, setPaneIndex] = useState(0)
   const [editingTaskTitle, setEditingTaskTitle] =
     useState(false)
@@ -153,15 +130,10 @@ const Home: NextPage = () => {
       // console.log("User onSwipedLeft!", eventData)
     },
     onSwipedUp: (eventData) => {
-      // warn(t('messages.not_implemented_yet'))
+
     },
     onSwipedDown: (eventData) => {
-      // warn(t('messages.not_implemented_yet'))
 
-      // console.log("%c ❔: Home:NextPage -> eventData ", "font-size:16px;background-color:#60f867;color:black;", eventData)
-
-      // alert('hack')
-      // console.log("User onSwipedRight!", eventData)
     },
     onSwipedRight: (eventData) => {
       if (wrap(0, 3, paneIndex - 1) === 0)
@@ -227,6 +199,11 @@ const Home: NextPage = () => {
     }
   }, [session])
 
+  const size = useWindowSize()
+  useEffect(() => {
+    if (size.width < 800) setFolded(true)
+    else setFolded(false)
+  })
   useEffect(() => {
     if (taskGroups.length > 0) {
       getTasks(
@@ -280,8 +257,6 @@ const Home: NextPage = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <AnimatePresence>
-
-
       <main
         className={`${s.main} ${folded ? s.folded : ''
           }`}
@@ -369,13 +344,13 @@ const Home: NextPage = () => {
                       setFolded(false)
 
                   }}
-                >
-                  <>
-                    <p>
-                      {t('buttons.add_task_group')}
-                    </p>
-                    <IoAddCircleOutline />
-                </>
+                  >
+                    <Button
+                      title={t('buttons.add_task_group')}
+                      icon={<IoAddCircleOutline />}
+                      hint={'Добавьте группу чтобы сгруппировать ваши задачи'}
+                      hintPosition={'right'}
+                    />
               </li>
             )}
 

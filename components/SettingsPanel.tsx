@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { fastTransition } from './anims';
 import { IoSettings } from 'react-icons/io5';
-import { setTheme, warn } from './../utils/apputils';
+import { setTheme, notif } from './../utils/apputils';
 import { Modal } from 'antd';
 import { useUserStore } from 'utils/store';
 import { deleteUser, updateUser } from './../utils/fire';
@@ -41,7 +41,6 @@ export const SettingsPanel = () => {
         >
 
             <button
-                // onClick={() => warn(t('messages.not_implemented_yet'))}
                 onClick={() => setModalOpen(true)}
             >            <IoSettings size={30} />
                 <p>{t('settings.title')}</p>
@@ -90,7 +89,6 @@ export const SettingsPanel = () => {
                 visible={deleteModal}
                 onOk={() => {
                     deleteUser(user.id).then(res => {
-
                         reset()
                         signOut()
                     })
