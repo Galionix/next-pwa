@@ -32,7 +32,7 @@ export const Button = ({ type, title, hint, hintPosition, disabled, icon, onClic
         // title={title ? title : ''}
         >
             {icon ? icon : null}
-            <span >{title}</span>
+            {title !== "" && <span >{title}</span>}
         </div>
     </Tooltip>
     )

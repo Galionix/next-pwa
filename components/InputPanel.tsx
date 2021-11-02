@@ -27,7 +27,10 @@ import {
     IoSend,
 } from 'react-icons/io5'
 import classNames from 'classnames/bind';
+import { useLongPress } from 'react-use';
+import { Popover, Tag } from 'antd'
 
+const { CheckableTag } = Tag;
 
 const cn = classNames.bind(s);
 type Props = {
@@ -55,6 +58,7 @@ export const InputPanel = (
     props: Props["props"]
 ) => {
 
+    const [popoverOpen, setPopoverOpen] = useState(false)
     const {
         taskGroups,
         setTasks,
@@ -62,6 +66,16 @@ export const InputPanel = (
         setNewTaskGroupTitle
     } = props
 
+    const onLongPress = () => {
+        console.log('calls callback after long pressing 300ms');
+
+    };
+
+    const longPressOptions = {
+        isPreventDefault: false,
+        delay: 200,
+    };
+    const longPressEvent = useLongPress(onLongPress, longPressOptions);
 
     const {
         setTaskGroupIndex,
@@ -137,7 +151,7 @@ export const InputPanel = (
     }
     return (
         <>
-            <button
+            {/* <button
                 onClick={() => notif({
                     type: 'warning',
                     message: t('messages.not_implemented_yet')
@@ -145,7 +159,7 @@ export const InputPanel = (
                 })}
             >
                 <IoPlanet />{' '}
-            </button>
+            </button> */}
             <motion.input
                 {...fastTransition}
                 autoFocus
@@ -165,25 +179,61 @@ export const InputPanel = (
                     }
                 }}
             />
-            <button
-                className={` ${cn(
-                    {
-                        normal: urgencies[urgency] === 'normal',
-                        urgent: urgencies[urgency] === 'urgent',
-                        warning: urgencies[urgency] === 'warning',
-                    }
-                )} `}
+            <Popover
+                title="Urgency"
+                trigger="click"
+                visible={popoverOpen}
+                overlayClassName={s.urgencyPickerOverlay}
+                content={<>
+                    <CheckableTag
+                        checked={urgency === 0}
+                        className={s.normal} onClick={() => {
+                            setUrgency(0)
+                            setPopoverOpen(false)
+                        }}>
+                        normal
+                    </CheckableTag>
+                    <CheckableTag
+                        checked={urgency === 1}
+                        className={`${s.urgency} ${s.urgent}`} onClick={() => {
+                            setUrgency(1)
+                            setPopoverOpen(false)
+                        }}>
+                        urgent
+                    </CheckableTag>
+                    <CheckableTag
+                        checked={urgency === 2}
+                        className={`${s.urgency} ${s.warning}`} onClick={() => {
+                            setUrgency(2)
+                            setPopoverOpen(false)
+                        }}>
+                        warning
+                    </CheckableTag>
+                </>}
 
-                onClick={() => {
-                    setUrgency(urgency < urgencies.length - 1 ? urgency + 1 : 0)
-                }}
             >
-                {urgency === 0 ? (
-                    <IoAlertCircleOutline />
-                ) : (
-                    <IoAlertCircle />
-                )}
-            </button>
+                <button
+
+                    onClick={() => setPopoverOpen(true)}
+                    className={` ${cn(
+                        {
+                            normal: urgencies[urgency] === 'normal',
+                            urgent: urgencies[urgency] === 'urgent',
+                            warning: urgencies[urgency] === 'warning',
+                        }
+                    )} `}
+                // onClick={() => {
+                //     setUrgency(urgency < urgencies.length - 1 ? urgency + 1 : 0)
+                // }}
+                // {...longPressEvent}
+                >
+                    {urgency === 0 ? (
+                        <IoAlertCircleOutline />
+                    ) : (
+                        <IoAlertCircle />
+                    )}
+                </button>
+            </Popover>
 
             {newTaskTitle === '' && (
                 <button

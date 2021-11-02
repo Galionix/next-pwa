@@ -109,11 +109,11 @@ const Home: NextPage = () => {
     console.log('calls callback after long pressing 300ms');
   };
 
-  const defaultOptions = {
+  const longPressOptions = {
     isPreventDefault: false,
-    delay: 300,
+    delay: 200,
   };
-  const longPressEvent = useLongPress(onLongPress, defaultOptions);
+  const longPressEvent = useLongPress(onLongPress, longPressOptions);
 
   const swipeHandlers = useSwipeable({
     // onSwiped: (eventData) => console.log("User Swiped!", eventData),
@@ -126,7 +126,7 @@ const Home: NextPage = () => {
 
       // console.log("%c 🧞‍♀️: Home:onSwipedLeft -> paneIndex ",
       //   "font-size:16px;background-color:#a5b942;color:white;",
-      //   wrap(0, 3, paneIndex - 1))
+      //   wrap(0, 3, paneIndex + 1))
       // console.log("User onSwipedLeft!", eventData)
     },
     onSwipedUp: (eventData) => {
@@ -145,14 +145,14 @@ const Home: NextPage = () => {
 
       // console.log("%c 🧞‍♀️: Home:onSwipedRight -> paneIndex ",
       //   "font-size:16px;background-color:#a5b942;color:white;",
-      //   wrap(0, 3, paneIndex + 1))
+      //   wrap(0, 3, paneIndex - 1))
       // console.log("User onSwipedRight!", eventData)
     },
     delta: 10,                            // min distance(px) before a swipe starts. *See Notes*
-    preventDefaultTouchmoveEvent: false,  // call e.preventDefault *See Details*
+    // preventDefaultTouchmoveEvent: false,  // call e.preventDefault *See Details*
     trackTouch: true,                     // track touch input
     trackMouse: false,                    // track mouse input
-    rotationAngle: 0,                     // set a rotation angle
+    // rotationAngle: 0,                     // set a rotation angle
 
   });
 
@@ -200,10 +200,10 @@ const Home: NextPage = () => {
   }, [session])
 
   const size = useWindowSize()
-  useEffect(() => {
-    if (size.width < 800) setFolded(true)
-    else setFolded(false)
-  })
+  // useEffect(() => {
+  //   if (size.width < 800) setFolded(true)
+  //   else setFolded(false)
+  // })
   useEffect(() => {
     if (taskGroups.length > 0) {
       getTasks(
@@ -260,7 +260,7 @@ const Home: NextPage = () => {
       <main
         className={`${s.main} ${folded ? s.folded : ''
           }`}
-        {...swipeHandlers}
+          {...swipeHandlers}
       >
         {session.status === 'authenticated' && (
           <UserPanel />
@@ -346,8 +346,8 @@ const Home: NextPage = () => {
                   }}
                   >
                     <Button
-                      title={t('buttons.add_task_group')}
-                      icon={<IoAddCircleOutline />}
+                      title={!folded ? t('buttons.add_task_group') : ""}
+                      icon={<IoAddCircleOutline size={20} />}
                       hint={'Добавьте группу чтобы сгруппировать ваши задачи'}
                       hintPosition={'right'}
                     />
@@ -373,7 +373,7 @@ const Home: NextPage = () => {
                   setEditingTaskTitle(true)
                   // console.log(taskGroups[taskGroupIndex].id)
                 }}
-                {...longPressEvent}
+                // {...longPressEvent}
               >
                 {index === taskGroupIndex &&
                   editingTaskTitle ? (
@@ -528,7 +528,6 @@ const Home: NextPage = () => {
                 setPaneIndex(parseInt(e))
                 if (window.innerWidth < 800)
                   setFolded(true)
-                // console.log(e)
               }}
               defaultActiveKey="1"
               activeKey={
@@ -540,6 +539,7 @@ const Home: NextPage = () => {
                 { inkBar: true }
               }
             // onChange={callback}
+
             >
               <TabPane
                 tab={t('buttons.active_tasks')}
