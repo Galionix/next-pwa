@@ -441,3 +441,11 @@ gap: 10px;
 .urgency.warning{
 				color:var(--color-red)
 			}
+
+.floatingButton{
+	@include m.interactive;
+	z-index: 1000;
+	position: absolute;
+	right:16px;
+	top:10px;
+}

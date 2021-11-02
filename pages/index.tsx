@@ -27,7 +27,7 @@ import {
   useState
 } from 'react'
 import { AiFillDelete } from 'react-icons/ai'
-import { IoAddCircleOutline, IoArchiveOutline } from 'react-icons/io5'
+import { IoAddCircleOutline, IoArchiveOutline, IoArchiveSharp } from 'react-icons/io5'
 import { RiInboxUnarchiveLine } from "react-icons/ri"
 import { useSwipeable } from 'react-swipeable'
 import { useLongPress, useWindowSize } from 'react-use'
@@ -243,11 +243,41 @@ const Home: NextPage = () => {
     //   "font-size:16px;background-color:#328181;color:white;",
     //   task)
     updateTask({
-      id, data: {
-        ...task,
+      id,
+      data: {
+        ...task!.data,
         archived: value
       }
-    })
+    }
+    )
+  }
+
+
+  const allowArchive = () =>
+    tasks.filter(task =>
+      task.data.checkable
+      &&
+      task.data.checked
+      &&
+      !task.data.archived
+    ).length > 1
+
+  const archiveChecked = () => {
+
+    const tasksToArchive = tasks.filter((task) =>
+      task.data.checkable
+      &&
+      task.data.checked
+      &&
+      !task.data.archived)
+
+
+    tasksToArchive && tasksToArchive.forEach(task => updateTask({
+      id: task.id, data: {
+        ...task.data,
+        archived: true
+      }
+    }))
   }
 
   return (
@@ -261,7 +291,19 @@ const Home: NextPage = () => {
         className={`${s.main} ${folded ? s.folded : ''
           }`}
           {...swipeHandlers}
-      >
+        >
+          {allowArchive() && <div
+            className={s.floatingButton}
+            onClick={() => archiveChecked()}
+          >
+
+            <Button
+
+              icon={<IoArchiveSharp size={30} />}
+              hint={"Archive all"}
+            />
+          </div>
+          }
         {session.status === 'authenticated' && (
           <UserPanel />
         )}

@@ -13,13 +13,14 @@ interface Props {
     icon?: JSX.Element
     onClick?: Function
     hintPosition?: TooltipPlacement
+    className?: string
 }
 
-export const Button = ({ type, title, hint, hintPosition, disabled, icon, onClick }: Props) => {
+export const Button = ({ type, title, hint, hintPosition, disabled, icon, onClick, className }: Props) => {
     return (<Tooltip title={hint} placement={hintPosition} >
 
         <div
-            className={cn({
+            className={`${cn({
                 button: true,
                 warning: type === 'warning',
                 error: type === 'error',
@@ -27,7 +28,7 @@ export const Button = ({ type, title, hint, hintPosition, disabled, icon, onClic
                 success: type === 'success',
                 disabled,
                 icon: !!icon
-            })}
+            })} ${className && className}`}
             onClick={onClick && onClick()}
         // title={title ? title : ''}
         >

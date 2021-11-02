@@ -171,14 +171,15 @@ export const f_updateTask = async (
 	taskGroupId: string,
 	taskId: string,
 	data: any
-): Promise<any> => {
+	): Promise<any> => {
+    console.log("%c 🍛: data ", "font-size:16px;background-color:#2eb3e4;color:white;", data)
 	// console.log('updating')
 	return await updateDoc(
 		doc(
 			db,
 			`users/${userid}/taskGroups/${taskGroupId}/tasks/${taskId}`
 		),
-		{ ...data }
+		data 
 	)
 }
 
