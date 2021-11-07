@@ -8,6 +8,7 @@ import { db, user } from './fire'
 import { notification } from 'antd'
 import { MutableRefObject, useRef } from 'react'
 import { IconType } from 'antd/lib/notification'
+import { collectionGroup } from 'firebase/firestore'
 // import useTranslation from 'next-translate/useTranslation'
 
 export const requestNotificationPermission =
@@ -26,17 +27,76 @@ export const deviceNotification = async (
 	})
 }
 
+ 
 export const getTaskGroups = async (
 	userid: string
 ) => {
-	// console.log(
-	// 	'%c 🧜‍♂️: getTaskGroups ',
-	// 	'font-size:16px;background-color:#409416;color:white;',
-	// 	'getTaskGroups'
+	const taskGroupsRef = collection(
+		db,
+		`users/${userid}/taskGroups`
+	)
+	// const taskGroupsRef = collectionGroup(
+	// 	db,
+	// 	`users/${userid}/taskGroups`
 	// )
+	const q = query(
+		taskGroupsRef,
+		orderBy('timestamp', 'desc')
+	)
+	const querySnapshot = await getDocs(
+		q
+	)
 
-	// const { id: userid } = await user(email)
+	const res: {
+		id: string;
+		data: any;
+		taskArray: any[];
+		activeTasks: number;
+		archivedTasks: number;
+		urgentTasks: number;
+		warningTasks: number;
+	}[] = []
 
+	 querySnapshot.forEach(doc => {
+		 res.push({
+			 id: doc.id,
+			 data: doc.data(),
+			 taskArray: [],
+			 activeTasks: 0,
+			 archivedTasks: 0,
+			 urgentTasks: 0,
+			 warningTasks: 0
+		 })
+	})
+	
+	// ANTIPATTERN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	for (const doc of res) {
+		const taskArray = await getTasks(userid,doc.id)
+		doc.taskArray = taskArray
+		doc.activeTasks = taskArray
+                              .filter(el => el.data.checked === false)
+			.length
+		doc.archivedTasks = taskArray
+                              .filter(el => el.data.archived === true)
+			.length
+		
+		doc.urgentTasks = taskArray
+                              .filter(el => el.data.urgency === 'urgent' && el.data.checked === false)
+			.length
+				
+		doc.warningTasks = taskArray
+                              .filter(el => el.data.urgency === 'warning' && el.data.checked === false)
+                              .length
+	}
+	
+    // console.log("%c 🤘: res ", "font-size:16px;background-color:#20a2d6;color:white;", res)
+	return res
+}
+
+export const getTaskGroups_old = async (
+	userid: string
+) => {
 	const taskGroupsRef = collection(
 		db,
 		`users/${userid}/taskGroups`
@@ -47,17 +107,10 @@ export const getTaskGroups = async (
 	)
 	const querySnapshot = await getDocs(
 		q
-		// collection(db, `users/${userid}/taskGroups`)
 	)
-	// console.log(
-	// 	'%c 🐥: querySnapshot ',
-	// 	'font-size:16px;background-color:#426695;color:white;',
-	// 	querySnapshot.size
-	// )
+
 	const res: { id: string; data: any }[] = []
 	querySnapshot.forEach(doc => {
-		// doc.data() is never undefined for query doc snapshots
-		// console.log(doc.id, ' => ', doc.data())
 		res.push({ id: doc.id, data: doc.data() })
 	})
 
@@ -68,13 +121,6 @@ export const getTasks = async (
 	userid: string,
 	taskGroup: string
 ) => {
-	// console.log(
-	// 	'%c 🇹🇱: getTasks ',
-	// 	'font-size:16px;background-color:#2e6575;color:white;',
-	// 	'getTasks'
-	// )
-
-	// const { id: userid } = await user(email)
 	const tasksRef = collection(
 		db,
 		`users/${userid}/taskGroups/${taskGroup}/tasks`
@@ -85,22 +131,14 @@ export const getTasks = async (
 	)
 	const querySnapshot = await getDocs(
 		q
-		// collection(
-		// 	db,
-		// 	`users/${userid}/taskGroups/${taskGroup}/tasks`
-		// )
 	)
 	const res: { id: string; data: any }[] = []
 	querySnapshot.forEach(doc => {
-		// doc.data() is never undefined for query doc snapshots
-		// console.log(doc.id, ' => ', doc.data())
 		res.push({
 			id: doc.id,
 			data: doc.data(),
-			// checked: doc.checked,
 		})
 	})
-
 	return res
 }
 
@@ -176,4 +214,29 @@ export const notif = ({
 		message,
 		description: description || '',
 	})
+}
+
+export const refreshTaskData = async (
+	{	userid,
+	taskGroupIndex,
+	setTaskGroups,
+		setTasks
+	}:
+{	userid: string,
+	taskGroupIndex: number,
+	setTaskGroups: Function,
+			setTasks: Function
+		}
+) => {
+	        getTaskGroups(userid).then(res => {
+          setTaskGroups(res)
+          if (res.length > 0 && taskGroupIndex > -1) {
+            getTasks(
+              userid,
+              res[taskGroupIndex].id
+            ).then(res => {
+              setTasks(res)
+            })
+          }
+        })
 }

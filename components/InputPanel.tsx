@@ -35,7 +35,7 @@ const { CheckableTag } = Tag;
 const cn = classNames.bind(s);
 type Props = {
     props: {
-        taskGroups: { id: string; data: any }[]
+        // taskGroups: { id: string; data: any }[]
         setTasks: Dispatch<
             SetStateAction<
                 {
@@ -44,10 +44,10 @@ type Props = {
                 }[]
             >
         >
-        setTaskGroups: Dispatch<SetStateAction<{
-            id: string;
-            data: any;
-        }[]>>
+        // setTaskGroups: Dispatch<SetStateAction<{
+        //     id: string;
+        //     data: any;
+        // }[]>>
         setNewTaskGroupTitle: Dispatch<SetStateAction<string>>
 
     }
@@ -60,9 +60,9 @@ export const InputPanel = (
 
     const [popoverOpen, setPopoverOpen] = useState(false)
     const {
-        taskGroups,
+        // taskGroups,
         setTasks,
-        setTaskGroups,
+        // setTaskGroups,
         setNewTaskGroupTitle
     } = props
 
@@ -82,6 +82,8 @@ export const InputPanel = (
         taskGroupIndex,
         setUser,
         user,
+        taskGroups,
+        setTaskGroups
     } = useUserStore(state => state)
 
     const urgencies = [

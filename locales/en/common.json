@@ -6,7 +6,8 @@
 		"add_task_group": "New task group",
 		"new_task": "New task",
 		"archived_tasks": "Archive",
-		"active_tasks": "Active"
+		"active_tasks": "Active",
+		"current_day" : "Today"
 	},
 	"messages": {
 		"my_first_group": "Add first group",

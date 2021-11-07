@@ -22,7 +22,7 @@ import useTranslation from 'next-translate/useTranslation'
 import { useRouter } from 'next/dist/client/router'
 import Head from 'next/head'
 import { wrap } from 'popmotion'
-import {
+import React, {
   useEffect,
   useRef,
   useState
@@ -44,6 +44,7 @@ import { isValidText } from './../utils/apputils'
 import { deleteTaskGroup, f_updateTask, f_updateTaskGroupTitle, newTaskGroup } from './../utils/fire'
 import { useUserStore } from './../utils/store'
 import { Button } from './../components/Button/Button';
+import { Tooltip } from 'antd';
 
 
 const cn = classNames.bind(s);
@@ -54,13 +55,13 @@ const { TabPane } = Tabs;
 
 
 const Home: NextPage = () => {
-  const loading = true
-  const router = useRouter()
+  // const loading = true
+  // const router = useRouter()
   const { t } = useTranslation('common')
-  const [email, setEmail] = useState('')
-  const [userId, setUserId] = useState('')
+  // const [email, setEmail] = useState('')
+  // const [userId, setUserId] = useState('')
   const [folded, setFolded] = useState(false)
-  const textInputRef = useRef(null)
+  // const textInputRef = useRef(null)
   const [paneIndex, setPaneIndex] = useState(0)
   const [editingTaskTitle, setEditingTaskTitle] =
     useState(false)
@@ -88,9 +89,9 @@ const Home: NextPage = () => {
   const [editingTaskText, setEditingTaskText] =
     useState('')
 	// const [selectedTaskGroup, setSelectedTaskGroup] = useState(0)
-  const [taskGroups, setTaskGroups] = useState<
-    { id: string; data: any }[]
-  >([])
+  // const [taskGroups, setTaskGroups] = useState<
+  //   { id: string; data: any, taskArray: any[] }[]
+  // >([])
   const [tasks, setTasks] = useState<
     { id: string; data: any }[]
   >([])
@@ -99,6 +100,8 @@ const Home: NextPage = () => {
     taskGroupIndex,
     setUser,
     user,
+    taskGroups,
+    setTaskGroups
   } = useUserStore(state => state)
 
   type session_type = {
@@ -173,22 +176,16 @@ const Home: NextPage = () => {
         //@ts-ignore
         const { data } = user_document.data()
 
-        console.log("%c 👩‍💼: Home:NextPage -> userDoc ",
-          "font-size:16px;background-color:#26a60f;color:white;",
-          data)
         if (data?.theme !== '' && data?.theme !== undefined)
           setTheme(data.theme)
         setUser({ name, email, picture, id, data })
-        // setEmail(email)
-        // console.log("%c 🇸🇮: Home:NextPage -> id ", "font-size:16px;background-color:#3b9399;color:white;", id)
-
         requestNotificationPermission()
         getTaskGroups(id).then(res => {
           setTaskGroups(res)
           setNewTaskGroupTitle(
             `Task group ${res.length + 1}`
           )
-          if (res.length > 0) {
+          if (res.length > 0 && taskGroupIndex > -1) {
             getTasks(
               id,
               res[taskGroupIndex].id
@@ -201,7 +198,7 @@ const Home: NextPage = () => {
     }
   }, [session])
 
-  const size = useWindowSize()
+  // const size = useWindowSize()
   // useEffect(() => {
   //   if (size.width < 800) setFolded(true)
   //   else setFolded(false)
@@ -282,6 +279,12 @@ const Home: NextPage = () => {
     }))
   }
 
+  const currentDayClick = () => {
+
+    // getTasks(user)
+
+  }
+
   return (
     <>
       <Head>
@@ -308,7 +311,8 @@ const Home: NextPage = () => {
           <UserPanel />
         )}
 
-          {(session.status === 'authenticated') && (<div className={s.sidebar}>
+          {(session.status === 'authenticated') && (
+            <div className={s.sidebar}>
             <div className={`${s.sidebarControls}`}>
               {settingNewTaskGroup ? (<li
                 className={` ${s.control} `}
@@ -395,16 +399,25 @@ const Home: NextPage = () => {
                     />
                 </li>
               )}
-              <button
-                className={currentDaySelected ? s.currentDaySelected : s.currentDay}
-                onClick={(e) => {
-                  setCurrentDaySelected(true)
-                  setTaskGroupIndex(-1)
-                }}
-              >
-                {!currentDaySelected ? <AiOutlineStar size={20} /> : <AiFillStar size={20} />}
-                {!folded && <span>Current day</span>}
-              </button>
+                <Tooltip
+                  title={"Список на сегодня"}
+                  placement="right"
+                >
+                  <button
+                    className={currentDaySelected ? s.currentDaySelected : s.currentDay}
+                    onClick={(e) => {
+                      currentDayClick()
+                      setCurrentDaySelected(true)
+                      setTaskGroupIndex(-1)
+                    }}
+                  >
+                    {!currentDaySelected
+                      ? <AiOutlineStar size={20} />
+                      : <AiFillStar size={20} />}
+                    {!folded && <span>{t("buttons.current_day")}</span>
+                    }
+                  </button>
+                </Tooltip>
             </div>
             <motion.ul layout
               {...fastTransition}
@@ -448,7 +461,6 @@ const Home: NextPage = () => {
                             .id,
                           updateTaskGroupTitle
                         ).then(() => {
-                                  // console.log('updated')
                           getTaskGroups(
                             user.id
                           ).then(res => {
@@ -506,7 +518,17 @@ const Home: NextPage = () => {
                     />
                   ) : (
                     <>
-                      <p>
+                        <p>
+                          {group.activeTasks !== 0 && <span
+                            className={cn({
+                              activeTasks: true,
+                              urgent: group.urgentTasks > 0,
+                              warning: group.warningTasks > 0,
+                            })}
+                          >
+                            {group.activeTasks}
+                          </span>
+                          }
                         {' '}
                         {`${folded
                           ? extractCapitals(
@@ -789,9 +811,9 @@ const Home: NextPage = () => {
 
             <div className={` ${s.newTask} `}>
               <InputPanel
-                setTaskGroups={setTaskGroups}
+                // setTaskGroups={setTaskGroups}
                 setNewTaskGroupTitle={setNewTaskGroupTitle}
-                taskGroups={taskGroups}
+                // taskGroups={taskGroups}
                 setTasks={setTasks}
               />
             </div>

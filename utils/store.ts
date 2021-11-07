@@ -16,8 +16,8 @@ export const useUserStore = create<Store>(
 				set({
 					user: { picture: '/image/user.png' },
 				}),
-			// setSessionLoading: (sessionLoading: any) =>
-			// 	set({ sessionLoading }),
+			taskGroups: [],
+			setTaskGroups: (taskGroups: any) => set({ taskGroups }),
 		}),
 		{
 			name: 'app-storage',

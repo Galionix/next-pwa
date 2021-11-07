@@ -106,7 +106,6 @@ export const newTaskGroup = async (
 	userid: string,
 	title?: string
 ) => {
-	// const userdoc = await user(email)
 	const docRef = await addDoc(
 		collection(db, `users/${userid}/taskGroups`),
 		{
@@ -114,8 +113,6 @@ export const newTaskGroup = async (
 			timestamp: serverTimestamp(),
 		}
 	)
-
-	// userdoc.
 }
 
 export const addTask = async (

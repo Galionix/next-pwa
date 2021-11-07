@@ -88,3 +88,52 @@ border-radius: 2px !important;
 li{
   list-style: none;
 }
+
+.notFound{
+  height: 100vh;
+
+  
+
+  h1{
+    grid-row: title;
+    color: rgba(0, 0, 0, 0.7);
+    //  font-family: 'Open Sans Condensed';
+    user-select: none;
+  }
+  a{
+    grid-row: button;
+    button{
+      color: rgba(0, 0, 0, 0.7);
+        cursor:pointer;
+        font-size: 40px;
+        display: flex;
+        gap: 20px;
+        font-family: 'Rubik';
+        &:hover{
+          color: var(--color-acc);
+        }
+    }
+
+  }
+  h1,a{
+    justify-self: center;
+  }
+  .image{
+    grid-row: img;
+    display: flex;
+    justify-content: center;
+    img{
+      border-radius: 50%;
+      overflow: hidden;
+    }
+  }
+  display: grid;
+  grid-template-rows: 1fr 
+  [img] auto
+  50px
+  [title] auto 
+  100px 
+  [button] auto
+  1fr
+  ;
+}

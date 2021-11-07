@@ -7,6 +7,7 @@
 		"new_task": "Добавить задачу",
 		"archived_tasks": "Архив",
 		"active_tasks": "Активные"
+		,"current_day" : "Сегодня"
 	},
 	"messages": {
 		"my_first_group": "Моя первая группа",

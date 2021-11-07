@@ -6,4 +6,8 @@ export interface Store {
 		taskGroupIndex: number
 	) => void
 	reset: () => void
+	taskGroups: any[]
+	setTaskGroups: (
+		taskGroups: any[]
+	) => void
 }
