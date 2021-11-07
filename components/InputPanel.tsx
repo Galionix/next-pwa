@@ -180,34 +180,35 @@ export const InputPanel = (
                 }}
             />
             <Popover
-                title="Urgency"
+                title={t("urgency.title")}
                 trigger="click"
                 visible={popoverOpen}
                 overlayClassName={s.urgencyPickerOverlay}
+                onVisibleChange={(state) => setPopoverOpen(state)}
                 content={<>
                     <CheckableTag
-                        checked={urgency === 0}
-                        className={s.normal} onClick={() => {
-                            setUrgency(0)
-                            setPopoverOpen(false)
+                        checked={urgency === 2}
+                        className={`${s.urgency} ${s.warning}`} onClick={() => {
+                            setUrgency(2)
+                            // setPopoverOpen(false)
                         }}>
-                        normal
+                        {t("urgency.warning")}
                     </CheckableTag>
                     <CheckableTag
                         checked={urgency === 1}
                         className={`${s.urgency} ${s.urgent}`} onClick={() => {
                             setUrgency(1)
-                            setPopoverOpen(false)
+                            // setPopoverOpen(false)
                         }}>
-                        urgent
+                        {t("urgency.urgent")}
                     </CheckableTag>
                     <CheckableTag
-                        checked={urgency === 2}
-                        className={`${s.urgency} ${s.warning}`} onClick={() => {
-                            setUrgency(2)
-                            setPopoverOpen(false)
+                        checked={urgency === 0}
+                        className={`${s.urgency} ${s.normal}`} onClick={() => {
+                            setUrgency(0)
+                            // setPopoverOpen(false)
                         }}>
-                        warning
+                        {t("urgency.normal")}
                     </CheckableTag>
                 </>}
 

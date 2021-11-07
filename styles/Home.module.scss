@@ -6,7 +6,11 @@
 	height: 100vh;
     overflow: hidden;
 	grid-template-columns: [sidebar] 200px [main] 1fr;
-	grid-template-rows: [userpanel] 100px [main] 1fr [settings] 100px [footer] auto;
+	grid-template-rows: 
+	[userpanel] 70px
+	[main] 1fr
+	[settings] 20px 
+	[footer] auto;
 
 	.userPanel {
 		display: flex;
@@ -93,10 +97,13 @@
 		grid-area: main / sidebar;
 &>input{
 	width: calc(100% - 20px);
-	    margin:10px;
+	margin:auto;
     padding: 5px;
 }
 		li {
+			p{
+				margin: 0;
+			}
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
@@ -235,10 +242,10 @@
 
 	.newTask {
 		display: flex;
-
+align-items: flex-end;
 		padding: 5px;
 
-		grid-area: footer / main;
+		grid-area: settings/main/footer-end/main;
 		gap: 5px;
 
 		input {
@@ -399,11 +406,23 @@
 		}
 	}
 	.settings{
-		padding: 5px;
+		p{
+			margin: 0;
+		}
+		// margin-top: ;
+		margin-bottom: 5px;
+		// margin-inline: 15px;
+		// // margin-left: 15px;
+		width: calc(100% - 30px);
+		height: 70px;
+		border-radius: 5px;
+		background: rgba(180, 180, 180, 0.3);
+		// padding: 15px;
 		grid-area:    settings / sidebar / footer-end / sidebar;
 		display: flex;
 		align-items: center;
-		place-self: end center;
+		justify-content: center;
+		place-self: center;
 		button{
 			@include m.interactive;
 		}
@@ -416,10 +435,18 @@
 }
 
 .settings_modal{
-	section{
-		display: flex;
-		justify-content: space-between;
-	}
+	
+		section{
+			display: flex;
+flex-direction: column;
+gap: 20px;
+			& > div{
+						display: flex;
+
+			justify-content: space-between;	
+			}
+		}
+	
 }
 
 .urgencyPickerOverlay{
@@ -434,7 +461,12 @@ flex-direction: column;
 gap: 10px;
 	}
 }
-
+.urgency {
+	background-color: transparent !important;
+}
+.urgency.normal{
+	color: rgb(82, 82, 82);
+}
 .urgency.urgent{
 				color:var(--color-orange)
 			}
@@ -448,4 +480,46 @@ gap: 10px;
 	position: absolute;
 	right:16px;
 	top:10px;
+}
+
+.sidebarControls{
+
+	padding: 0 10px 10px;
+	grid-area: main/sidebar;
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	gap: 5px;
+	overflow-y: scroll;
+	position: sticky;
+	top:0;
+	z-index: 1;
+	background: var(--bg-main);
+	button{
+		padding: 5px;
+		display: flex;
+		gap: 10px;
+		align-items: center;
+	}
+	li > div{
+		padding: 5px;
+	}
+}
+
+.sidebar{
+	grid-area: main / sidebar / main / sidebar;
+	overflow-y: scroll;
+	button > svg {
+		color: var(--color-acc);
+	}
+}
+.currentDay{
+	border: 1px solid transparent;
+
+}
+.currentDaySelected{
+	border: 1px solid var(--color-acc-50);
+
+	background: var(--color-acc-50);
+	border-radius: 2px;
 }

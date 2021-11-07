@@ -44,15 +44,15 @@ color: rgba(0, 0, 0, 0.7);
 				}
 			}
 			.control{
-				height: 35px;
+				// height: 35px;
 				justify-content: center;
 				p{
 					display: none;
 				}
-				svg{
-					width: 100%;
-					height: 100%;
-				}
+				// svg{
+				// 	width: 100%;
+				// 	height: 100%;
+				// }
 			}
 			.taskGroups{
 				li{
@@ -66,5 +66,14 @@ color: rgba(0, 0, 0, 0.7);
 			.settings p {
 				display: none;
 			}
-	 
+			.sidebarControls{
+				padding: 0 10px;
+				padding-bottom: 10px;
+				li > div,button{
+				display: flex;
+
+				flex-direction: column;
+				justify-content: center;
+				}
+			}
 }

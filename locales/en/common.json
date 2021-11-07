@@ -1,3 +1,41 @@
 {
-	"user": { "profile": "Profile" }
+	"user": { "profile": "Profile" },
+	"buttons": {
+		"auth": "Sign In",
+		"sign_out": "Sign Out",
+		"add_task_group": "New task group",
+		"new_task": "New task",
+		"archived_tasks": "Archive",
+		"active_tasks": "Active"
+	},
+	"messages": {
+		"my_first_group": "Add first group",
+		"not_logged": "Log in with Google",
+		"task_group_title_placeholder": "Enter caption...",
+		"add_tasks": "Great! Let's create first task.",
+		"not_implemented_yet": "This functionality has not yet been introduced.",
+		"ok": "Ok",
+		"cancel": "Cancel"
+	},
+	"settings": {
+		"title": "Settings",
+		"theme": "Theme",
+		"color": {
+			"black": "Dark",
+			"light": "Light"
+		},
+		"delete_modal": {
+			"button": "Delete account",
+			"title": "Full removal of account 😥",
+			"message": "You will delete the account, all your tasks will erase and you will quit the application. Would you like to continue?",
+			"ok": "Delete 😿",
+			"cancel": "Keep 😻"
+		}
+	},
+	"urgency": {
+		"title":"Urgency",
+		"normal": "Normal",
+		"urgent":"Urgent",
+		"warning":"Warning"
+	}
 }

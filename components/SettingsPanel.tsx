@@ -47,7 +47,7 @@ export const SettingsPanel = () => {
             </button>
 
             <Modal
-                wrapClassName={` ${s.settings_modal} `}
+                wrapClassName={`${s.settings_modal}`}
                 okText={t('messages.ok')}
                 cancelText={t('messages.cancel')}
                 title={t('settings.title')}
@@ -56,8 +56,9 @@ export const SettingsPanel = () => {
                 onOk={() => { setModalOpen(false) }}
                 onCancel={() => setModalOpen(false)}
 
-            >
+            ><>
                 <section>
+                        <div>
                     <p>{t('settings.theme')}</p>
                     <Select
                         defaultValue={user?.data?.theme || 'light'}
@@ -70,15 +71,18 @@ export const SettingsPanel = () => {
                         <Option value="black">{t('settings.color.black')}</Option>
                         <Option value="light">{t('settings.color.light')}</Option>
                     </Select>
-                    <Button danger
-                        onClick={() => setDeleteModal(true)}
-                    >{t('settings.delete_modal.button')}
+                        </div>
+                        <div>
 
-                    </Button>
+                            <Button danger className={` ${s.control} `}
 
+                                onClick={() => setDeleteModal(true)}
+                            >{t('settings.delete_modal.button')}
+
+                            </Button>
+                        </div>
                 </section>
-
-
+                </>
             </Modal>
             <Modal
                 closable={false}

@@ -10,6 +10,14 @@ body,#__next {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
     height: 100%;
 }
+:root {
+
+  --bg-main:white;
+  --bg-second:rgba(0, 0, 0, 0.7);
+
+}
+
+
 button{
   background: transparent;
   border:none;
@@ -49,6 +57,7 @@ input{
 }
 :root{
 --color-acc :#845EC2;
+--color-acc-50 :hsla(263, 45%, 56%, 0.3);
 --color-purple:#D65DB1;
 --color-red:#FF6F91;
 --color-green:#C4FCEF;
@@ -64,11 +73,18 @@ input{
 }
 
 body{
-  &.dark{
-    background: #000;
-    *,*::after,*::before {
-color:white;
-      
-}
+    &.dark{
+      background: #000;
+      *,*::after,*::before {
+  color:white;
+        
   }
+  }
+}
+.ant-tag-checkable-checked{
+border: 1px solid #ccc !important;
+border-radius: 2px !important;
+}
+li{
+  list-style: none;
 }

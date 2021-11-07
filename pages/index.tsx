@@ -13,6 +13,7 @@ import {
 
   getDoc
 } from 'firebase/firestore'
+import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { AnimatePresence, motion } from 'framer-motion'
 import type { NextPage } from 'next'
 import { Session } from 'next-auth'
@@ -64,6 +65,7 @@ const Home: NextPage = () => {
   const [editingTaskTitle, setEditingTaskTitle] =
     useState(false)
 
+  const [currentDaySelected, setCurrentDaySelected] = useState(false)
 
   const [
     settingNewTaskGroup,
@@ -205,7 +207,7 @@ const Home: NextPage = () => {
   //   else setFolded(false)
   // })
   useEffect(() => {
-    if (taskGroups.length > 0) {
+    if (taskGroups.length > 0 && taskGroupIndex > -1) {
       getTasks(
         user.id,
         taskGroups[taskGroupIndex].id
@@ -260,7 +262,7 @@ const Home: NextPage = () => {
       task.data.checked
       &&
       !task.data.archived
-    ).length > 1
+    ).length > 1 && (wrap(0, 3, paneIndex - 1) === 0)
 
   const archiveChecked = () => {
 
@@ -296,9 +298,7 @@ const Home: NextPage = () => {
             className={s.floatingButton}
             onClick={() => archiveChecked()}
           >
-
             <Button
-
               icon={<IoArchiveSharp size={30} />}
               hint={"Archive all"}
             />
@@ -308,83 +308,83 @@ const Home: NextPage = () => {
           <UserPanel />
         )}
 
-        {(session.status === 'authenticated') && (
-            <motion.ul layout
-              {...fastTransition}
-              className={` ${s.taskGroups} `}>
-            {settingNewTaskGroup ? (
-              <input
-                autoFocus
-                type='text'
-                value={newTaskGroupTitle}
-                onChange={e =>
-                  setNewTaskGroupTitle(
-                    e.target.value
-                  )
-                }
-                onBlur={e => {
-                  if (
-                    isValidText(newTaskGroupTitle)
-                  )
-                    newTaskGroup(
-                      user.id,
-                      newTaskGroupTitle
-                    ).then(() => {
-                      setTasks([])
-                      getTaskGroups(user.id).then(
-                        res => {
-                          setTaskGroups(res)
-                          setNewTaskGroupTitle(
-                            `Task group ${taskGroups.length +
-                            1
-                            }`
-                          )
-                          setSettingNewTaskGroup(
-                            false
-                          )
-                          setTaskGroupIndex(0)
-                        }
-                      )
-                    })
-                }}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
+          {(session.status === 'authenticated') && (<div className={s.sidebar}>
+            <div className={`${s.sidebarControls}`}>
+              {settingNewTaskGroup ? (<li
+                className={` ${s.control} `}
+              >
+                <input
+                  autoFocus
+                  type='text'
+                  value={newTaskGroupTitle}
+                  onChange={e =>
+                    setNewTaskGroupTitle(
+                      e.target.value
+                    )
+                  }
+                  onBlur={e => {
                     if (
-                      isValidText(
-                        newTaskGroupTitle
-                      )
+                      isValidText(newTaskGroupTitle)
                     )
                       newTaskGroup(
                         user.id,
                         newTaskGroupTitle
                       ).then(() => {
                         setTasks([])
-                        getTaskGroups(
-                          user.id
-                        ).then(res => {
-                          setTaskGroups(res)
-                          setNewTaskGroupTitle(
-                            `Task group ${taskGroups.length +
-                            1
-                            }`
-                          )
-                          setSettingNewTaskGroup(
-                            false
-                          )
-                          setTaskGroupIndex(0)
-                        })
+                        getTaskGroups(user.id).then(
+                          res => {
+                            setTaskGroups(res)
+                            setNewTaskGroupTitle(
+                              `Task group ${taskGroups.length +
+                              1
+                              }`
+                            )
+                            setSettingNewTaskGroup(
+                              false
+                            )
+                            setTaskGroupIndex(0)
+                          }
+                        )
                       })
-                  }
-                }}
-              />
-            ) : (
-              <li
-                className={` ${s.control} `}
+                  }}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      if (
+                        isValidText(
+                          newTaskGroupTitle
+                        )
+                      )
+                        newTaskGroup(
+                          user.id,
+                          newTaskGroupTitle
+                        ).then(() => {
+                          setTasks([])
+                          getTaskGroups(
+                            user.id
+                          ).then(res => {
+                            setTaskGroups(res)
+                            setNewTaskGroupTitle(
+                              `Task group ${taskGroups.length +
+                              1
+                              }`
+                            )
+                            setSettingNewTaskGroup(
+                              false
+                            )
+                            setTaskGroupIndex(0)
+                          })
+                        })
+                    }
+                  }}
+                />
+              </li>
+              ) : (
+                <li
+                  className={` ${s.control} `}
                   onClick={() => {
                     setSettingNewTaskGroup(true)
                     if (window.innerWidth < 800)
                       setFolded(false)
-
                   }}
                   >
                     <Button
@@ -393,63 +393,76 @@ const Home: NextPage = () => {
                       hint={'Добавьте группу чтобы сгруппировать ваши задачи'}
                       hintPosition={'right'}
                     />
-              </li>
-            )}
-
-            {taskGroups.map((group, index) => (
-              <li
-                key={group.id}
-                className={
-                  taskGroupIndex === index
-                    ? s.selected
-                    : ''
-                }
-                onClick={() => {
-                  setUpdateTaskGroupTitle(
-                    group.data.title
-                  )
-                  setTaskGroupIndex(index)
-                  // setFolded(false)
+                </li>
+              )}
+              <button
+                className={currentDaySelected ? s.currentDaySelected : s.currentDay}
+                onClick={(e) => {
+                  setCurrentDaySelected(true)
+                  setTaskGroupIndex(-1)
                 }}
-                onDoubleClick={() => {
-                  setEditingTaskTitle(true)
-                  // console.log(taskGroups[taskGroupIndex].id)
-                }}
-                // {...longPressEvent}
               >
-                {index === taskGroupIndex &&
-                  editingTaskTitle ? (
-                  <input
-                    autoFocus
-                    onBlur={() => {
-                      if (
-                        !isValidText(
-                          updateTaskGroupTitle
+                {!currentDaySelected ? <AiOutlineStar size={20} /> : <AiFillStar size={20} />}
+                {!folded && <span>Current day</span>}
+              </button>
+            </div>
+            <motion.ul layout
+              {...fastTransition}
+              className={` ${s.taskGroups} `}>
+              {taskGroups.map((group, index) => (
+                <li
+                  key={group.id}
+                  className={
+                    taskGroupIndex === index
+                      ? s.selected
+                      : ''
+                  }
+                  onClick={() => {
+                    setUpdateTaskGroupTitle(
+                      group.data.title
+                    )
+                    setCurrentDaySelected(false)
+                    setTaskGroupIndex(index)
+                    // setFolded(false)
+                  }}
+                  onDoubleClick={() => {
+                    setEditingTaskTitle(true)
+                    // console.log(taskGroups[taskGroupIndex].id)
+                  }}
+                // {...longPressEvent}
+                >
+                  {index === taskGroupIndex &&
+                    editingTaskTitle ? (
+                    <input
+                      autoFocus
+                      onBlur={() => {
+                        if (
+                          !isValidText(
+                            updateTaskGroupTitle
+                          )
                         )
-                      )
-                        return
-                      f_updateTaskGroupTitle(
-                        user.id,
-                        taskGroups[taskGroupIndex]
-                          .id,
-                        updateTaskGroupTitle
-                      ).then(() => {
-												// console.log('updated')
-
-                        getTaskGroups(
-                          user.id
-                        ).then(res => {
-                          setNewTaskGroupTitle(
-                            `Task group ${res.length + 1
-                            }`
-                          )
-                          setTaskGroups(res)
-                          setEditingTaskTitle(
-                            false
-                          )
+                          return
+                        f_updateTaskGroupTitle(
+                          user.id,
+                          taskGroups[taskGroupIndex]
+                            .id,
+                          updateTaskGroupTitle
+                        ).then(() => {
+                                  // console.log('updated')
+                          getTaskGroups(
+                            user.id
+                          ).then(res => {
+                            setNewTaskGroupTitle(
+                              `Task group ${res.length + 1
+                              }`
+                            )
+                            setTaskGroups(res)
+                            setEditingTaskTitle(
+                              false
+                            )
+                          })
                         })
-                      })
-                    }}
+                      }}
                       onKeyDown={e => {
                         if (e.key === 'Enter') {
                           if (
@@ -473,11 +486,11 @@ const Home: NextPage = () => {
                                 }`
                               )
                               setTaskGroups(res)
-                            setEditingTaskTitle(
-                              false
-                            )
+                              setEditingTaskTitle(
+                                false
+                              )
+                            })
                           })
-                        })
                         }
                       }}
                       type='text'
@@ -491,22 +504,22 @@ const Home: NextPage = () => {
                         )
                       }}
                     />
-                ) : (
-                  <>
-                    <p>
-                      {' '}
-                      {`${folded
-                        ? extractCapitals(
-                          group.data.title
-                        )
-                        : group.data.title
-                        }`}
-                    </p>
+                  ) : (
+                    <>
+                      <p>
+                        {' '}
+                        {`${folded
+                          ? extractCapitals(
+                            group.data.title
+                          )
+                          : group.data.title
+                          }`}
+                      </p>
                       {!folded && (
                         <AiFillDelete
                           onClick={e => {
                             e.stopPropagation()
-													// console.log({ index, taskGroupIndex })
+                            // console.log({ index, taskGroupIndex })
                             deleteTaskGroup(
                               user.id,
                               taskGroups[index].id
@@ -555,10 +568,11 @@ const Home: NextPage = () => {
                         />
                       )}
                     </>
-                )}
-              </li>
-            ))}
+                  )}
+                </li>
+              ))}
             </motion.ul>
+          </div>
         )}
         {session.status === 'authenticated' ? (
 
