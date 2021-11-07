@@ -3,7 +3,7 @@ import { AiFillHome } from "react-icons/ai";
 import { RiArrowGoBackLine } from "react-icons/ri";
 // import "styles/globals.scss"
 import Image from 'next/image';
-import Link from 'next/Link';
+import Link from 'next/link';
 
 export default function Custom404() {
     return <main
