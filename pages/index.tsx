@@ -68,6 +68,7 @@ const Home: NextPage = () => {
     settingNewTaskGroup,
     setSettingNewTaskGroup,
   ] = useState(false)
+
   const [
     newTaskGroupTitle,
     setNewTaskGroupTitle,
