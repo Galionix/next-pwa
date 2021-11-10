@@ -27,7 +27,7 @@ export const deviceNotification = async (
 	})
 }
 
- 
+
 export const getTaskGroups = async (
 	userid: string
 ) => {
@@ -57,40 +57,40 @@ export const getTaskGroups = async (
 		warningTasks: number;
 	}[] = []
 
-	 querySnapshot.forEach(doc => {
-		 res.push({
-			 id: doc.id,
-			 data: doc.data(),
-			 taskArray: [],
-			 activeTasks: 0,
-			 archivedTasks: 0,
-			 urgentTasks: 0,
-			 warningTasks: 0
-		 })
+	querySnapshot.forEach(doc => {
+		res.push({
+			id: doc.id,
+			data: doc.data(),
+			taskArray: [],
+			activeTasks: 0,
+			archivedTasks: 0,
+			urgentTasks: 0,
+			warningTasks: 0
+		})
 	})
-	
+
 	// ANTIPATTERN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	for (const doc of res) {
-		const taskArray = await getTasks(userid,doc.id)
+		const taskArray = await getTasks(userid, doc.id)
 		doc.taskArray = taskArray
 		doc.activeTasks = taskArray
-                              .filter(el => el.data.checked === false)
+			.filter(el => el.data.checked === false)
 			.length
 		doc.archivedTasks = taskArray
-                              .filter(el => el.data.archived === true)
+			.filter(el => el.data.archived === true)
 			.length
-		
+
 		doc.urgentTasks = taskArray
-                              .filter(el => el.data.urgency === 'urgent' && el.data.checked === false)
+			.filter(el => el.data.urgency === 'urgent' && el.data.checked === false)
 			.length
-				
+
 		doc.warningTasks = taskArray
-                              .filter(el => el.data.urgency === 'warning' && el.data.checked === false)
-                              .length
+			.filter(el => el.data.urgency === 'warning' && el.data.checked === false)
+			.length
 	}
-	
-    // console.log("%c 🤘: res ", "font-size:16px;background-color:#20a2d6;color:white;", res)
+
+	// console.log("%c 🤘: res ", "font-size:16px;background-color:#20a2d6;color:white;", res)
 	return res
 }
 
@@ -156,10 +156,10 @@ export const extractCapitals = (text: string) => {
 		return `${text
 			.split(' ')[0][0]
 			.toUpperCase()}${text
-			.split(' ')[1][0]
-			.toUpperCase()}${text
-			.split(' ')[2][0]
-			.toUpperCase()}`
+				.split(' ')[1][0]
+				.toUpperCase()}${text
+					.split(' ')[2][0]
+					.toUpperCase()}`
 	if (text.split(' ').length > 1)
 		return `${text
 			.split(' ')[0][0]
@@ -217,26 +217,32 @@ export const notif = ({
 }
 
 export const refreshTaskData = async (
-	{	userid,
-	taskGroupIndex,
-	setTaskGroups,
-		setTasks
+	{ userid,
+		taskGroupIndex,
+		setTaskGroups,
+		setTasks,
+		setGroupsLoading
 	}:
-{	userid: string,
-	taskGroupIndex: number,
-	setTaskGroups: Function,
+		{
+			userid: string,
+			taskGroupIndex: number,
+			setTaskGroups: Function,
 			setTasks: Function
+			setGroupsLoading: Function
 		}
 ) => {
-	        getTaskGroups(userid).then(res => {
-          setTaskGroups(res)
-          if (res.length > 0 && taskGroupIndex > -1) {
-            getTasks(
-              userid,
-              res[taskGroupIndex].id
-            ).then(res => {
-              setTasks(res)
-            })
-          }
-        })
+	setGroupsLoading(true)
+	getTaskGroups(userid).then(res => {
+		setTaskGroups(res)
+		if (res.length > 0 && taskGroupIndex > -1) {
+			getTasks(
+				userid,
+				res[taskGroupIndex].id
+			).then(res => {
+				setTasks(res)
+				setGroupsLoading(false)
+
+			})
+		}
+	})
 }

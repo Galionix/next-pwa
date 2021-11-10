@@ -16,6 +16,7 @@ import {
     getTasks,
     notif,
     getTaskGroups,
+    refreshTaskData,
 } from './../utils/apputils'
 import { addTask, newTaskGroup } from './../utils/fire'
 import { useUserStore } from 'utils/store'
@@ -36,14 +37,14 @@ const cn = classNames.bind(s);
 type Props = {
     props: {
         // taskGroups: { id: string; data: any }[]
-        setTasks: Dispatch<
-            SetStateAction<
-                {
-                    id: string
-                    data: any
-                }[]
-            >
-        >
+        // setTasks: Dispatch<
+        //     SetStateAction<
+        //         {
+        //             id: string
+        //             data: any
+        //         }[]
+        //     >
+        // >
         // setTaskGroups: Dispatch<SetStateAction<{
         //     id: string;
         //     data: any;
@@ -61,7 +62,7 @@ export const InputPanel = (
     const [popoverOpen, setPopoverOpen] = useState(false)
     const {
         // taskGroups,
-        setTasks,
+        // setTasks,
         // setTaskGroups,
         setNewTaskGroupTitle
     } = props
@@ -83,7 +84,10 @@ export const InputPanel = (
         setUser,
         user,
         taskGroups,
-        setTaskGroups
+        setTaskGroups,
+        setTasks,
+        groupsLoading,
+        setGroupsLoading
     } = useUserStore(state => state)
 
     const urgencies = [
@@ -117,13 +121,21 @@ export const InputPanel = (
                             urgency: urgencies[urgency]
                         }
                     ).then(() => {
-                        getTasks(
-                            user.id,
-                            res[0].id
-                        ).then(res => {
-                            setTasks(res)
-                            setNewTaskTitle('')
+                        refreshTaskData({
+                            userid: user.id,
+                            taskGroupIndex,
+                            setTaskGroups,
+                            setTasks,
+                            setGroupsLoading
                         })
+                        setNewTaskTitle('')
+                        // getTasks(
+                        //     user.id,
+                        //     res[0].id
+                        // ).then(res => {
+                        //     setTasks(res)
+                        //     setNewTaskTitle('')
+                        // })
                     })
                 })
             }
@@ -137,13 +149,21 @@ export const InputPanel = (
                         urgency: urgencies[urgency]
                     }
                 ).then(() => {
-                    getTasks(
-                        user.id,
-                        taskGroups[taskGroupIndex].id
-                    ).then(res => {
-                        setTasks(res)
-                        setNewTaskTitle('')
+                    refreshTaskData({
+                        userid: user.id,
+                        taskGroupIndex,
+                        setTaskGroups,
+                        setTasks,
+                        setGroupsLoading
                     })
+                    setNewTaskTitle('')
+                    // getTasks(
+                    //     user.id,
+                    //     taskGroups[taskGroupIndex].id
+                    // ).then(res => {
+                    //     setTasks(res)
+                    //     setNewTaskTitle('')
+                    // })
                 })
             }
 

@@ -2,7 +2,7 @@
 import {
   extractCapitals,
   getTaskGroups,
-  getTasks, requestNotificationPermission,
+  getTasks, refreshTaskData, requestNotificationPermission,
   setTheme
 } from '@/utils/apputils'
 import { initUser } from '@/utils/fire'
@@ -45,6 +45,7 @@ import { deleteTaskGroup, f_updateTask, f_updateTaskGroupTitle, newTaskGroup } f
 import { useUserStore } from './../utils/store'
 import { Button } from './../components/Button/Button';
 import { Tooltip } from 'antd';
+import Image from 'next/image';
 
 
 const cn = classNames.bind(s);
@@ -55,13 +56,8 @@ const { TabPane } = Tabs;
 
 
 const Home: NextPage = () => {
-  // const loading = true
-  // const router = useRouter()
   const { t } = useTranslation('common')
-  // const [email, setEmail] = useState('')
-  // const [userId, setUserId] = useState('')
   const [folded, setFolded] = useState(false)
-  // const textInputRef = useRef(null)
   const [paneIndex, setPaneIndex] = useState(0)
   const [editingTaskTitle, setEditingTaskTitle] =
     useState(false)
@@ -88,20 +84,21 @@ const Home: NextPage = () => {
     useState('')
   const [editingTaskText, setEditingTaskText] =
     useState('')
-	// const [selectedTaskGroup, setSelectedTaskGroup] = useState(0)
-  // const [taskGroups, setTaskGroups] = useState<
-  //   { id: string; data: any, taskArray: any[] }[]
+
+  // const [tasks, setTasks] = useState<
+  //   { id: string; data: any }[]
   // >([])
-  const [tasks, setTasks] = useState<
-    { id: string; data: any }[]
-  >([])
   const {
     setTaskGroupIndex,
     taskGroupIndex,
     setUser,
     user,
     taskGroups,
-    setTaskGroups
+    setTaskGroups,
+    tasks,
+    setTasks,
+    groupsLoading,
+    setGroupsLoading
   } = useUserStore(state => state)
 
   type session_type = {
@@ -180,20 +177,27 @@ const Home: NextPage = () => {
           setTheme(data.theme)
         setUser({ name, email, picture, id, data })
         requestNotificationPermission()
-        getTaskGroups(id).then(res => {
-          setTaskGroups(res)
-          setNewTaskGroupTitle(
-            `Task group ${res.length + 1}`
-          )
-          if (res.length > 0 && taskGroupIndex > -1) {
-            getTasks(
-              id,
-              res[taskGroupIndex].id
-            ).then(res => {
-              setTasks(res)
-            })
-          }
+        refreshTaskData({
+          userid: id,
+          taskGroupIndex,
+          setTaskGroups,
+          setTasks,
+          setGroupsLoading
         })
+        // getTaskGroups(id).then(res => {
+        //   setTaskGroups(res)
+        //   setNewTaskGroupTitle(
+        //     `Task group ${res.length + 1}`
+        //   )
+        //   if (res.length > 0 && taskGroupIndex > -1) {
+        //     getTasks(
+        //       id,
+        //       res[taskGroupIndex].id
+        //     ).then(res => {
+        //       setTasks(res)
+        //     })
+        //   }
+        // })
       })
     }
   }, [session])
@@ -227,11 +231,18 @@ const Home: NextPage = () => {
       id,
       data
     ).then(() => {
-      getTasks(
-        user.id,
-        taskGroups[taskGroupIndex].id
-      ).then(res => {
-        setTasks(res)
+      // getTasks(
+      //   user.id,
+      //   taskGroups[taskGroupIndex].id
+      // ).then(res => {
+      //   setTasks(res)
+      // })
+      refreshTaskData({
+        userid: user.id,
+        taskGroupIndex,
+        setTaskGroups,
+        setTasks,
+        setGroupsLoading
       })
     })
 		// setTasks(tasks.map((task, i) => task.id === id ? { id, data } : task))
@@ -249,17 +260,36 @@ const Home: NextPage = () => {
       }
     }
     )
+    refreshTaskData({
+      userid: user.id,
+      taskGroupIndex,
+      setTaskGroups,
+      setTasks,
+      setGroupsLoading
+    })
   }
 
 
-  const allowArchive = () =>
-    tasks.filter(task =>
+  const allowArchive = () => {
+
+    const isZeroTab = wrap(0, 3, paneIndex - 1) === 0
+    // console.log("tab", wrap(0, 3, paneIndex - 1))
+    const tasksExist = tasks.filter(task =>
       task.data.checkable
       &&
       task.data.checked
       &&
       !task.data.archived
-    ).length > 1 && (wrap(0, 3, paneIndex - 1) === 0)
+    ).length > 1
+
+    const res = tasksExist && isZeroTab
+    // || tasksExist && (window.innerHeight > 800) && isZeroTab
+    // (folded && isZeroTab && (window.innerWidth < 800)) || !folded
+
+    return res
+  }
+
+
 
   const archiveChecked = () => {
 
@@ -422,7 +452,7 @@ const Home: NextPage = () => {
             <motion.ul layout
               {...fastTransition}
               className={` ${s.taskGroups} `}>
-              {taskGroups.map((group, index) => (
+                {taskGroups.map((group, index) => (
                 <li
                   key={group.id}
                   className={
@@ -436,13 +466,10 @@ const Home: NextPage = () => {
                     )
                     setCurrentDaySelected(false)
                     setTaskGroupIndex(index)
-                    // setFolded(false)
                   }}
                   onDoubleClick={() => {
                     setEditingTaskTitle(true)
-                    // console.log(taskGroups[taskGroupIndex].id)
                   }}
-                // {...longPressEvent}
                 >
                   {index === taskGroupIndex &&
                     editingTaskTitle ? (
@@ -540,8 +567,7 @@ const Home: NextPage = () => {
                       {!folded && (
                         <AiFillDelete
                           onClick={e => {
-                            e.stopPropagation()
-                            // console.log({ index, taskGroupIndex })
+                                e.stopPropagation()
                             deleteTaskGroup(
                               user.id,
                               taskGroups[index].id
@@ -576,15 +602,6 @@ const Home: NextPage = () => {
                                   setTasks(res)
                                 })
                               })
-                              // getTaskGroups(
-                              //   user.id
-                              // ).then(res => {
-                              //   setNewTaskGroupTitle(
-                              //     `Task group ${res.length + 1
-                              //     }`
-                              //   )
-                              //   setTaskGroups(res)
-                              // })
                             })
                           }}
                         />
@@ -592,7 +609,21 @@ const Home: NextPage = () => {
                     </>
                   )}
                 </li>
-              ))}
+                ))
+                }
+                {
+                  groupsLoading && <aside
+                    className={` ${s.taskGroupsOverlay} `}
+
+                  >
+                    <Image
+                      src="/image/loadingHeart.gif"
+                      width={64}
+                      height={64}
+                    />
+
+                  </aside>
+                }
             </motion.ul>
           </div>
         )}
@@ -814,7 +845,7 @@ const Home: NextPage = () => {
                 // setTaskGroups={setTaskGroups}
                 setNewTaskGroupTitle={setNewTaskGroupTitle}
                 // taskGroups={taskGroups}
-                setTasks={setTasks}
+                // setTasks={setTasks}
               />
             </div>
             <SettingsPanel />
