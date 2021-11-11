@@ -185,29 +185,10 @@ const Home: NextPage = () => {
           setTasks,
           setGroupsLoading
         })
-        // getTaskGroups(id).then(res => {
-        //   setTaskGroups(res)
-        //   setNewTaskGroupTitle(
-        //     `Task group ${res.length + 1}`
-        //   )
-        //   if (res.length > 0 && taskGroupIndex > -1) {
-        //     getTasks(
-        //       id,
-        //       res[taskGroupIndex].id
-        //     ).then(res => {
-        //       setTasks(res)
-        //     })
-        //   }
-        // })
       })
     }
   }, [session])
 
-  // const size = useWindowSize()
-  // useEffect(() => {
-  //   if (size.width < 800) setFolded(true)
-  //   else setFolded(false)
-  // })
   useEffect(() => {
     if (taskGroups.length > 0 && taskGroupIndex > -1) {
       getTasks(
@@ -232,12 +213,6 @@ const Home: NextPage = () => {
       id,
       data
     ).then(() => {
-      // getTasks(
-      //   user.id,
-      //   taskGroups[taskGroupIndex].id
-      // ).then(res => {
-      //   setTasks(res)
-      // })
       refreshTaskData({
         userid: user.id,
         taskGroupIndex,
@@ -246,13 +221,9 @@ const Home: NextPage = () => {
         setGroupsLoading
       })
     })
-		// setTasks(tasks.map((task, i) => task.id === id ? { id, data } : task))
   }
   const onArchive = (id: string, value: boolean) => {
     const task = tasks.find((item) => item.id === id)
-    // console.log("%c 👶: onArchive -> task ",
-    //   "font-size:16px;background-color:#328181;color:white;",
-    //   task)
     updateTask({
       id,
       data: {
@@ -312,7 +283,45 @@ const Home: NextPage = () => {
 
   const currentDayClick = () => {
 
-    // getTasks(user)
+    setCurrentDaySelected(true)
+
+    const tgName = new Date(Date
+      .now())
+      .toLocaleDateString(
+        "ru-RU",
+        {
+          year: '2-digit',
+          month: 'short',
+          day: 'numeric',
+        })
+
+    const allowCreateNew = !taskGroups.some(
+      taskgroup =>
+        taskgroup.data.title === tgName
+    )
+
+    // console.log(allowCreateNew)
+    if (allowCreateNew) {
+      newTaskGroup(
+        user.id,
+        tgName
+      ).then(() => {
+        refreshTaskData({
+          userid: user.id,
+          taskGroupIndex,
+          setTaskGroups,
+          setTasks,
+          setGroupsLoading
+        }).then(() => {
+          setTaskGroupIndex(0)
+        })
+      })
+    } else {
+      setTaskGroupIndex(
+        taskGroups.findIndex(tg => tg.data.title === tgName)
+      )
+    }
+
 
   }
 
@@ -380,6 +389,8 @@ const Home: NextPage = () => {
                             setTaskGroupIndex(0)
                           }
                         )
+                        setCurrentDaySelected(false)
+
                       })
                   }}
                   onKeyDown={e => {
@@ -438,8 +449,7 @@ const Home: NextPage = () => {
                     className={currentDaySelected ? s.currentDaySelected : s.currentDay}
                     onClick={(e) => {
                       currentDayClick()
-                      setCurrentDaySelected(true)
-                      setTaskGroupIndex(-1)
+                      // setTaskGroupIndex(-1)
                     }}
                   >
                     {!currentDaySelected
@@ -461,7 +471,8 @@ const Home: NextPage = () => {
                       ? s.selected
                       : ''
                   }
-                  onClick={() => {
+                    onClick={() => {
+                      setPaneIndex(1)
                     setUpdateTaskGroupTitle(
                       group.data.title
                     )
@@ -648,22 +659,13 @@ const Home: NextPage = () => {
               animated={
                 { inkBar: true }
               }
-            // onChange={callback}
-
             >
               <TabPane
                 tab={t('buttons.active_tasks')}
                 key={'1'}
-              // activeKey={
-              //   wrap(0, 3, paneIndex) > 0 ? wrap(0, 3, paneIndex) : 1
-              // }
               >
                 <motion.ul layout
                   {...fastTransition}
-                  // onClick={() => {
-                  //   if (window.innerWidth < 800)
-                  //     // setFolded(true)
-                  // }}
                   className={` ${s.tasks} `}
                 >
                   {!settingNewTaskGroup &&
@@ -756,18 +758,6 @@ const Home: NextPage = () => {
 
                                     }}
                                     size={25} />}
-                                  {/* <Checkbox
-                                checked={task.data.checked}
-                              /> */}
-                                  {/* <input
-                          type='checkbox'
-                          readOnly
-                        name=''
-                        id=''
-                        checked={
-                          task.data.checked
-                        }
-                      /> */}
                               </>
                             )}
                           </li>
@@ -779,10 +769,6 @@ const Home: NextPage = () => {
               <TabPane tab={t('buttons.archived_tasks')} key="2">
                 <motion.ul layout
                   {...fastTransition}
-                  // onClick={() => {
-                  //   if (window.innerWidth < 800)
-                  //     // setFolded(true)
-                  // }}
                   className={` ${s.tasks}  ${s.archived_tasks} `}
                 >
                   {!settingNewTaskGroup &&
@@ -798,24 +784,6 @@ const Home: NextPage = () => {
                             })}
 
                             key={task.id}
-                          // onDoubleClick={e => {
-                          //   e.stopPropagation()
-                          //   setEditingTaskIndex(task.id)
-                          //   setEditingTaskText(
-                          //     task.data.text
-                          //   )
-                          //   setSettingNewTask(true)
-                          // }}
-                          // onClick={() => {
-                          //   updateTask({
-                          //     id: task.id,
-                          //     data: {
-                          //       ...task.data,
-                          //       checked:
-                          //         !task.data.checked,
-                          //     },
-                          //   })
-                          // }}
                           >
                             <p>{task.data.text}</p>
                             <RiInboxUnarchiveLine
@@ -839,16 +807,13 @@ const Home: NextPage = () => {
         <Loader
           loading={session.status === 'loading'}
         />
-          {session.status === 'authenticated' && (<>
-
-            <div className={` ${s.newTask} `}>
+          {(session.status === 'authenticated') && (<>
+            {(wrap(0, 3, paneIndex - 1) !== 1) && <div className={` ${s.newTask} `}>
               <InputPanel
-                // setTaskGroups={setTaskGroups}
                 setNewTaskGroupTitle={setNewTaskGroupTitle}
-                // taskGroups={taskGroups}
-                // setTasks={setTasks}
               />
             </div>
+            }
             <SettingsPanel />
           </>
         )}
