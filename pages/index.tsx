@@ -518,7 +518,7 @@ const Home: NextPage = () => {
                       : ''
                   }
                     onClick={() => {
-                      setPaneIndex(1)
+                      setPaneIndex(0)
                     setUpdateTaskGroupTitle(
                       group.data.title
                     )
