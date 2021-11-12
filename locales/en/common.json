@@ -16,7 +16,9 @@
 		"add_tasks": "Great! Let's create first task.",
 		"not_implemented_yet": "This functionality has not yet been introduced.",
 		"ok": "Ok",
-		"cancel": "Cancel"
+		"cancel": "Cancel",
+		"task_description":"You can leave here a short description..."
+
 	},
 	"settings": {
 		"title": "Settings",

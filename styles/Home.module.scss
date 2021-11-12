@@ -180,12 +180,11 @@
 
 
 	.tasks {
-		// overflow-y: scroll;
 
 		grid-area: userpanel / main / footer / main;
 
 		li {
-												&.urgent{
+			&.urgent{
 				background:var(--color-orange)
 			}
 			&.warning{
@@ -193,8 +192,10 @@
 			}
 			border-radius: 3px;
 			svg{
-				
 				@include m.interactive;
+				&:nth-of-type(1){
+					margin-left: auto;
+				}
 				margin-right: 10px;
 			}
 			&.checked{
@@ -205,9 +206,6 @@
 			align-items: center;
 
 			margin-bottom: 5px;
-
-			// border-bottom: 1px solid
-			// 	rgba(204, 204, 204, 0.3);
 
 			p {
 			
@@ -565,4 +563,11 @@ gap: 10px;
 	justify-content: center;
 
 }
-
+ul.tasks{
+	textarea{
+		border-radius: 5px;
+		padding: 10px;
+		width: 100%;
+		resize: none;
+	}
+}

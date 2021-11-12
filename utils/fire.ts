@@ -168,8 +168,7 @@ export const f_updateTask = async (
 	taskGroupId: string,
 	taskId: string,
 	data: any
-	): Promise<any> => {
-    console.log("%c 🍛: data ", "font-size:16px;background-color:#2eb3e4;color:white;", data)
+): Promise<any> => {
 	// console.log('updating')
 	return await updateDoc(
 		doc(

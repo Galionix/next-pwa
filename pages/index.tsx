@@ -10,7 +10,6 @@ import { Tabs } from 'antd'
 import 'antd/dist/antd.css' // or 'antd/dist/antd.less'
 import classNames from 'classnames/bind'
 import {
-
   getDoc
 } from 'firebase/firestore'
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
@@ -28,7 +27,11 @@ import React, {
   useState
 } from 'react'
 import { AiFillDelete } from 'react-icons/ai'
-import { IoAddCircleOutline, IoArchiveOutline, IoArchiveSharp } from 'react-icons/io5'
+import {
+  IoAddCircleOutline,
+  IoArchiveOutline,
+  IoArchiveSharp
+} from 'react-icons/io5'
 import { RiInboxUnarchiveLine } from "react-icons/ri"
 import { useSwipeable } from 'react-swipeable'
 import { useLongPress, useWindowSize } from 'react-use'
@@ -41,11 +44,17 @@ import { NotLogged } from './../components/NotLogged'
 import { SettingsPanel } from './../components/SettingsPanel'
 import { UserPanel } from './../components/UserPanel'
 import { isValidText } from './../utils/apputils'
-import { deleteTaskGroup, f_updateTask, f_updateTaskGroupTitle, newTaskGroup } from './../utils/fire'
+import {
+  deleteTaskGroup,
+  f_updateTask,
+  f_updateTaskGroupTitle,
+  newTaskGroup
+} from './../utils/fire'
 import { useUserStore } from './../utils/store'
 import { Button } from './../components/Button/Button';
 import { Tooltip } from 'antd';
 import Image from 'next/image';
+import { GoNote } from "react-icons/go";
 
 
 const cn = classNames.bind(s);
@@ -86,6 +95,9 @@ const Home: NextPage = () => {
   const [editingTaskText, setEditingTaskText] =
     useState('')
 
+  const [noteIndexEditing, setNoteIndexEditing] = useState("");
+
+  const [textareaValue, setTextareaValue] = useState("")
   // const [tasks, setTasks] = useState<
   //   { id: string; data: any }[]
   // >([])
@@ -106,6 +118,7 @@ const Home: NextPage = () => {
     data: Session | null;
     status: "authenticated" | "unauthenticated" | "loading";
   }
+
   const session = useSession()
 
   const onLongPress = () => {
@@ -116,6 +129,7 @@ const Home: NextPage = () => {
     isPreventDefault: false,
     delay: 200,
   };
+
   const longPressEvent = useLongPress(onLongPress, longPressOptions);
 
   const swipeHandlers = useSwipeable({
@@ -222,6 +236,7 @@ const Home: NextPage = () => {
       })
     })
   }
+
   const onArchive = (id: string, value: boolean) => {
     const task = tasks.find((item) => item.id === id)
     updateTask({
@@ -241,7 +256,6 @@ const Home: NextPage = () => {
     })
   }
 
-
   const allowArchive = () => {
 
     const isZeroTab = wrap(0, 3, paneIndex - 1) === 0
@@ -260,8 +274,6 @@ const Home: NextPage = () => {
 
     return res
   }
-
-
 
   const archiveChecked = () => {
 
@@ -324,6 +336,38 @@ const Home: NextPage = () => {
 
 
   }
+
+  const switchTextArea = (task: any) => {
+    const taskId = task.id
+
+    // console.log("%c 🕰️: switchTextArea -> id ",
+    //   "font-size:16px;background-color:#5692f5;color:white;",
+    //   taskId)
+
+    noteIndexEditing === taskId
+      ? setNoteIndexEditing("")
+      : setNoteIndexEditing(taskId)
+
+    setTextareaValue(task.data?.description)
+
+    // console.log(task.data.description)
+    // updateTask(user.id,{...task.data,})
+
+  }
+
+  const updateTextArea = (task: any, text: string) => {
+    setTextareaValue(text)
+
+    updateTask({
+      id: task.id,
+      data: {
+        ...task.data,
+        description: text,
+      },
+    })
+
+  }
+
 
   return (
     <>
@@ -418,6 +462,8 @@ const Home: NextPage = () => {
                               false
                             )
                             setTaskGroupIndex(0)
+                            setCurrentDaySelected(false)
+
                           })
                         })
                     }
@@ -478,6 +524,7 @@ const Home: NextPage = () => {
                     )
                     setCurrentDaySelected(false)
                     setTaskGroupIndex(index)
+                      setNoteIndexEditing("")
                   }}
                   onDoubleClick={() => {
                     setEditingTaskTitle(true)
@@ -646,6 +693,7 @@ const Home: NextPage = () => {
               centered
               size="small"
               onTabClick={e => {
+                setNoteIndexEditing("")
                 setPaneIndex(parseInt(e))
                 if (window.innerWidth < 800)
                   setFolded(true)
@@ -673,57 +721,40 @@ const Home: NextPage = () => {
                       if (!task.data.archived)
                         return (
 
-                          <li
-                            className={cn({
-                              checked: task.data.checked,
-                              normal: task.data.urgency === 'normal',
-                              urgent: task.data.urgency === 'urgent',
-                              warning: task.data.urgency === 'warning',
-                            })}
-
-                            key={task.id}
-                            onDoubleClick={e => {
-                              e.stopPropagation()
-                              setEditingTaskIndex(task.id)
-                              setEditingTaskText(
-                                task.data.text
-                              )
-                              setSettingNewTask(true)
-                            }}
-                            onClick={() => {
-                              updateTask({
-                                id: task.id,
-                                data: {
-                                  ...task.data,
-                                  checked:
-                                    !task.data.checked,
-                                },
-                              })
-                            }}
-                          >
-                            {settingNewTask &&
-                              editingTaskIndex === task.id ? (
-                              <input
-                                type='text'
-                                autoFocus
-                                onBlur={() => {
-                                  if (
-                                    !isValidText(
-                                      editingTaskText
-                                    )
-                                  )
-                                    return
-                                  setSettingNewTask(false)
-                                  updateTask({
-                                    id: task.id,
-                                    data: {
-                                      ...task.data,
-                                      text: editingTaskText,
-                                    },
-                                  })
-                                }}
-                                onKeyDown={e => {
-                                  if (e.key === 'Enter') {
+                          <>
+                            <li
+                              className={cn({
+                                checked: task.data.checked,
+                                normal: task.data.urgency === 'normal',
+                                urgent: task.data.urgency === 'urgent',
+                                warning: task.data.urgency === 'warning',
+                              })}
+                              key={task.id}
+                              onDoubleClick={e => {
+                                e.stopPropagation()
+                                setEditingTaskIndex(task.id)
+                                setEditingTaskText(
+                                  task.data.text
+                                )
+                                setSettingNewTask(true)
+                              }}
+                              onClick={() => {
+                                updateTask({
+                                  id: task.id,
+                                  data: {
+                                    ...task.data,
+                                    checked:
+                                      !task.data.checked,
+                                  },
+                                })
+                              }}
+                            >
+                              {settingNewTask &&
+                                editingTaskIndex === task.id ? (
+                                <input
+                                  type='text'
+                                  autoFocus
+                                  onBlur={() => {
                                     if (
                                       !isValidText(
                                         editingTaskText
@@ -738,29 +769,66 @@ const Home: NextPage = () => {
                                         text: editingTaskText,
                                       },
                                     })
-                                  }
-                                }}
-                                placeholder=''
-                                value={editingTaskText}
-                                onChange={e => {
-                                  setEditingTaskText(
-                                    e.target.value
-                                  )
-                                }}
-                              />
-                            ) : (
-                              <>
-                                <p>{task.data.text}</p>
+                                  }}
+                                  onKeyDown={e => {
+                                    if (e.key === 'Enter') {
+                                      if (
+                                        !isValidText(
+                                          editingTaskText
+                                        )
+                                      )
+                                        return
+                                      setSettingNewTask(false)
+                                      updateTask({
+                                        id: task.id,
+                                        data: {
+                                          ...task.data,
+                                          text: editingTaskText,
+                                        },
+                                      })
+                                    }
+                                  }}
+                                  placeholder=''
+                                  value={editingTaskText}
+                                  onChange={e => {
+                                    setEditingTaskText(
+                                      e.target.value
+                                    )
+                                  }}
+                                />
+                              ) : (
+                                <>
+                                  <p>{task.data.text}</p>
                                   {task.data.checked && <IoArchiveOutline
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      onArchive(task.id, true)
-
-                                    }}
-                                    size={25} />}
-                              </>
-                            )}
-                          </li>
+                                        onArchive(task.id, true)
+                                      }}
+                                      size={25} />}
+                                    <GoNote
+                                      size={25}
+                                      onClick={
+                                        (e) => {
+                                          e.stopPropagation()
+                                          switchTextArea(task)
+                                        }
+                                      }
+                                    />
+                                </>
+                              )}
+                            </li>
+                            {noteIndexEditing === task.id && <motion.textarea
+                              placeholder={t("messages.task_description")}
+                              name=""
+                              id=""
+                              cols={30}
+                              rows={10}
+                              value={textareaValue}
+                              onChange={(e) => {
+                                updateTextArea(task, e.target.value)
+                              }}
+                            ></motion.textarea>}
+                          </>
                         )
                     })}
                   {tasks.length === 0 && <AddTasks />}
@@ -776,24 +844,44 @@ const Home: NextPage = () => {
                       if (task.data.archived)
                         return (
 
-                          <li
-                            className={cn({
-                              normal: task.data.urgency === 'normal',
-                              urgent: task.data.urgency === 'urgent',
-                              warning: task.data.urgency === 'warning',
-                            })}
-
-                            key={task.id}
-                          >
-                            <p>{task.data.text}</p>
-                            <RiInboxUnarchiveLine
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onArchive(task.id, false)
-
+                          <>
+                            <li
+                              className={cn({
+                                normal: task.data.urgency === 'normal',
+                                urgent: task.data.urgency === 'urgent',
+                                warning: task.data.urgency === 'warning',
+                              })}
+                              key={task.id}
+                            >
+                              <p>{task.data.text}</p>
+                              <GoNote
+                                size={25}
+                                onClick={
+                                  (e) => {
+                                    e.stopPropagation()
+                                    switchTextArea(task)
+                                  }
+                                }
+                              />
+                              <RiInboxUnarchiveLine
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onArchive(task.id, false)
+                                }}
+                                size={25} />
+                            </li>
+                            {noteIndexEditing === task.id && <motion.textarea
+                              placeholder={t("messages.task_description")}
+                              name=""
+                              id=""
+                              cols={30}
+                              rows={10}
+                              value={textareaValue}
+                              onChange={(e) => {
+                                updateTextArea(task, e.target.value)
                               }}
-                              size={25} />
-                          </li>
+                            ></motion.textarea>}
+                          </>
                         )
                     })}
                   {tasks.length === 0 && <AddTasks />}
