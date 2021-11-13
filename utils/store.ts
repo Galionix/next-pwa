@@ -1,3 +1,4 @@
+import { Itask } from 'types/fireTypes'
 import create from 'zustand'
 import { persist } from 'zustand/middleware'
 // import { Store } from './../types/store'
@@ -14,7 +15,7 @@ export interface Store {
 	setTaskGroups: (
 		taskGroups: any[]
 	) => void
-	tasks: any[],
+	tasks: Itask[],
 	setTasks: (
 		taskGroups: any[]
 	) => void

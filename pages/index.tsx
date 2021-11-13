@@ -30,11 +30,12 @@ import { AiFillDelete } from 'react-icons/ai'
 import {
   IoAddCircleOutline,
   IoArchiveOutline,
-  IoArchiveSharp
+  IoArchiveSharp,
+  IoDocumentTextSharp
 } from 'react-icons/io5'
 import { RiInboxUnarchiveLine } from "react-icons/ri"
 import { useSwipeable } from 'react-swipeable'
-import { useLongPress, useWindowSize } from 'react-use'
+import { useClickAway, useDebounce, useLongPress, useWindowSize } from 'react-use'
 import s from '../styles/Home.module.scss'
 import { AddTasks } from './../components/AddTasks/AddTasks'
 import { fastTransition } from './../components/anims'
@@ -55,7 +56,8 @@ import { Button } from './../components/Button/Button';
 import { Tooltip } from 'antd';
 import Image from 'next/image';
 import { GoNote } from "react-icons/go";
-
+import { urgencies, UrgencyPopover } from 'components/UrgencyPopover'
+import { Itask } from 'types/fireTypes'
 
 const cn = classNames.bind(s);
 // const db = getFirestore(app)
@@ -63,8 +65,11 @@ const cn = classNames.bind(s);
 const { TabPane } = Tabs;
 
 
-
 const Home: NextPage = () => {
+
+
+
+
   const { t } = useTranslation('common')
   const [folded, setFolded] = useState(false)
   const [paneIndex, setPaneIndex] = useState(0)
@@ -72,6 +77,10 @@ const Home: NextPage = () => {
     useState(false)
 
   const [currentDaySelected, setCurrentDaySelected] = useState(false)
+
+  const getUrgencyIndex = (urgency: string) => urgencies.indexOf(urgency)
+  const textAreaRef = useRef(null);
+  const textAreaRef2 = useRef(null);
 
   const [
     settingNewTaskGroup,
@@ -98,9 +107,33 @@ const Home: NextPage = () => {
   const [noteIndexEditing, setNoteIndexEditing] = useState("");
 
   const [textareaValue, setTextareaValue] = useState("")
-  // const [tasks, setTasks] = useState<
-  //   { id: string; data: any }[]
-  // >([])
+
+  useClickAway(textAreaRef, () => {
+    const editingTask = tasks.find(task => task.id === noteIndexEditing)
+    if (editingTask)
+      updateTask({
+        id: noteIndexEditing,
+        data: {
+          ...editingTask.data,
+          description: textareaValue,
+        },
+      })
+    setNoteIndexEditing("")
+  });
+
+  useClickAway(textAreaRef2, () => {
+    const editingTask = tasks.find(task => task.id === noteIndexEditing)
+    if (editingTask)
+      updateTask({
+        id: noteIndexEditing,
+        data: {
+          ...editingTask.data,
+          description: textareaValue,
+        },
+      })
+    setNoteIndexEditing("")
+  });
+
   const {
     setTaskGroupIndex,
     taskGroupIndex,
@@ -121,17 +154,18 @@ const Home: NextPage = () => {
 
   const session = useSession()
 
-  const onLongPress = () => {
-    console.log('calls callback after long pressing 300ms');
+  const onLongPress = (e: any) => {
+    console.log(e);
   };
 
   const longPressOptions = {
     isPreventDefault: false,
-    delay: 200,
+    delay: 300,
   };
 
   const longPressEvent = useLongPress(onLongPress, longPressOptions);
 
+  // console.log(longPressEvent)
   const swipeHandlers = useSwipeable({
     // onSwiped: (eventData) => console.log("User Swiped!", eventData),
     onSwipedLeft: (eventData) => {
@@ -160,10 +194,6 @@ const Home: NextPage = () => {
 
       setPaneIndex(wrap(0, 3, paneIndex - 1))
 
-      // console.log("%c 🧞‍♀️: Home:onSwipedRight -> paneIndex ",
-      //   "font-size:16px;background-color:#a5b942;color:white;",
-      //   wrap(0, 3, paneIndex - 1))
-      // console.log("User onSwipedRight!", eventData)
     },
     delta: 10,                            // min distance(px) before a swipe starts. *See Notes*
     // preventDefaultTouchmoveEvent: false,  // call e.preventDefault *See Details*
@@ -212,6 +242,7 @@ const Home: NextPage = () => {
         setTasks(res)
       })
     }
+    console.log(taskGroups)
   }, [taskGroupIndex])
 
   const updateTask = ({
@@ -219,8 +250,9 @@ const Home: NextPage = () => {
     data,
   }: {
     id: string
-    data: any
+      data: any
   }) => {
+    console.log("%c 🌐: Home:NextPage -> data ", "font-size:16px;background-color:#5d01b7;color:white;", data)
     f_updateTask(
       user.id,
       taskGroups[taskGroupIndex].id,
@@ -333,41 +365,55 @@ const Home: NextPage = () => {
         taskGroups.findIndex(tg => tg.data.title === tgName)
       )
     }
-
-
   }
 
   const switchTextArea = (task: any) => {
     const taskId = task.id
 
-    // console.log("%c 🕰️: switchTextArea -> id ",
-    //   "font-size:16px;background-color:#5692f5;color:white;",
-    //   taskId)
-
-    noteIndexEditing === taskId
-      ? setNoteIndexEditing("")
-      : setNoteIndexEditing(taskId)
+    if (noteIndexEditing !== taskId)
+      setNoteIndexEditing(taskId)
 
     setTextareaValue(task.data?.description)
 
-    // console.log(task.data.description)
-    // updateTask(user.id,{...task.data,})
-
   }
 
-  const updateTextArea = (task: any, text: string) => {
-    setTextareaValue(text)
+  // const updateTextArea = (task: any, text: string) => {
+  //   setTextareaValue(text)
+  //   updateTask({
+  //     id: task.id,
+  //     data: {
+  //       ...task.data,
+  //       description: text,
+  //     },
+  //   })
+  // }
 
-    updateTask({
-      id: task.id,
-      data: {
-        ...task.data,
-        description: text,
-      },
-    })
+  const [, cancel] = useDebounce(
+    () => {
+      const editingTask = tasks
+        .find(task => task.id === noteIndexEditing)
 
-  }
+      // console.log({
+      //   textareaValue,
+      //   noteIndexEditing,
+      //   tasks,
+      //   editingTask
+      // }
+      // )
 
+      if (editingTask)
+        updateTask({
+          id: noteIndexEditing,
+          data: {
+            ...editingTask.data,
+            description: textareaValue,
+          },
+        })
+
+    },
+    2000,
+    [textareaValue]
+  );
 
   return (
     <>
@@ -605,14 +651,15 @@ const Home: NextPage = () => {
                   ) : (
                     <>
                         <p>
-                          {group.activeTasks !== 0 && <span
+                            {<span
                             className={cn({
                               activeTasks: true,
                               urgent: group.urgentTasks > 0,
                               warning: group.warningTasks > 0,
+                              placehold: group.activeTasks === 0
                             })}
                           >
-                            {group.activeTasks}
+                              {group.activeTasks}
                           </span>
                           }
                         {' '}
@@ -647,20 +694,19 @@ const Home: NextPage = () => {
                                     0
                                   )
                               }
-                              getTaskGroups(
-                                user.id
-                              ).then(res => {
-                                setTaskGroups(res)
-                                setNewTaskGroupTitle(
-                                  `Task group ${res.length + 1}`
-                                )
-                                getTasks(
-                                  user.id,
-                                  res[taskGroupIndex].id
-                                ).then(res => {
-                                  setTasks(res)
-                                })
+                              // 
+
+                              refreshTaskData({
+                                userid: user.id,
+                                taskGroupIndex,
+                                setTaskGroups,
+                                setTasks,
+                                setGroupsLoading
                               })
+
+                              setNewTaskGroupTitle(
+                                `Task group ${taskGroups.length + 1}`
+                              )
                             })
                           }}
                         />
@@ -673,22 +719,18 @@ const Home: NextPage = () => {
                 {
                   groupsLoading && <aside
                     className={` ${s.taskGroupsOverlay} `}
-
                   >
                     <Image
                       src="/image/loadingHeart.gif"
                       width={64}
                       height={64}
                     />
-
                   </aside>
                 }
             </motion.ul>
           </div>
         )}
-        {session.status === 'authenticated' ? (
-
-
+          {session.status === 'authenticated' ? (
             <Tabs
               centered
               size="small"
@@ -709,7 +751,14 @@ const Home: NextPage = () => {
               }
             >
               <TabPane
-                tab={t('buttons.active_tasks')}
+                tab={
+                  <>
+                    <span>
+                      {t('buttons.active_tasks')}
+                    </span>
+
+                  </>
+                }
                 key={'1'}
               >
                 <motion.ul layout
@@ -730,28 +779,20 @@ const Home: NextPage = () => {
                                 warning: task.data.urgency === 'warning',
                               })}
                               key={task.id}
-                              onDoubleClick={e => {
-                                e.stopPropagation()
-                                setEditingTaskIndex(task.id)
-                                setEditingTaskText(
-                                  task.data.text
-                                )
-                                setSettingNewTask(true)
+
+                              {...longPressEvent}
+                              onMouseDown={(e: any) => {
+                                e.taskId = task.id
+                                longPressEvent.onMouseDown(e)
                               }}
-                              onClick={() => {
-                                updateTask({
-                                  id: task.id,
-                                  data: {
-                                    ...task.data,
-                                    checked:
-                                      !task.data.checked,
-                                  },
-                                })
+                              onTouchStart={(e: any) => {
+                                e.taskId = task.id
+                                longPressEvent.onTouchStart(e)
                               }}
                             >
                               {settingNewTask &&
                                 editingTaskIndex === task.id ? (
-                                <input
+                                  <input
                                   type='text'
                                   autoFocus
                                   onBlur={() => {
@@ -790,7 +831,8 @@ const Home: NextPage = () => {
                                   }}
                                   placeholder=''
                                   value={editingTaskText}
-                                  onChange={e => {
+                                    onChange={e => {
+                                      e.stopPropagation()
                                     setEditingTaskText(
                                       e.target.value
                                     )
@@ -798,26 +840,72 @@ const Home: NextPage = () => {
                                 />
                               ) : (
                                 <>
-                                  <p>{task.data.text}</p>
-                                  {task.data.checked && <IoArchiveOutline
-                                    onClick={(e) => {
-                                      e.stopPropagation();
+                                    <p
+                                      key={task.id + "p"}
+                                      onDoubleClick={e => {
+                                        e.stopPropagation()
+                                        setEditingTaskIndex(task.id)
+                                        setEditingTaskText(
+                                          task.data.text
+                                        )
+                                        setSettingNewTask(true)
+                                      }}
+                                      onClick={() => {
+                                        updateTask({
+                                          id: task.id,
+                                          data: {
+                                            ...task.data,
+                                            checked:
+                                              !task.data.checked,
+                                          },
+                                        })
+                                      }}
+                                    >{task.data.text}</p>
+                                    <UrgencyPopover
+                                      urgency={getUrgencyIndex(task.data.urgency)}
+                                      setUrgency={(urgencyIndex) => updateTask({
+                                        id: task.id,
+                                        data: {
+                                          ...task.data,
+                                          // @ts-ignore
+                                          urgency: urgencies[urgencyIndex],
+                                        },
+                                      })}
+                                      hideOnSelect
+                                    />
+                                    {task.data.checked && <button
+                                      key={task.id + "b"}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
                                         onArchive(task.id, true)
                                       }}
-                                      size={25} />}
-                                    <GoNote
-                                      size={25}
+                                    >
+                                      <IoArchiveOutline
+                                        size={25} />
+                                    </button>}
+                                    <button
+                                      key={task.id + "bt"}
                                       onClick={
                                         (e) => {
                                           e.stopPropagation()
                                           switchTextArea(task)
                                         }
                                       }
-                                    />
+                                    >
+                                      {task.data?.description ?
+                                        <IoDocumentTextSharp
+                                          size={25}
+                                        /> :
+                                        <GoNote
+                                          size={25}
+                                        />}
+                                    </button>
                                 </>
                               )}
                             </li>
                             {noteIndexEditing === task.id && <motion.textarea
+                              key={task.id + "ta"}
+                              ref={textAreaRef2}
                               placeholder={t("messages.task_description")}
                               name=""
                               id=""
@@ -825,7 +913,7 @@ const Home: NextPage = () => {
                               rows={10}
                               value={textareaValue}
                               onChange={(e) => {
-                                updateTextArea(task, e.target.value)
+                                setTextareaValue(e.target.value)
                               }}
                             ></motion.textarea>}
                           </>
@@ -843,7 +931,6 @@ const Home: NextPage = () => {
                     tasks.map(task => {
                       if (task.data.archived)
                         return (
-
                           <>
                             <li
                               className={cn({
@@ -851,34 +938,47 @@ const Home: NextPage = () => {
                                 urgent: task.data.urgency === 'urgent',
                                 warning: task.data.urgency === 'warning',
                               })}
-                              key={task.id}
+                              key={task.id + "12"}
                             >
                               <p>{task.data.text}</p>
-                              <GoNote
-                                size={25}
+                              <button
                                 onClick={
                                   (e) => {
                                     e.stopPropagation()
                                     switchTextArea(task)
                                   }
                                 }
-                              />
-                              <RiInboxUnarchiveLine
+                              >
+                                {task.data?.description ?
+                                  <IoDocumentTextSharp
+                                    size={25}
+                                  /> :
+                                  <GoNote
+                                    size={25}
+                                  />}
+                              </button>
+                              <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   onArchive(task.id, false)
                                 }}
-                                size={25} />
+                              >
+                                <RiInboxUnarchiveLine
+                                  size={25} />
+                              </button>
                             </li>
                             {noteIndexEditing === task.id && <motion.textarea
+                              ref={textAreaRef}
                               placeholder={t("messages.task_description")}
                               name=""
                               id=""
                               cols={30}
                               rows={10}
+                              key={task.id + "ta2"}
                               value={textareaValue}
                               onChange={(e) => {
-                                updateTextArea(task, e.target.value)
+                                setTextareaValue(e.target.value)
+
                               }}
                             ></motion.textarea>}
                           </>

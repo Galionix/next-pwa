@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { fastTransition } from './anims'
 import s from '../styles/Home.module.scss'
-
+import { UrgencyPopover } from "./UrgencyPopover"
 import useTranslation from 'next-translate/useTranslation'
 import {
     Dispatch,
@@ -61,15 +61,11 @@ export const InputPanel = (
 
     const [popoverOpen, setPopoverOpen] = useState(false)
     const {
-        // taskGroups,
-        // setTasks,
-        // setTaskGroups,
         setNewTaskGroupTitle
     } = props
 
     const onLongPress = () => {
         console.log('calls callback after long pressing 300ms');
-
     };
 
     const longPressOptions = {
@@ -192,16 +188,16 @@ export const InputPanel = (
                 onChange={e => {
                     setNewTaskTitle(e.target.value)
                 }}
-                // onBlur={() => {
-                //     performAddTask()
-                // }}
                 onKeyDown={e => {
                     if (e.key === 'Enter') {
                         performAddTask()
                     }
                 }}
             />
-            <Popover
+            <UrgencyPopover
+                urgency={urgency} setUrgency={setUrgency}
+            />
+            {/* <Popover
                 title={t("urgency.title")}
                 trigger="click"
                 visible={popoverOpen}
@@ -256,7 +252,7 @@ export const InputPanel = (
                         <IoAlertCircle />
                     )}
                 </button>
-            </Popover>
+            </Popover> */}
 
             {newTaskTitle === '' && (
                 <button
