@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { fastTransition } from './anims'
 import s from '../styles/Home.module.scss'
-import { UrgencyPopover } from "./UrgencyPopover"
+import { UrgencyPopover } from "./taskActions/UrgencyPopover"
 import useTranslation from 'next-translate/useTranslation'
 import {
     Dispatch,

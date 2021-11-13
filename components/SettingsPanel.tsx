@@ -1,21 +1,24 @@
-import s from '../styles/Home.module.scss'
-import useTranslation from 'next-translate/useTranslation';
-import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { Button, Checkbox, Divider, Modal, Select } from 'antd';
+import { CheckboxValueType } from 'antd/lib/checkbox/Group';
 import { motion } from 'framer-motion';
-import { fastTransition } from './anims';
-import { IoSettings } from 'react-icons/io5';
-import { setTheme, notif } from './../utils/apputils';
-import { Modal } from 'antd';
-import { useUserStore } from 'utils/store';
-import { deleteUser, updateUser } from './../utils/fire';
-import { Checkbox } from 'antd';
-import { Cascader } from 'antd';
-import { Select } from 'antd';
-import { Button } from 'antd';
 import { signOut } from 'next-auth/react';
+import useTranslation from 'next-translate/useTranslation';
+import React, { useState } from 'react';
+import { IoSettings } from 'react-icons/io5';
+import { useUserStore } from 'utils/store';
+import s from '../styles/Home.module.scss';
+import { setTheme } from './../utils/apputils';
+import { deleteUser, updateUser } from './../utils/fire';
+import { fastTransition } from './anims';
 
 const { Option } = Select;
+
+
+
+function onChange(checkedValue: CheckboxValueType[]) {
+    console.log('checked = ', checkedValue);
+}
+
 export const SettingsPanel = () => {
 
     const {
@@ -30,6 +33,15 @@ export const SettingsPanel = () => {
     }
 
     const { t } = useTranslation('common')
+
+    const options = [
+        { label: t('settings.actions.Urgency'), value: 'Urgency' },
+        { label: t('settings.actions.Delete'), value: 'Delete' },
+        { label: t('settings.actions.Archive'), value: 'Archive' },
+        { label: t('settings.actions.Notification'), value: 'Notification' },
+        { label: t('settings.actions.Description'), value: 'Description' },
+    ];
+
     const [modalOpen, setModalOpen] = useState(false)
     const [deleteModal, setDeleteModal] = useState(false)
     return (
@@ -37,15 +49,12 @@ export const SettingsPanel = () => {
             layout
             {...fastTransition}
             className={` ${s.settings} `}
-
         >
-
             <button
                 onClick={() => setModalOpen(true)}
             >            <IoSettings size={30} />
                 <p>{t('settings.title')}</p>
             </button>
-
             <Modal
                 wrapClassName={`${s.settings_modal}`}
                 okText={t('messages.ok')}
@@ -55,7 +64,6 @@ export const SettingsPanel = () => {
                 visible={modalOpen}
                 onOk={() => { setModalOpen(false) }}
                 onCancel={() => setModalOpen(false)}
-
             ><>
                 <section>
                         <div>
@@ -72,6 +80,16 @@ export const SettingsPanel = () => {
                         <Option value="light">{t('settings.color.light')}</Option>
                     </Select>
                         </div>
+
+                        <Divider plain orientation="left">{t('settings.task_actions_section')}</Divider>
+                        <div>
+                            <Checkbox.Group
+                                options={options}
+                                defaultValue={['Apple']}
+                                onChange={onChange}
+                            />
+                        </div>
+                        <Divider plain orientation="left">{t('settings.danger_section')}</Divider>
                         <div>
 
                             <Button danger className={` ${s.control} `}
@@ -99,7 +117,6 @@ export const SettingsPanel = () => {
                 }}
                 onCancel={() => setDeleteModal(false)}
                 okButtonProps={{ danger: true }}
-
             >
                 <p>{t('settings.delete_modal.message')}</p>
             </Modal>

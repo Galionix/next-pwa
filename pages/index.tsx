@@ -56,7 +56,7 @@ import { Button } from './../components/Button/Button';
 import { Tooltip } from 'antd';
 import Image from 'next/image';
 import { GoNote } from "react-icons/go";
-import { urgencies, UrgencyPopover } from 'components/UrgencyPopover'
+import { urgencies, UrgencyPopover } from 'components/taskActions/UrgencyPopover'
 import { Itask } from 'types/fireTypes'
 
 const cn = classNames.bind(s);
@@ -538,7 +538,9 @@ const Home: NextPage = () => {
                   placement="right"
                 >
                   <button
-                    className={currentDaySelected ? s.currentDaySelected : s.currentDay}
+                    className={currentDaySelected
+                      ? s.currentDaySelected
+                      : s.currentDay}
                     onClick={(e) => {
                       currentDayClick()
                       // setTaskGroupIndex(-1)

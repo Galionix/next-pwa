@@ -1,13 +1,10 @@
 
 import { Popover, Tag } from 'antd';
-import s from '../styles/Home.module.scss'
+import s from '../../styles/Home.module.scss'
 import classNames from 'classnames/bind';
 import useTranslation from 'next-translate/useTranslation'
 import {
     Dispatch,
-    // ForwardedRef,
-    // forwardRef,
-    // MutableRefObject,
     SetStateAction,
     useState,
 } from 'react'
@@ -16,21 +13,26 @@ import { IoAlertCircle, IoAlertCircleOutline } from 'react-icons/io5';
 const { CheckableTag } = Tag;
 
 const cn = classNames.bind(s);
+
 export const urgencies = [
     'normal',
     'urgent',
     'warning',
 ]
 
-export const UrgencyPopover = ({ urgency, setUrgency, hideOnSelect }:
-    { urgency: number, setUrgency: Dispatch<SetStateAction<number>>, hideOnSelect?: boolean }) => {
+export const UrgencyPopover = ({
+    urgency,
+    setUrgency,
+    hideOnSelect }:
+    {
+        urgency: number,
+        setUrgency: Dispatch<SetStateAction<number>>,
+        hideOnSelect?: boolean
+    }) => {
 
     const { t } = useTranslation('common')
 
-
-    // const [urgency, setUrgency] = useState(0)
     const [popoverOpen, setPopoverOpen] = useState(false)
-
 
     return (
         <Popover
@@ -65,10 +67,8 @@ export const UrgencyPopover = ({ urgency, setUrgency, hideOnSelect }:
                     {t("urgency.normal")}
                 </CheckableTag>
             </>}
-
         >
             <button
-
                 onClick={() => setPopoverOpen(true)}
                 className={` ${cn(
                     {
@@ -78,7 +78,7 @@ export const UrgencyPopover = ({ urgency, setUrgency, hideOnSelect }:
                     }
                 )} `}
             >
-                {urgency === 0 ? (
+                {!popoverOpen ? (
                     <IoAlertCircleOutline />
                 ) : (
                     <IoAlertCircle />

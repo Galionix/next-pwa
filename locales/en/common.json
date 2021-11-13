@@ -33,6 +33,15 @@
 			"message": "You will delete the account, all your tasks will erase and you will quit the application. Would you like to continue?",
 			"ok": "Delete 😿",
 			"cancel": "Keep 😻"
+		},
+		"danger_section": "Danger zone",
+		"task_actions_section": "Task quick actions",		
+		"actions" : {
+			"Urgency": "Urgency",
+			"Delete": "Delete",
+			"Archive": "Archive",
+			"Notification": "Notification",
+			"Description": "Description"
 		}
 	},
 	"urgency": {

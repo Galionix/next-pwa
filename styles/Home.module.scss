@@ -435,6 +435,7 @@
 flex-direction: column;
 gap: 20px;
 			& > div{
+				margin: 0 !important;
 						display: flex;
 
 			justify-content: space-between;	
@@ -575,3 +576,4 @@ ul.tasks{
 		resize: none;
 	}
 }
+

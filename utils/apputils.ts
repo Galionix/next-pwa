@@ -147,6 +147,7 @@ export const isValidText = (text: string) => {
 	if (text.trim().length < 3) return false
 	return true
 }
+
 export const extractCapitals = (text: string) => {
 	if (text.trim().length < 5)
 		return `${text.trim()[0].toUpperCase()}${text
