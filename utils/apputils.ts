@@ -178,11 +178,35 @@ export const extractCapitals = (text: string) => {
 export const setTheme = (theme: string) => {
 	// window.document.classlist.add(theme)
 	if (theme === 'light') {
-		window.document.body.classList.add('light')
-		window.document.body.classList.remove('dark')
+		document
+			.documentElement
+			.style
+			.setProperty
+			(
+				'--bg-main',
+				'white'
+			);
+
+		document
+			.documentElement
+			.style
+			.setProperty
+			(
+				'--bg-second',
+				'rgba(0, 0, 0, 0.7)'
+			);
+
 	} else {
-		window.document.body.classList.add('dark')
-		window.document.body.classList.remove('light')
+		document.documentElement.style.setProperty
+			('--bg-second',
+				'white'
+			);
+
+		document.documentElement.style.setProperty
+			('--bg-main',
+				'rgba(0, 0, 0, 0.7)'
+			);
+
 	}
 
 	// console.log(

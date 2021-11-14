@@ -8,7 +8,7 @@ body,#__next {
   margin: 0;
   font-family:'Rubik', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-    height: 100%;
+  height: 100%;
 }
 :root {
 
@@ -16,7 +16,6 @@ body,#__next {
   --bg-second:rgba(0, 0, 0, 0.7);
 
 }
-
 
 button{
   background: transparent;
@@ -49,37 +48,42 @@ ul{
 input{
  
   font: inherit;
+
   &:focus{
     outline: none;
     border: 1px dashed rgb(82, 82, 82);
     border-radius: 2px;
   }
+
 }
+
 :root{
---color-acc :#845EC2;
---color-acc-50 :hsla(263, 45%, 56%, 0.3);
---color-purple:#D65DB1;
---color-red:#FF6F91;
---color-green:#C4FCEF;
---color-yellow:#F9F871;
---color-orange:#FFC75F;
---color-tomato:#FF9671;
+  --color-acc :#845EC2;
+  --color-acc-50 :hsla(263, 45%, 56%, 0.3);
+  --color-purple:#D65DB1;
+  --color-red:#FF6F91;
+  --color-green:#C4FCEF;
+  --color-yellow:#F9F871;
+  --color-orange:#FFC75F;
+  --color-tomato:#FF9671;
 
-  --accent-bg: linear-gradient(30deg, #0c3483 0%, #a2b6df 100%, #6b8cce 100%, #a2b6df 100%);
-  // --accent-bg: linear-gradient(to top, #accbee 0%, #e7f0fd 100%);
-  // background-image: linear-gradient(to top, #9890e3 0%, #b1f4cf 100%);
-// --accent-bg: linear-gradient(180deg, #2af598 0%, #009efd 100%);
-// : red;
+  --accent-bg: linear-gradient(
+    30deg, 
+  #0c3483 0%, 
+  #a2b6df 100%, 
+  #6b8cce 100%, 
+  #a2b6df 100%
+  );
+
 }
 
-body{
-    &.dark{
-      background: #000;
+body,input,textarea{
+    background: var(--bg-main);
+    color: var(--bg-second);
       *,*::after,*::before {
-  color:white;
-        
+            // background: var(--bg-main);
   }
-  }
+  
 }
 .ant-tag-checkable-checked{
 border: 1px solid #ccc !important;
@@ -96,14 +100,14 @@ li{
 
   h1{
     grid-row: title;
-    color: rgba(0, 0, 0, 0.7);
+    color: var(--bg-second);
     //  font-family: 'Open Sans Condensed';
     user-select: none;
   }
   a{
     grid-row: button;
     button{
-      color: rgba(0, 0, 0, 0.7);
+      color: var(--bg-second);
         cursor:pointer;
         font-size: 40px;
         display: flex;

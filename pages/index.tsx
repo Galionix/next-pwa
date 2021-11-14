@@ -18,7 +18,7 @@ import type { NextPage } from 'next'
 import { Session } from 'next-auth'
 import { useSession } from 'next-auth/react'
 import useTranslation from 'next-translate/useTranslation'
-import { useRouter } from 'next/dist/client/router'
+// import { useRouter } from 'next/dist/client/router'
 import Head from 'next/head'
 import { wrap } from 'popmotion'
 import React, {
@@ -26,6 +26,7 @@ import React, {
   useRef,
   useState
 } from 'react'
+
 import { AiFillDelete } from 'react-icons/ai'
 import {
   IoAddCircleOutline,
@@ -35,7 +36,10 @@ import {
 } from 'react-icons/io5'
 import { RiInboxUnarchiveLine } from "react-icons/ri"
 import { useSwipeable } from 'react-swipeable'
-import { useClickAway, useDebounce, useLongPress, useWindowSize } from 'react-use'
+import {
+  useClickAway, useDebounce, useLongPress,
+  // useWindowSize
+} from 'react-use'
 import s from '../styles/Home.module.scss'
 import { AddTasks } from './../components/AddTasks/AddTasks'
 import { fastTransition } from './../components/anims'
@@ -57,7 +61,7 @@ import { Tooltip } from 'antd';
 import Image from 'next/image';
 import { GoNote } from "react-icons/go";
 import { urgencies, UrgencyPopover } from 'components/taskActions/UrgencyPopover'
-import { Itask } from 'types/fireTypes'
+// import { Itask } from 'types/fireTypes'
 
 const cn = classNames.bind(s);
 // const db = getFirestore(app)
@@ -110,7 +114,7 @@ const Home: NextPage = () => {
 
   useClickAway(textAreaRef, () => {
     const editingTask = tasks.find(task => task.id === noteIndexEditing)
-    if (editingTask)
+    if (editingTask && typeof (textareaValue) !== "undefined")
       updateTask({
         id: noteIndexEditing,
         data: {
@@ -123,7 +127,7 @@ const Home: NextPage = () => {
 
   useClickAway(textAreaRef2, () => {
     const editingTask = tasks.find(task => task.id === noteIndexEditing)
-    if (editingTask)
+    if (editingTask && typeof (textareaValue) !== "undefined")
       updateTask({
         id: noteIndexEditing,
         data: {
@@ -165,7 +169,6 @@ const Home: NextPage = () => {
 
   const longPressEvent = useLongPress(onLongPress, longPressOptions);
 
-  // console.log(longPressEvent)
   const swipeHandlers = useSwipeable({
     // onSwiped: (eventData) => console.log("User Swiped!", eventData),
     onSwipedLeft: (eventData) => {
@@ -401,7 +404,7 @@ const Home: NextPage = () => {
       // }
       // )
 
-      if (editingTask)
+      if (editingTask && typeof (textareaValue) !== "undefined")
         updateTask({
           id: noteIndexEditing,
           data: {
