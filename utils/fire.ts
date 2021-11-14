@@ -97,9 +97,7 @@ export const initUser = async (
 
 		return docRef
 	} else return querySnapshot.docs[0].ref
-	// } catch (e) {
-	// 	console.error('Error adding document: ', e)
-	// }
+
 }
 // initUser()
 
@@ -170,7 +168,6 @@ export const f_updateTask = async (
 	taskId: string,
 	data: Itask["data"]
 ): Promise<any> => {
-	// console.log('updating')
 	return await updateDoc(
 		doc(
 			db,

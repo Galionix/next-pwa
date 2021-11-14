@@ -30,9 +30,7 @@ function MyApp({ Component,
   //   ; (async () => {
   //     const session: any = await getSession()
   //     setUser(session)
-  //     console.log("%c 🏒: MyApp -> session ",
-  //       "font-size:16px;background-color:#6372a3;color:white;",
-  //       session)
+
 
   //     // setUser(session?.user)
   //   })()

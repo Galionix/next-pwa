@@ -17,7 +17,6 @@ export const AuthButton = () => {
                     e.preventDefault()
 
                     signIn('google').then(msg => {
-                        // console.log("%c 🔛: AuthButton -> msg ", "font-size:16px;background-color:#84693e;color:white;", msg)
 
                     })
                 }}

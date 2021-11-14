@@ -69,6 +69,7 @@ const cn = classNames.bind(s);
 const { TabPane } = Tabs;
 
 
+
 const Home: NextPage = () => {
 
   const { t } = useTranslation('common')
@@ -108,6 +109,9 @@ const Home: NextPage = () => {
   const [noteIndexEditing, setNoteIndexEditing] = useState("");
 
   const [textareaValue, setTextareaValue] = useState("")
+
+
+
 
   useClickAway(textAreaRef, () => {
     const editingTask = tasks.find(task => task.id === noteIndexEditing)
@@ -166,6 +170,7 @@ const Home: NextPage = () => {
 
   const longPressEvent = useLongPress(onLongPress, longPressOptions);
 
+
   const swipeHandlers = useSwipeable({
     // onSwiped: (eventData) => console.log("User Swiped!", eventData),
     onSwipedLeft: (eventData) => {
@@ -174,11 +179,8 @@ const Home: NextPage = () => {
       else
         setFolded(true)
       setPaneIndex(wrap(0, 3, paneIndex + 1))
-
-      // console.log("%c 🧞‍♀️: Home:onSwipedLeft -> paneIndex ",
       //   "font-size:16px;background-color:#a5b942;color:white;",
       //   wrap(0, 3, paneIndex + 1))
-      // console.log("User onSwipedLeft!", eventData)
     },
     onSwipedUp: (eventData) => {
 
@@ -193,7 +195,6 @@ const Home: NextPage = () => {
         setFolded(true)
 
       setPaneIndex(wrap(0, 3, paneIndex - 1))
-
     },
     delta: 10,                            // min distance(px) before a swipe starts. *See Notes*
     // preventDefaultTouchmoveEvent: false,  // call e.preventDefault *See Details*
@@ -242,7 +243,6 @@ const Home: NextPage = () => {
         setTasks(res)
       })
     }
-    console.log(taskGroups)
   }, [taskGroupIndex])
 
   const updateTask = ({
@@ -251,8 +251,7 @@ const Home: NextPage = () => {
   }: {
     id: string
       data: any
-  }) => {
-    console.log("%c 🌐: Home:NextPage -> data ", "font-size:16px;background-color:#5d01b7;color:white;", data)
+    }) => {
     f_updateTask(
       user.id,
       taskGroups[taskGroupIndex].id,
@@ -291,7 +290,6 @@ const Home: NextPage = () => {
   const allowArchive = () => {
 
     const isZeroTab = wrap(0, 3, paneIndex - 1) === 0
-    // console.log("tab", wrap(0, 3, paneIndex - 1))
     const tasksExist = tasks.filter(task =>
       task.data.checkable
       // &&
@@ -344,7 +342,6 @@ const Home: NextPage = () => {
         taskgroup.data.title === tgName
     )
 
-    // console.log(allowCreateNew)
     if (allowCreateNew) {
       newTaskGroup(
         user.id,
@@ -393,13 +390,7 @@ const Home: NextPage = () => {
       const editingTask = tasks
         .find(task => task.id === noteIndexEditing)
 
-      // console.log({
-      //   textareaValue,
-      //   noteIndexEditing,
-      //   tasks,
-      //   editingTask
-      // }
-      // )
+
 
       if (editingTask && typeof (textareaValue) !== "undefined")
         updateTask({
@@ -414,6 +405,7 @@ const Home: NextPage = () => {
     2000,
     [textareaValue]
   );
+
 
   return (
     <>

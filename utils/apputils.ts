@@ -90,7 +90,6 @@ export const getTaskGroups = async (
 			.length
 	}
 
-	// console.log("%c 🤘: res ", "font-size:16px;background-color:#20a2d6;color:white;", res)
 	return res
 }
 
@@ -209,11 +208,7 @@ export const setTheme = (theme: string) => {
 
 	}
 
-	// console.log(
-	// 	'%c 🧐: setTheme -> window.document ',
-	// 	'font-size:16px;background-color:#939ac8;color:white;',
-	// 	window.document.body
-	// )
+
 }
 
 export const useFocus = () => {
