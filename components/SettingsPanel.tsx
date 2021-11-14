@@ -52,7 +52,7 @@ export const SettingsPanel = () => {
         >
             <button
                 onClick={() => setModalOpen(true)}
-            >            <IoSettings size={30} />
+            ><IoSettings size={30} />
                 <p>{t('settings.title')}</p>
             </button>
             <Modal
@@ -62,7 +62,7 @@ export const SettingsPanel = () => {
                 title={t('settings.title')}
                 centered
                 visible={modalOpen}
-                onOk={() => { setModalOpen(false) }}
+                onOk={() => setModalOpen(false)}
                 onCancel={() => setModalOpen(false)}
             ><>
                 <section>
