@@ -77,3 +77,19 @@ color: rgba(0, 0, 0, 0.7);
 				}
 			}
 }
+@mixin overlay ($index:10) {
+			position: relative;
+
+				&:after{
+					pointer-events: none;
+					content: "";
+					position: absolute;
+					inset:0;
+					background: var(--bg-overlay);
+					z-index: $index;
+					opacity: 0;
+				}
+				&:hover:after{
+					opacity:1;
+				}
+}

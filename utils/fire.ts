@@ -15,6 +15,7 @@ import {
 	where,
 	serverTimestamp,
 } from 'firebase/firestore'
+import { Itask } from 'types/fireTypes'
 // import {
 // 	getDatabase,
 // 	ref,
@@ -124,7 +125,7 @@ export const addTask = async (
 		urgency: string
 	}
 ) => {
-	// const { id: userid } = await user(email)
+
 	const docRef = await addDoc(
 		collection(
 			db,
@@ -167,7 +168,7 @@ export const f_updateTask = async (
 	userid: string,
 	taskGroupId: string,
 	taskId: string,
-	data: any
+	data: Itask["data"]
 ): Promise<any> => {
 	// console.log('updating')
 	return await updateDoc(
@@ -175,7 +176,7 @@ export const f_updateTask = async (
 			db,
 			`users/${userid}/taskGroups/${taskGroupId}/tasks/${taskId}`
 		),
-		data 
+		data
 	)
 }
 

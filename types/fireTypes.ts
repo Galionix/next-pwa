@@ -4,7 +4,7 @@ export interface Itask {
 
         description: string;
         archived: boolean;
-        checked: boolean;
+        // checked: boolean;
         checkable: boolean;
         text: string;
         timestamp: any;

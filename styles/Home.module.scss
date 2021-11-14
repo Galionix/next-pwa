@@ -102,7 +102,7 @@
 			}
 
 			&.selected {
-				background: rgba(180, 180, 180, 0.3);
+				background: var(--bg-overlay);
 			}
 
 			svg {
@@ -151,7 +151,7 @@
 
 					content: '';
 
-					background: rgba(180, 180, 180, 0.2);
+					background: var(--bg-overlay);
  
 					inset: 0;
 				}
@@ -165,6 +165,8 @@
 		grid-area: userpanel / main / footer / main;
 
 		li {
+			@include m.overlay;
+
 			&.urgent{
 				background:var(--color-orange)
 			}
@@ -195,7 +197,7 @@
 			
 				margin: 0;
 				padding: 5px;
-				cursor: default;
+				cursor: pointer;
 				width: 100%;
 			}
 
@@ -219,21 +221,51 @@
 				width: 25px;
 				margin-right: 5px;
 			}
+			border:1px solid transparent;
+			p{
+
+				cursor: pointer;
+			}
+			&:hover{
+				
+				border:1px solid var(--bg-overlay);
+			}
 		}
 		&.archived_tasks{
 		li{
+
+			p{
+	cursor: pointer;
+
+			}
+			@include m.overlay;
+
 			&.urgent{
-				background:var(--color-orange)
+				background:var(--color-orange);
+
 			}
 			&.warning{
-				background:var(--color-red)
+				background:var(--color-red);
+
+				
 			}
+
 		}
 	}
 	}
 
 
 	.newTask {
+		input{
+			&::placeholder{
+			color: var(--bg-second);
+			opacity: 0.5;
+			}
+			background: var(--bg-overlay);
+			border-radius: 5px;
+			padding: 5px 10px;
+			color: var(--bg-second);
+		}
 		display: flex;
 		align-items: flex-end;
 		padding: 5px;
@@ -385,7 +417,7 @@
 				user-select: none;
 
 				border: 10px solid
-					rgba(187, 209, 226, 0.753);
+					var(--bg-overlay);
 				border-radius: 50%;
 			}
 		}
@@ -401,7 +433,7 @@
 		width: calc(100% - 30px);
 		height: 70px;
 		border-radius: 5px;
-		background: rgba(180, 180, 180, 0.3);
+		background: var(--bg-overlay);
 		// padding: 15px;
 		grid-area:    settings / sidebar / footer-end / sidebar;
 		display: flex;
@@ -499,7 +531,7 @@ gap: 10px;
    position: absolute;
     z-index: -1;
     content: "";
-    background: rgba(180, 180, 180, 0.2);
+    background: var(--bg-overlay);
     inset: 0;
 }
 	}
@@ -526,9 +558,9 @@ gap: 10px;
 .currentDaySelected {
 	cursor: pointer;
 
-	border: 1px solid var(--color-acc-50);
+	border: 1px solid var(--bg-overlay);
 
-	background: var(--color-acc-50);
+	background: var(--bg-overlay);
 	border-radius: 2px;
 }
 .activeTasks{
@@ -536,7 +568,7 @@ gap: 10px;
 	padding: 0 3px;
 	border-radius: 50%;
 	line-height: 1;
-	border: 1px solid var(--color-acc-50);
+	border: 1px solid var(--bg-overlay);
 // width: ;
 &.urgent{
 				border: 1px solid var(--color-orange)
@@ -555,7 +587,7 @@ gap: 10px;
 	width: 100%;
 	height: 100%;
 	position: absolute;
-	background: rgba(255, 255, 255, 0.3);
+	background: var(--bg-overlay);
 	top: 0;
 	left: 0;
 	display: flex;

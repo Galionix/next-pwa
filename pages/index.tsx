@@ -71,9 +71,6 @@ const { TabPane } = Tabs;
 
 const Home: NextPage = () => {
 
-
-
-
   const { t } = useTranslation('common')
   const [folded, setFolded] = useState(false)
   const [paneIndex, setPaneIndex] = useState(0)
@@ -297,8 +294,8 @@ const Home: NextPage = () => {
     // console.log("tab", wrap(0, 3, paneIndex - 1))
     const tasksExist = tasks.filter(task =>
       task.data.checkable
-      &&
-      task.data.checked
+      // &&
+      // task.data.checked
       &&
       !task.data.archived
     ).length > 1
@@ -314,8 +311,8 @@ const Home: NextPage = () => {
 
     const tasksToArchive = tasks.filter((task) =>
       task.data.checkable
-      &&
-      task.data.checked
+      // &&
+      // task.data.checked
       &&
       !task.data.archived)
 
@@ -778,7 +775,7 @@ const Home: NextPage = () => {
                           <>
                             <li
                               className={cn({
-                                checked: task.data.checked,
+                                // checked: task.data.checked,
                                 normal: task.data.urgency === 'normal',
                                 urgent: task.data.urgency === 'urgent',
                                 warning: task.data.urgency === 'warning',
@@ -855,15 +852,20 @@ const Home: NextPage = () => {
                                         )
                                         setSettingNewTask(true)
                                       }}
-                                      onClick={() => {
-                                        updateTask({
-                                          id: task.id,
-                                          data: {
-                                            ...task.data,
-                                            checked:
-                                              !task.data.checked,
-                                          },
-                                        })
+                                      onClick={(e) => {
+
+                                        e.stopPropagation()
+                                        switchTextArea(task)
+
+
+                                        // updateTask({
+                                        //   id: task.id,
+                                        //   data: {
+                                        //     ...task.data,
+                                        //     checked:
+                                        //       !task.data.checked,
+                                        //   },
+                                        // })
                                       }}
                                     >{task.data.text}</p>
                                     <UrgencyPopover
@@ -878,7 +880,7 @@ const Home: NextPage = () => {
                                       })}
                                       hideOnSelect
                                     />
-                                    {task.data.checked && <button
+                                    {<button
                                       key={task.id + "b"}
                                       onClick={(e) => {
                                         e.stopPropagation();
@@ -890,12 +892,12 @@ const Home: NextPage = () => {
                                     </button>}
                                     <button
                                       key={task.id + "bt"}
-                                      onClick={
-                                        (e) => {
-                                          e.stopPropagation()
-                                          switchTextArea(task)
-                                        }
-                                      }
+                                      // onClick={
+                                      //   (e) => {
+                                      //     e.stopPropagation()
+                                      //     switchTextArea(task)
+                                      //   }
+                                      // }
                                     >
                                       {task.data?.description ?
                                         <IoDocumentTextSharp
@@ -945,14 +947,19 @@ const Home: NextPage = () => {
                               })}
                               key={task.id + "12"}
                             >
-                              <p>{task.data.text}</p>
+                              <p
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  switchTextArea(task)
+                                }}
+                              >{task.data.text}</p>
                               <button
-                                onClick={
-                                  (e) => {
-                                    e.stopPropagation()
-                                    switchTextArea(task)
-                                  }
-                                }
+                                // onClick={
+                                //   (e) => {
+                                //     e.stopPropagation()
+                                //     switchTextArea(task)
+                                //   }
+                                // }
                               >
                                 {task.data?.description ?
                                   <IoDocumentTextSharp

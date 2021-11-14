@@ -12,8 +12,9 @@ body,#__next {
 }
 :root {
 
-  --bg-main:white;
-  --bg-second:rgba(0, 0, 0, 0.7);
+  --bg-main: rgba(126, 126, 126, 0.5);
+  --bg-second: rgba(0, 0, 0, 0.7);
+  --bg-overlay: rgba(126, 126, 126, 0.3);
 
 }
 
@@ -84,6 +85,9 @@ body,input,textarea{
             // background: var(--bg-main);
   }
   
+}
+p{
+ color: var(--bg-second); 
 }
 .ant-tag-checkable-checked{
 border: 1px solid #ccc !important;
