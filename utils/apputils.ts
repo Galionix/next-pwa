@@ -264,5 +264,8 @@ export const refreshTaskData = async (
 
 			})
 		}
+		else {
+			setGroupsLoading(false);
+		}
 	})
 }
