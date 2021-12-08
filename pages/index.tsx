@@ -126,18 +126,19 @@ const Home: NextPage = () => {
     setNoteIndexEditing("")
   });
 
-  useClickAway(textAreaRef2, () => {
-    const editingTask = tasks.find(task => task.id === noteIndexEditing)
-    if (editingTask && typeof (textareaValue) !== "undefined")
-      updateTask({
-        id: noteIndexEditing,
-        data: {
-          ...editingTask.data,
-          description: textareaValue,
-        },
-      })
-    setNoteIndexEditing("")
-  });
+  // useClickAway(textAreaRef2, (wtf) => {
+  // console.log('%c 4️⃣: Home:NextPage -> wtf ', 'font-size:16px;background-color:#bc0e57;color:white;', wtf)
+  //   const editingTask = tasks.find(task => task.id === noteIndexEditing)
+  //   if (editingTask && typeof (textareaValue) !== "undefined")
+  //     updateTask({
+  //       id: noteIndexEditing,
+  //       data: {
+  //         ...editingTask.data,
+  //         description: textareaValue,
+  //       },
+  //     })
+  //   setNoteIndexEditing("")
+  // });
 
   const {
     setTaskGroupIndex,
@@ -368,9 +369,15 @@ const Home: NextPage = () => {
     const taskId = task.id
 
     if (noteIndexEditing !== taskId)
-      setNoteIndexEditing(taskId)
+    {  setNoteIndexEditing(taskId)
 
-    setTextareaValue(task.data?.description)
+      setTextareaValue(task.data?.description)
+    }
+    else {
+      setNoteIndexEditing("")
+      setTextareaValue("")
+
+    }
 
   }
 
@@ -771,6 +778,7 @@ const Home: NextPage = () => {
                                 normal: task.data.urgency === 'normal',
                                 urgent: task.data.urgency === 'urgent',
                                 warning: task.data.urgency === 'warning',
+                                editing: noteIndexEditing === task.id
                               })}
                               key={task.id}
 
