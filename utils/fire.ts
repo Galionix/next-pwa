@@ -14,6 +14,7 @@ import {
 	query,
 	where,
 	serverTimestamp,
+	enableMultiTabIndexedDbPersistence,
 } from 'firebase/firestore'
 import { Itask } from 'types/fireTypes'
 // import {
@@ -42,6 +43,15 @@ export const firebaseConfig = {
 export const app = initializeApp(firebaseConfig)
 export const db = getFirestore(app)
 
+try {
+	
+
+enableMultiTabIndexedDbPersistence(db)
+	.then(() => { console.log("enableMultiTabIndexedDbPersistence enabled"); })
+	.catch((e) => console.log("enableMultiTabIndexedDbPersistence error",e))
+} catch (error) {
+	console.log(error)
+}
 export const user = async (email: string) => {
 	const userRef = collection(db, 'users')
 
