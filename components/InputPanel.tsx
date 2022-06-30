@@ -180,7 +180,7 @@ export const InputPanel = (
             </button> */}
             <motion.input
                 {...fastTransition}
-                autoFocus
+                // autoFocus
                 layout
                 type='text'
                 placeholder={t('buttons.new_task')}
