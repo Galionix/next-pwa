@@ -44,7 +44,7 @@ export const app = initializeApp(firebaseConfig)
 export const db = getFirestore(app)
 
 try {
-	
+
 
 enableMultiTabIndexedDbPersistence(db)
 	.then(() => { console.log("enableMultiTabIndexedDbPersistence enabled"); })
@@ -115,13 +115,13 @@ export const newTaskGroup = async (
 	userid: string,
 	title?: string
 ) => {
-	const docRef = await addDoc(
-		collection(db, `users/${userid}/taskGroups`),
-		{
-			title: title || 'new taskGroup',
-			timestamp: serverTimestamp(),
-		}
-	)
+	const docRef = await addDoc(collection(db, `users/${userid}/taskGroups`), {
+    title: title || 'new taskGroup',
+    timestamp: serverTimestamp(),
+    createdAt: serverTimestamp(),
+    // created: app.database.ServerValue.TIMESTAMP,
+    // created:
+  });
 }
 
 export const addTask = async (
@@ -135,18 +135,18 @@ export const addTask = async (
 ) => {
 
 	const docRef = await addDoc(
-		collection(
-			db,
-			`users/${userid}/taskGroups/${taskGroup}/tasks`
-		),
-		{
-			...task,
-			timestamp: serverTimestamp(),
-			checked: false,
+    collection(db, `users/${userid}/taskGroups/${taskGroup}/tasks`),
+    {
+      ...task,
+      timestamp: serverTimestamp(),
+      checked: false,
+      createdAt: serverTimestamp(),
+	updatedAt: serverTimestamp(),
+	  archivedAt: null,
 
-			// app.FieldValue.serverTimestamp(),
-		}
-	)
+      // app.FieldValue.serverTimestamp(),
+    },
+  );
 }
 export const f_updateTaskGroupTitle = async (
 	userid: string,
@@ -154,13 +154,10 @@ export const f_updateTaskGroupTitle = async (
 	title: string
 ) => {
 	// const { id: userid } = await user(email)
-	return await updateDoc(
-		doc(
-			db,
-			`users/${userid}/taskGroups/${taskId}`
-		),
-		{ title }
-	)
+	return await updateDoc(doc(db, `users/${userid}/taskGroups/${taskId}`), {
+    title,
+    updatedAt: serverTimestamp(),
+  });
 }
 
 /**
@@ -179,12 +176,12 @@ export const f_updateTask = async (
 	data: Itask["data"]
 ): Promise<any> => {
 	return await updateDoc(
-		doc(
-			db,
-			`users/${userid}/taskGroups/${taskGroupId}/tasks/${taskId}`
-		),
-		data
-	)
+    doc(db, `users/${userid}/taskGroups/${taskGroupId}/tasks/${taskId}`),
+    {
+      ...data,
+      updatedAt: serverTimestamp(),
+    },
+  );
 }
 
 export const deleteTaskGroup = async (
@@ -204,9 +201,10 @@ export const updateUser = async (
 	data: any
 ) => {
 	return await updateDoc(doc(db, `users/${id}`), {
-		id,
-		...data,
-	})
+    id,
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
 }
 
 export const deleteUser = async (id: string) => {

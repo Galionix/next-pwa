@@ -4719,6 +4719,13 @@ isobject@^3.0.1:
   resolved "https://registry.yarnpkg.com/isobject/-/isobject-3.0.1.tgz#4e431e92b11a9731636aa1f9c8d1ccbcfdab78df"
   integrity sha1-TkMekrEalzFjaqH5yNHMvP2reN8=
 
+javascript-time-ago@^2.5.5:
+  version "2.5.5"
+  resolved "https://registry.yarnpkg.com/javascript-time-ago/-/javascript-time-ago-2.5.5.tgz#5487015c59c7115c6281548e627be4ee6f6376a8"
+  integrity sha512-vZWIEKTPDcxH2B+ZVBK4AIuHkDcUoV80L9d+1WsRmp68hMXym0cQrf45WCP4mKgZjVGxTio7uYeDTkveX3DzlA==
+  dependencies:
+    relative-time-format "^1.1.4"
+
 jest-worker@27.0.0-next.5:
   version "27.0.0-next.5"
   resolved "https://registry.yarnpkg.com/jest-worker/-/jest-worker-27.0.0-next.5.tgz#5985ee29b12a4e191f4aae4bb73b97971d86ec28"
@@ -5107,6 +5114,11 @@ moment@^2.24.0, moment@^2.25.3:
   version "2.29.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.1.tgz#b2be769fa31940be9eeea6469c075e35006fa3d3"
   integrity sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ==
+
+moment@^2.29.3:
+  version "2.29.3"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.3.tgz#edd47411c322413999f7a5940d526de183c031f3"
+  integrity sha512-c6YRvhEo//6T2Jz/vVtYzqBzwvPT95JBQ+smCytzf7c50oMZRsR/a4w88aD34I+/QVSfnoAnSBFPJHItlOMJVw==
 
 ms@2.0.0:
   version "2.0.0"
@@ -6364,6 +6376,11 @@ regjsparser@^0.6.4:
   dependencies:
     jsesc "~0.5.0"
 
+relative-time-format@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/relative-time-format/-/relative-time-format-1.1.4.tgz#50c308a482985333a13df119b1ff2763e3eb0685"
+  integrity sha512-WRWEDEZFTD/95oYMd58kzlYHI6QzexMpPkxvi4/P+NLdzli/tteNonmAa5jYLm8ehJVTGiM2siNg7i1Dkn/gDw==
+
 require-directory@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/require-directory/-/require-directory-2.1.1.tgz#8c64ad5fd30dab1c976e2344ffe7f792a6a6df42"
@@ -7042,11 +7059,6 @@ throttle-debounce@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/throttle-debounce/-/throttle-debounce-3.0.1.tgz#32f94d84dfa894f786c9a1f290e7a645b6a19abb"
   integrity sha512-dTEWWNu6JmeVXY0ZYoPuH5cRIwc0MeGbJwah9KUNYSJwommQpCzTySTpEe8Gs1J23aeWEuAobe4Ag7EHVt/LOg==
-
-timeago.js@4.0.0-beta.3:
-  version "4.0.0-beta.3"
-  resolved "https://registry.yarnpkg.com/timeago.js/-/timeago.js-4.0.0-beta.3.tgz#e9215f4b52c47481f5f3076b7d46010d8af0a9b1"
-  integrity sha512-98KoI4axalqyrlZMEavKfBBtJOJugHtpC1n/TPLx3edS0GFSUg9YkvtqFKAaOHjbaz5729b2U0MczMr39TM65A==
 
 timers-browserify@2.0.12, timers-browserify@^2.0.4:
   version "2.0.12"

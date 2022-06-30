@@ -10,7 +10,7 @@ import { Tabs } from 'antd'
 import 'antd/dist/antd.css' // or 'antd/dist/antd.less'
 import classNames from 'classnames/bind'
 import {
-  getDoc
+  getDoc, serverTimestamp
 } from 'firebase/firestore'
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { AnimatePresence, motion } from 'framer-motion'
@@ -282,10 +282,10 @@ const Home: NextPage = () => {
       id,
       data: {
         ...task!.data,
-        archived: value
-      }
-    }
-    )
+        archived: value,
+        archivedAt: value ? serverTimestamp() : null,
+      },
+    });
     refreshTaskData({
       userid: user.id,
       taskGroupIndex,
@@ -420,6 +420,7 @@ const Home: NextPage = () => {
     [textareaValue]
   );
     const editingTask = tasks.find(task => task.id === noteIndexEditing);
+    console.log('editingTask: ', editingTask);
 
 
   return (
@@ -836,13 +837,7 @@ const Home: NextPage = () => {
                                     setTextareaValue(e.target.value);
                                   }}
                                 ></motion.textarea>
-                                <TaskDetails
-                                  taskDates={{
-                                    startDate: editingTask?.data.timestamp,
-                                    archiveDate: editingTask?.data.timestamp,
-                                    updatedDate: editingTask?.data.timestamp,
-                                  }}
-                                />
+                                <TaskDetails taskDates={{...editingTask!.data}} />
                               </>
                             )}
                           </>
@@ -901,7 +896,7 @@ const Home: NextPage = () => {
                                 <RiInboxUnarchiveLine size={25} />
                               </button>
                             </li>
-                            {noteIndexEditing === task.id && (
+                            {noteIndexEditing === task.id && (<>
                               <motion.textarea
                                 ref={textAreaRef}
                                 placeholder={t('messages.task_description')}
@@ -915,6 +910,8 @@ const Home: NextPage = () => {
                                   setTextareaValue(e.target.value);
                                 }}
                               ></motion.textarea>
+                              <TaskDetails taskDates={{ ...editingTask!.data }} />
+                              </>
                             )}
                           </>
                         );
