@@ -38,7 +38,7 @@ import { RiInboxUnarchiveLine } from "react-icons/ri"
 import { useSwipeable } from 'react-swipeable'
 import {
   useClickAway, useDebounce, useLongPress,
-  // useWindowSize
+  useWindowSize
 } from 'react-use'
 import s from '../styles/Home.module.scss'
 import { AddTasks } from './../components/AddTasks/AddTasks'
@@ -84,6 +84,7 @@ const Home: NextPage = () => {
   const textAreaRef = useRef(null);
   const textAreaRef2 = useRef(null);
 
+  const isMobile = useWindowSize().width < 1024
   const [
     settingNewTaskGroup,
     setSettingNewTaskGroup,
@@ -764,50 +765,52 @@ const Home: NextPage = () => {
                                   >
                                     {task.data.text}
                                   </p>
-                                  {(paneIndex!==0)&&<>
-                                    <UrgencyPopover
-                                      urgency={getUrgencyIndex(
-                                        task.data.urgency,
-                                      )}
-                                      setUrgency={urgencyIndex =>
-                                        updateTask({
-                                          id: task.id,
-                                          data: {
-                                            ...task.data,
-                                            // @ts-ignore
-                                            urgency: urgencies[urgencyIndex],
-                                          },
-                                        })
+                                  {paneIndex !== 0 && (
+                                    <>
+                                      <UrgencyPopover
+                                        urgency={getUrgencyIndex(
+                                          task.data.urgency,
+                                        )}
+                                        setUrgency={urgencyIndex =>
+                                          updateTask({
+                                            id: task.id,
+                                            data: {
+                                              ...task.data,
+                                              // @ts-ignore
+                                              urgency: urgencies[urgencyIndex],
+                                            },
+                                          })
+                                        }
+                                        hideOnSelect
+                                      />
+                                      {
+                                        <button
+                                          key={task.id + 'b'}
+                                          onClick={e => {
+                                            e.stopPropagation();
+                                            onArchive(task.id, true);
+                                          }}
+                                        >
+                                          <IoArchiveOutline size={25} />
+                                        </button>
                                       }
-                                      hideOnSelect
-                                    />
-                                    {
                                       <button
-                                        key={task.id + 'b'}
-                                        onClick={e => {
-                                          e.stopPropagation();
-                                          onArchive(task.id, true);
-                                        }}
+                                        key={task.id + 'bt'}
+                                        // onClick={
+                                        //   (e) => {
+                                        //     e.stopPropagation()
+                                        //     switchTextArea(task)
+                                        //   }
+                                        // }
                                       >
-                                        <IoArchiveOutline size={25} />
+                                        {task.data?.description ? (
+                                          <IoDocumentTextSharp size={25} />
+                                        ) : (
+                                          <GoNote size={25} />
+                                        )}
                                       </button>
-                                    }
-                                    <button
-                                      key={task.id + 'bt'}
-                                      // onClick={
-                                      //   (e) => {
-                                      //     e.stopPropagation()
-                                      //     switchTextArea(task)
-                                      //   }
-                                      // }
-                                    >
-                                      {task.data?.description ? (
-                                        <IoDocumentTextSharp size={25} />
-                                      ) : (
-                                        <GoNote size={25} />
-                                      )}
-                                    </button>
-                                  </>}
+                                    </>
+                                  )}
                                 </>
                               )}
                             </li>
@@ -910,7 +913,7 @@ const Home: NextPage = () => {
           <Loader loading={session.status === 'loading'} />
           {session.status === 'authenticated' && (
             <>
-              {paneIndex===1 && (
+              {(paneIndex === 1 || !isMobile) && (
                 <div className={` ${s.newTask} `}>
                   <InputPanel setNewTaskGroupTitle={setNewTaskGroupTitle} />
                 </div>
@@ -924,4 +927,4 @@ const Home: NextPage = () => {
   );
 }
 
-export default Home
+export default Home;
