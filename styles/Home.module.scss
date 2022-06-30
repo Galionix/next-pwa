@@ -6,10 +6,10 @@
 	height: 100vh;
     overflow: hidden;
 	grid-template-columns: [sidebar] 200px [main] 1fr;
-	grid-template-rows: 
+	grid-template-rows:
 	[userpanel] 70px
 	[main] 1fr
-	[settings] 20px 
+	[settings] 20px
 	[footer] auto;
 
 	.userPanel {
@@ -152,7 +152,7 @@
 					content: '';
 pointer-events: none;
 					background: var(--bg-overlay);
- 
+
 					inset: 0;
 				}
 			}
@@ -181,7 +181,7 @@ pointer-events: none;
 				&:hover{
 				// border-bottom:1px solid transparent;
 				border-bottom:1px dashed var(--bg-overlay);
-					
+
 					&:after {content:none;  }}
 			}
 			@include m.overlay;
@@ -213,7 +213,7 @@ pointer-events: none;
 			margin-bottom: 5px;
 
 			p {
-			
+
 				margin: 0;
 				padding: 5px;
 				cursor: pointer;
@@ -221,10 +221,10 @@ pointer-events: none;
 			}
 
 			input {
-				
+
 		padding: 5px;
 		color:var(--bg-second);
-	
+
 				margin-right: 10px;
 
 				&:only-child {
@@ -250,7 +250,7 @@ pointer-events: none;
 				cursor: pointer;
 			}
 			&:hover{
-				
+
 				border:1px solid var(--bg-overlay);
 			}
 		}
@@ -270,7 +270,7 @@ pointer-events: none;
 			&.warning{
 				background:var(--color-red);
 
-				
+
 			}
 
 		}
@@ -348,7 +348,7 @@ pointer-events: none;
 		.base,
 		.orbit {
 			width: 100%;
-			
+
 			grid-row: 1/-1;
 			grid-column: 1/-1;
 			place-self: center;
@@ -466,7 +466,7 @@ pointer-events: none;
 		button{
 			@include m.interactive;
 		}
- 
+
 	}
 }
 
@@ -488,10 +488,10 @@ pointer-events: none;
 				margin: 0 !important;
 						display: flex;
 
-			justify-content: space-between;	
+			justify-content: space-between;
 			}
 		}
-	
+
 }
 
 .urgencyPickerOverlay{
@@ -538,7 +538,17 @@ gap: 10px;
 	position: sticky;
 	top:0;
 	z-index: 1;
-	// background: var(--bg-main);
+	&::before{
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: var(--bg-main);
+		// opacity: 0.5;
+	}
+	background: white;
 	button{
 		padding: 5px;
 		display: flex;
