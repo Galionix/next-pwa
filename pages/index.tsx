@@ -61,6 +61,7 @@ import { Tooltip } from 'antd';
 import Image from 'next/image';
 import { GoNote } from "react-icons/go";
 import { urgencies, UrgencyPopover } from 'components/taskActions/UrgencyPopover'
+import { TaskDetails } from 'components/TaskStats'
 // import { Itask } from 'types/fireTypes'
 
 const cn = classNames.bind(s);
@@ -84,7 +85,7 @@ const Home: NextPage = () => {
   const textAreaRef = useRef(null);
   const textAreaRef2 = useRef(null);
 
-  const isMobile = useWindowSize().width < 1024
+  // const isMobile = useWindowSize().width < 1024
   const [
     settingNewTaskGroup,
     setSettingNewTaskGroup,
@@ -111,8 +112,13 @@ const Home: NextPage = () => {
 
   const [textareaValue, setTextareaValue] = useState("")
 
+  const [touchableDevice, setTouchableDevice] = useState(false)
 
-
+  useEffect(() => {
+    if (window.navigator.maxTouchPoints > 0) {
+      setTouchableDevice(true)
+    }
+  },[])
 
   useClickAway(textAreaRef, () => {
     const editingTask = tasks.find(task => task.id === noteIndexEditing)
@@ -413,6 +419,7 @@ const Home: NextPage = () => {
     2000,
     [textareaValue]
   );
+    const editingTask = tasks.find(task => task.id === noteIndexEditing);
 
 
   return (
@@ -815,19 +822,28 @@ const Home: NextPage = () => {
                               )}
                             </li>
                             {noteIndexEditing === task.id && (
-                              <motion.textarea
-                                key={task.id + 'ta'}
-                                ref={textAreaRef2}
-                                placeholder={t('messages.task_description')}
-                                name=''
-                                id=''
-                                cols={30}
-                                rows={10}
-                                value={textareaValue}
-                                onChange={e => {
-                                  setTextareaValue(e.target.value);
-                                }}
-                              ></motion.textarea>
+                              <>
+                                <motion.textarea
+                                  key={task.id + 'ta'}
+                                  ref={textAreaRef2}
+                                  placeholder={t('messages.task_description')}
+                                  name=''
+                                  id=''
+                                  cols={30}
+                                  rows={10}
+                                  value={textareaValue}
+                                  onChange={e => {
+                                    setTextareaValue(e.target.value);
+                                  }}
+                                ></motion.textarea>
+                                <TaskDetails
+                                  taskDates={{
+                                    startDate: editingTask?.data.timestamp,
+                                    archiveDate: editingTask?.data.timestamp,
+                                    updatedDate: editingTask?.data.timestamp,
+                                  }}
+                                />
+                              </>
                             )}
                           </>
                         );
@@ -913,7 +929,7 @@ const Home: NextPage = () => {
           <Loader loading={session.status === 'loading'} />
           {session.status === 'authenticated' && (
             <>
-              {(paneIndex === 1 || !isMobile) && (
+              {(paneIndex === 1 || !touchableDevice) && (
                 <div className={` ${s.newTask} `}>
                   <InputPanel setNewTaskGroupTitle={setNewTaskGroupTitle} />
                 </div>
