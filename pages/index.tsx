@@ -421,348 +421,260 @@ const Home: NextPage = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <AnimatePresence>
-      <main
-        className={`${s.main} ${folded ? s.folded : ''
-          }`}
+        <main
+          className={`${s.main} ${folded ? s.folded : ''}`}
           {...swipeHandlers}
         >
-          {allowArchive() && <div
-            className={s.floatingButton}
-            onClick={() => archiveChecked()}
-          >
-            <Button
-              icon={<IoArchiveSharp size={30} />}
-              hint={"Archive all"}
-            />
-          </div>
-          }
-        {session.status === 'authenticated' && (
-          <UserPanel />
-        )}
+          {allowArchive() && (
+            <div className={s.floatingButton} onClick={() => archiveChecked()}>
+              <Button
+                icon={<IoArchiveSharp size={30} />}
+                hint={'Archive all'}
+              />
+            </div>
+          )}
+          {session.status === 'authenticated' && <UserPanel />}
 
-          {(session.status === 'authenticated') && (
+          {session.status === 'authenticated' && (
             <div className={s.sidebar}>
-            <div className={`${s.sidebarControls}`}>
-              {settingNewTaskGroup ? (<li
-                className={` ${s.control} `}
-              >
-                <input
-                  autoFocus
-                  type='text'
-                  value={newTaskGroupTitle}
-                  onChange={e =>
-                    setNewTaskGroupTitle(
-                      e.target.value
-                    )
-                  }
-                  onBlur={e => {
-                    if (
-                      isValidText(newTaskGroupTitle)
-                    )
-                      newTaskGroup(
-                        user.id,
-                        newTaskGroupTitle
-                      ).then(() => {
-                        setTasks([])
-                        getTaskGroups(user.id).then(
-                          res => {
-                            setTaskGroups(res)
-                            setNewTaskGroupTitle(
-                              `Task group ${taskGroups.length +
-                              1
-                              }`
-                            )
-                            setSettingNewTaskGroup(
-                              false
-                            )
-                            setTaskGroupIndex(0)
-                          }
-                        )
-                        setCurrentDaySelected(false)
-
-                      })
-                  }}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') {
-                      if (
-                        isValidText(
-                          newTaskGroupTitle
-                        )
-                      )
-                        newTaskGroup(
-                          user.id,
-                          newTaskGroupTitle
-                        ).then(() => {
-                          setTasks([])
-                          getTaskGroups(
-                            user.id
-                          ).then(res => {
-                            setTaskGroups(res)
-                            setNewTaskGroupTitle(
-                              `Task group ${taskGroups.length +
-                              1
-                              }`
-                            )
-                            setSettingNewTaskGroup(
-                              false
-                            )
-                            setTaskGroupIndex(0)
-                            setCurrentDaySelected(false)
-
-                          })
-                        })
-                    }
-                  }}
-                />
-              </li>
-              ) : (
-                <li
-                  className={` ${s.control} `}
-                  onClick={() => {
-                    setSettingNewTaskGroup(true)
-                    if (window.innerWidth < 800)
-                      setFolded(false)
-                  }}
+              <div className={`${s.sidebarControls}`}>
+                {settingNewTaskGroup ? (
+                  <li className={` ${s.control} `}>
+                    <input
+                      autoFocus
+                      type='text'
+                      value={newTaskGroupTitle}
+                      onChange={e => setNewTaskGroupTitle(e.target.value)}
+                      onBlur={e => {
+                        if (isValidText(newTaskGroupTitle))
+                          newTaskGroup(user.id, newTaskGroupTitle).then(() => {
+                            setTasks([]);
+                            getTaskGroups(user.id).then(res => {
+                              setTaskGroups(res);
+                              setNewTaskGroupTitle(
+                                `Task group ${taskGroups.length + 1}`,
+                              );
+                              setSettingNewTaskGroup(false);
+                              setTaskGroupIndex(0);
+                            });
+                            setCurrentDaySelected(false);
+                          });
+                      }}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          if (isValidText(newTaskGroupTitle))
+                            newTaskGroup(user.id, newTaskGroupTitle).then(
+                              () => {
+                                setTasks([]);
+                                getTaskGroups(user.id).then(res => {
+                                  setTaskGroups(res);
+                                  setNewTaskGroupTitle(
+                                    `Task group ${taskGroups.length + 1}`,
+                                  );
+                                  setSettingNewTaskGroup(false);
+                                  setTaskGroupIndex(0);
+                                  setCurrentDaySelected(false);
+                                });
+                              },
+                            );
+                        }
+                      }}
+                    />
+                  </li>
+                ) : (
+                  <li
+                    className={` ${s.control} `}
+                    onClick={() => {
+                      setSettingNewTaskGroup(true);
+                      if (window.innerWidth < 800) setFolded(false);
+                    }}
                   >
                     <Button
-                      title={!folded ? t('buttons.add_task_group') : ""}
+                      title={!folded ? t('buttons.add_task_group') : ''}
                       icon={<IoAddCircleOutline size={20} />}
                       hint={'Добавьте группу чтобы сгруппировать ваши задачи'}
                       hintPosition={'right'}
                     />
-                </li>
-              )}
-                <Tooltip
-                  title={"Список на сегодня"}
-                  placement="right"
-                >
+                  </li>
+                )}
+                <Tooltip title={'Список на сегодня'} placement='right'>
                   <button
-                    className={currentDaySelected
-                      ? s.currentDaySelected
-                      : s.currentDay}
-                    onClick={(e) => {
-                      currentDayClick()
+                    className={
+                      currentDaySelected ? s.currentDaySelected : s.currentDay
+                    }
+                    onClick={e => {
+                      currentDayClick();
                       // setTaskGroupIndex(-1)
                     }}
                   >
-                    {!currentDaySelected
-                      ? <AiOutlineStar size={20} />
-                      : <AiFillStar size={20} />}
-                    {!folded && <span>{t("buttons.current_day")}</span>
-                    }
+                    {!currentDaySelected ? (
+                      <AiOutlineStar size={20} />
+                    ) : (
+                      <AiFillStar size={20} />
+                    )}
+                    {!folded && <span>{t('buttons.current_day')}</span>}
                   </button>
                 </Tooltip>
-            </div>
-            <motion.ul layout
-              {...fastTransition}
-              className={` ${s.taskGroups} `}>
+              </div>
+              <motion.ul
+                layout
+                {...fastTransition}
+                className={` ${s.taskGroups} `}
+              >
                 {taskGroups.map((group, index) => (
-                <li
-                  key={group.id}
-                  className={
-                    taskGroupIndex === index
-                      ? s.selected
-                      : ''
-                  }
+                  <li
+                    key={group.id}
+                    className={taskGroupIndex === index ? s.selected : ''}
                     onClick={() => {
-                      setPaneIndex(0)
-                    setUpdateTaskGroupTitle(
-                      group.data.title
-                    )
-                    setCurrentDaySelected(false)
-                    setTaskGroupIndex(index)
-                      setNoteIndexEditing("")
-                  }}
-                  onDoubleClick={() => {
-                    setEditingTaskTitle(true)
-                  }}
-                >
-                  {index === taskGroupIndex &&
-                    editingTaskTitle ? (
-                    <input
-                      autoFocus
-                      onBlur={() => {
-                        if (
-                          !isValidText(
-                            updateTaskGroupTitle
-                          )
-                        )
-                          return
-                        f_updateTaskGroupTitle(
-                          user.id,
-                          taskGroups[taskGroupIndex]
-                            .id,
-                          updateTaskGroupTitle
-                        ).then(() => {
-                          getTaskGroups(
-                            user.id
-                          ).then(res => {
-                            setNewTaskGroupTitle(
-                              `Task group ${res.length + 1
-                              }`
-                            )
-                            setTaskGroups(res)
-                            setEditingTaskTitle(
-                              false
-                            )
-                          })
-                        })
-                      }}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') {
-                          if (
-                            !isValidText(
-                              updateTaskGroupTitle
-                            )
-                          )
-                            return
+                      setPaneIndex(0);
+                      setUpdateTaskGroupTitle(group.data.title);
+                      setCurrentDaySelected(false);
+                      setTaskGroupIndex(index);
+                      setNoteIndexEditing('');
+                    }}
+                    onDoubleClick={() => {
+                      setEditingTaskTitle(true);
+                    }}
+                  >
+                    {index === taskGroupIndex && editingTaskTitle ? (
+                      <input
+                        autoFocus
+                        onBlur={() => {
+                          if (!isValidText(updateTaskGroupTitle)) return;
                           f_updateTaskGroupTitle(
                             user.id,
-                            taskGroups[
-                              taskGroupIndex
-                            ].id,
-                            updateTaskGroupTitle
+                            taskGroups[taskGroupIndex].id,
+                            updateTaskGroupTitle,
                           ).then(() => {
-                            getTaskGroups(
-                              user.id
-                            ).then(res => {
+                            getTaskGroups(user.id).then(res => {
                               setNewTaskGroupTitle(
-                                `Task group ${res.length + 1
-                                }`
-                              )
-                              setTaskGroups(res)
-                              setEditingTaskTitle(
-                                false
-                              )
-                            })
-                          })
-                        }
-                      }}
-                      type='text'
-                      placeholder={t(
-                        'messages.task_group_title_placeholder'
-                      )}
-                      value={updateTaskGroupTitle}
-                      onChange={e => {
-                        setUpdateTaskGroupTitle(
-                          e.target.value
-                        )
-                      }}
-                    />
-                  ) : (
-                    <>
-                        <p>
-                            {<span
-                            className={cn({
-                              activeTasks: true,
-                              urgent: group.urgentTasks > 0,
-                              warning: group.warningTasks > 0,
-                              placehold: group.activeTasks === 0
-                            })}
-                          >
-                              {group.activeTasks}
-                          </span>
-                          }
-                        {' '}
-                        {`${folded
-                          ? extractCapitals(
-                            group.data.title
-                          )
-                          : group.data.title
-                          }`}
-                      </p>
-                      {!folded && (
-                        <AiFillDelete
-                          onClick={e => {
-                                e.stopPropagation()
-                            deleteTaskGroup(
+                                `Task group ${res.length + 1}`,
+                              );
+                              setTaskGroups(res);
+                              setEditingTaskTitle(false);
+                            });
+                          });
+                        }}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') {
+                            if (!isValidText(updateTaskGroupTitle)) return;
+                            f_updateTaskGroupTitle(
                               user.id,
-                              taskGroups[index].id
+                              taskGroups[taskGroupIndex].id,
+                              updateTaskGroupTitle,
                             ).then(() => {
-                              if (
-                                index <=
-                                taskGroupIndex
-                              ) {
-                                if (
-                                  taskGroupIndex > 0
-                                )
-                                  setTaskGroupIndex(
-                                    taskGroupIndex -
-                                    1
-                                  )
-                                else
-                                  setTaskGroupIndex(
-                                    0
-                                  )
-                              }
-                              // 
+                              getTaskGroups(user.id).then(res => {
+                                setNewTaskGroupTitle(
+                                  `Task group ${res.length + 1}`,
+                                );
+                                setTaskGroups(res);
+                                setEditingTaskTitle(false);
+                              });
+                            });
+                          }
+                        }}
+                        type='text'
+                        placeholder={t('messages.task_group_title_placeholder')}
+                        value={updateTaskGroupTitle}
+                        onChange={e => {
+                          setUpdateTaskGroupTitle(e.target.value);
+                        }}
+                      />
+                    ) : (
+                      <>
+                        <p>
+                          {
+                            <span
+                              className={cn({
+                                activeTasks: true,
+                                urgent: group.urgentTasks > 0,
+                                warning: group.warningTasks > 0,
+                                placehold: group.activeTasks === 0,
+                              })}
+                            >
+                              {group.activeTasks}
+                            </span>
+                          }{' '}
+                          {`${
+                            folded
+                              ? extractCapitals(group.data.title)
+                              : group.data.title
+                          }`}
+                        </p>
+                        {!folded && (
+                          <AiFillDelete
+                            onClick={e => {
+                              e.stopPropagation();
+                              deleteTaskGroup(
+                                user.id,
+                                taskGroups[index].id,
+                              ).then(() => {
+                                if (index <= taskGroupIndex) {
+                                  if (taskGroupIndex > 0)
+                                    setTaskGroupIndex(taskGroupIndex - 1);
+                                  else setTaskGroupIndex(0);
+                                }
+                                //
 
-                              refreshTaskData({
-                                userid: user.id,
-                                taskGroupIndex,
-                                setTaskGroups,
-                                setTasks,
-                                setGroupsLoading
-                              })
+                                refreshTaskData({
+                                  userid: user.id,
+                                  taskGroupIndex,
+                                  setTaskGroups,
+                                  setTasks,
+                                  setGroupsLoading,
+                                });
 
-                              setNewTaskGroupTitle(
-                                `Task group ${taskGroups.length + 1}`
-                              )
-                            })
-                          }}
-                        />
-                      )}
-                    </>
-                  )}
-                </li>
-                ))
-                }
-                {
-                  groupsLoading && <aside
-                    className={` ${s.taskGroupsOverlay} `}
-                  >
+                                setNewTaskGroupTitle(
+                                  `Task group ${taskGroups.length + 1}`,
+                                );
+                              });
+                            }}
+                          />
+                        )}
+                      </>
+                    )}
+                  </li>
+                ))}
+                {groupsLoading && (
+                  <aside className={` ${s.taskGroupsOverlay} `}>
                     <Image
-                      src="/image/loadingHeart.gif"
+                      src='/image/loadingHeart.gif'
                       width={64}
                       height={64}
                     />
                   </aside>
-                }
-            </motion.ul>
-          </div>
-        )}
+                )}
+              </motion.ul>
+            </div>
+          )}
           {session.status === 'authenticated' ? (
             <Tabs
               centered
-              size="small"
+              size='small'
               onTabClick={e => {
-                setNoteIndexEditing("")
-                setPaneIndex(parseInt(e))
-                if (window.innerWidth < 800)
-                  setFolded(true)
+                setNoteIndexEditing('');
+                setPaneIndex(parseInt(e));
+                if (window.innerWidth < 800) setFolded(true);
               }}
-              defaultActiveKey="1"
-              activeKey={
-                (wrap(0, 3, paneIndex) > 0 ? wrap(0, 3, paneIndex) : 1).toString()
-              }
+              defaultActiveKey='1'
+              activeKey={(wrap(0, 3, paneIndex) > 0
+                ? wrap(0, 3, paneIndex)
+                : 1
+              ).toString()}
               className={` ${s.tasks} `}
               style={{ overflowY: 'scroll', padding: '10px' }}
-              animated={
-                { inkBar: true }
-              }
+              animated={{ inkBar: true }}
             >
               <TabPane
                 tab={
                   <>
-                    <span>
-                      {t('buttons.active_tasks')}
-                    </span>
-
+                    <span>{t('buttons.active_tasks')}</span>
                   </>
                 }
                 key={'1'}
               >
-                <motion.ul layout
+                <motion.ul
+                  layout
                   {...fastTransition}
                   className={` ${s.tasks} `}
                 >
@@ -770,7 +682,6 @@ const Home: NextPage = () => {
                     tasks.map(task => {
                       if (!task.data.archived)
                         return (
-
                           <>
                             <li
                               className={cn({
@@ -778,120 +689,111 @@ const Home: NextPage = () => {
                                 normal: task.data.urgency === 'normal',
                                 urgent: task.data.urgency === 'urgent',
                                 warning: task.data.urgency === 'warning',
-                                editing: noteIndexEditing === task.id
+                                editing: noteIndexEditing === task.id,
                               })}
                               key={task.id}
-
                               {...longPressEvent}
                               onMouseDown={(e: any) => {
-                                e.taskId = task.id
-                                longPressEvent.onMouseDown(e)
+                                e.taskId = task.id;
+                                longPressEvent.onMouseDown(e);
                               }}
                               onTouchStart={(e: any) => {
-                                e.taskId = task.id
-                                longPressEvent.onTouchStart(e)
+                                e.taskId = task.id;
+                                longPressEvent.onTouchStart(e);
                               }}
                             >
                               {settingNewTask &&
-                                editingTaskIndex === task.id ? (
-                                  <input
+                              editingTaskIndex === task.id ? (
+                                <input
                                   type='text'
                                   autoFocus
                                   onBlur={() => {
-                                    if (
-                                      !isValidText(
-                                        editingTaskText
-                                      )
-                                    )
-                                      return
-                                    setSettingNewTask(false)
+                                    if (!isValidText(editingTaskText)) return;
+                                    setSettingNewTask(false);
                                     updateTask({
                                       id: task.id,
                                       data: {
                                         ...task.data,
                                         text: editingTaskText,
                                       },
-                                    })
+                                    });
                                   }}
                                   onKeyDown={e => {
                                     if (e.key === 'Enter') {
-                                      if (
-                                        !isValidText(
-                                          editingTaskText
-                                        )
-                                      )
-                                        return
-                                      setSettingNewTask(false)
+                                      if (!isValidText(editingTaskText)) return;
+                                      setSettingNewTask(false);
                                       updateTask({
                                         id: task.id,
                                         data: {
                                           ...task.data,
                                           text: editingTaskText,
                                         },
-                                      })
+                                      });
                                     }
                                   }}
                                   placeholder=''
                                   value={editingTaskText}
-                                    onChange={e => {
-                                      e.stopPropagation()
-                                    setEditingTaskText(
-                                      e.target.value
-                                    )
+                                  onChange={e => {
+                                    e.stopPropagation();
+                                    setEditingTaskText(e.target.value);
                                   }}
                                 />
                               ) : (
                                 <>
-                                    <p
-                                      key={task.id + "p"}
-                                      onDoubleClick={e => {
-                                        e.stopPropagation()
-                                        setEditingTaskIndex(task.id)
-                                        setEditingTaskText(
-                                          task.data.text
-                                        )
-                                        setSettingNewTask(true)
-                                      }}
-                                      onClick={(e) => {
+                                  <p
+                                    key={task.id + 'p'}
+                                    onDoubleClick={e => {
+                                      e.stopPropagation();
+                                      setEditingTaskIndex(task.id);
+                                      setEditingTaskText(task.data.text);
+                                      setSettingNewTask(true);
+                                    }}
+                                    onClick={e => {
+                                      e.stopPropagation();
+                                      switchTextArea(task);
 
-                                        e.stopPropagation()
-                                        switchTextArea(task)
-
-
-                                        // updateTask({
-                                        //   id: task.id,
-                                        //   data: {
-                                        //     ...task.data,
-                                        //     checked:
-                                        //       !task.data.checked,
-                                        //   },
-                                        // })
-                                      }}
-                                    >{task.data.text}</p>
+                                      // updateTask({
+                                      //   id: task.id,
+                                      //   data: {
+                                      //     ...task.data,
+                                      //     checked:
+                                      //       !task.data.checked,
+                                      //   },
+                                      // })
+                                    }}
+                                  >
+                                    {task.data.text}
+                                  </p>
+                                  {(paneIndex!==0)&&<>
                                     <UrgencyPopover
-                                      urgency={getUrgencyIndex(task.data.urgency)}
-                                      setUrgency={(urgencyIndex) => updateTask({
-                                        id: task.id,
-                                        data: {
-                                          ...task.data,
-                                          // @ts-ignore
-                                          urgency: urgencies[urgencyIndex],
-                                        },
-                                      })}
+                                      urgency={getUrgencyIndex(
+                                        task.data.urgency,
+                                      )}
+                                      setUrgency={urgencyIndex =>
+                                        updateTask({
+                                          id: task.id,
+                                          data: {
+                                            ...task.data,
+                                            // @ts-ignore
+                                            urgency: urgencies[urgencyIndex],
+                                          },
+                                        })
+                                      }
                                       hideOnSelect
                                     />
-                                    {<button
-                                      key={task.id + "b"}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        onArchive(task.id, true)
-                                      }}
-                                    >
-                                      <IoArchiveOutline
-                                        size={25} />
-                                    </button>}
+                                    {
+                                      <button
+                                        key={task.id + 'b'}
+                                        onClick={e => {
+                                          e.stopPropagation();
+                                          onArchive(task.id, true);
+                                        }}
+                                      >
+                                        <IoArchiveOutline size={25} />
+                                      </button>
+                                    }
                                     <button
-                                      key={task.id + "bt"}
+                                      key={task.id + 'bt'}
                                       // onClick={
                                       //   (e) => {
                                       //     e.stopPropagation()
@@ -899,38 +801,40 @@ const Home: NextPage = () => {
                                       //   }
                                       // }
                                     >
-                                      {task.data?.description ?
-                                        <IoDocumentTextSharp
-                                          size={25}
-                                        /> :
-                                        <GoNote
-                                          size={25}
-                                        />}
+                                      {task.data?.description ? (
+                                        <IoDocumentTextSharp size={25} />
+                                      ) : (
+                                        <GoNote size={25} />
+                                      )}
                                     </button>
+                                  </>}
                                 </>
                               )}
                             </li>
-                            {noteIndexEditing === task.id && <motion.textarea
-                              key={task.id + "ta"}
-                              ref={textAreaRef2}
-                              placeholder={t("messages.task_description")}
-                              name=""
-                              id=""
-                              cols={30}
-                              rows={10}
-                              value={textareaValue}
-                              onChange={(e) => {
-                                setTextareaValue(e.target.value)
-                              }}
-                            ></motion.textarea>}
+                            {noteIndexEditing === task.id && (
+                              <motion.textarea
+                                key={task.id + 'ta'}
+                                ref={textAreaRef2}
+                                placeholder={t('messages.task_description')}
+                                name=''
+                                id=''
+                                cols={30}
+                                rows={10}
+                                value={textareaValue}
+                                onChange={e => {
+                                  setTextareaValue(e.target.value);
+                                }}
+                              ></motion.textarea>
+                            )}
                           </>
-                        )
+                        );
                     })}
                   {tasks.length === 0 && <AddTasks />}
                 </motion.ul>
               </TabPane>
-              <TabPane tab={t('buttons.archived_tasks')} key="2">
-                <motion.ul layout
+              <TabPane tab={t('buttons.archived_tasks')} key='2'>
+                <motion.ul
+                  layout
                   {...fastTransition}
                   className={` ${s.tasks}  ${s.archived_tasks} `}
                 >
@@ -945,82 +849,79 @@ const Home: NextPage = () => {
                                 urgent: task.data.urgency === 'urgent',
                                 warning: task.data.urgency === 'warning',
                               })}
-                              key={task.id + "12"}
+                              key={task.id + '12'}
                             >
                               <p
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  switchTextArea(task)
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  switchTextArea(task);
                                 }}
-                              >{task.data.text}</p>
-                              <button
-                                // onClick={
-                                //   (e) => {
-                                //     e.stopPropagation()
-                                //     switchTextArea(task)
-                                //   }
-                                // }
                               >
-                                {task.data?.description ?
-                                  <IoDocumentTextSharp
-                                    size={25}
-                                  /> :
-                                  <GoNote
-                                    size={25}
-                                  />}
+                                {task.data.text}
+                              </p>
+                              <button
+                              // onClick={
+                              //   (e) => {
+                              //     e.stopPropagation()
+                              //     switchTextArea(task)
+                              //   }
+                              // }
+                              >
+                                {task.data?.description ? (
+                                  <IoDocumentTextSharp size={25} />
+                                ) : (
+                                  <GoNote size={25} />
+                                )}
                               </button>
                               <button
-                                onClick={(e) => {
+                                onClick={e => {
                                   e.stopPropagation();
-                                  onArchive(task.id, false)
+                                  onArchive(task.id, false);
                                 }}
                               >
-                                <RiInboxUnarchiveLine
-                                  size={25} />
+                                <RiInboxUnarchiveLine size={25} />
                               </button>
                             </li>
-                            {noteIndexEditing === task.id && <motion.textarea
-                              ref={textAreaRef}
-                              placeholder={t("messages.task_description")}
-                              name=""
-                              id=""
-                              cols={30}
-                              rows={10}
-                              key={task.id + "ta2"}
-                              value={textareaValue}
-                              onChange={(e) => {
-                                setTextareaValue(e.target.value)
-
-                              }}
-                            ></motion.textarea>}
+                            {noteIndexEditing === task.id && (
+                              <motion.textarea
+                                ref={textAreaRef}
+                                placeholder={t('messages.task_description')}
+                                name=''
+                                id=''
+                                cols={30}
+                                rows={10}
+                                key={task.id + 'ta2'}
+                                value={textareaValue}
+                                onChange={e => {
+                                  setTextareaValue(e.target.value);
+                                }}
+                              ></motion.textarea>
+                            )}
                           </>
-                        )
+                        );
                     })}
                   {tasks.length === 0 && <AddTasks />}
                 </motion.ul>
               </TabPane>
-
             </Tabs>
-
-        ) : session.status !== 'loading' && <NotLogged />
-        }
-        <Loader
-          loading={session.status === 'loading'}
-        />
-          {(session.status === 'authenticated') && (<>
-            {(wrap(0, 3, paneIndex - 1) !== 1) && <div className={` ${s.newTask} `}>
-              <InputPanel
-                setNewTaskGroupTitle={setNewTaskGroupTitle}
-              />
-            </div>
-            }
-            <SettingsPanel />
-          </>
-        )}
+          ) : (
+            session.status !== 'loading' && <NotLogged />
+          )}
+          <Loader loading={session.status === 'loading'} />
+          {session.status === 'authenticated' && (
+            <>
+              {paneIndex===1 && (
+                <div className={` ${s.newTask} `}>
+                  <InputPanel setNewTaskGroupTitle={setNewTaskGroupTitle} />
+                </div>
+              )}
+              <SettingsPanel />
+            </>
+          )}
         </main>
       </AnimatePresence>
     </>
-  )
+  );
 }
 
 export default Home
