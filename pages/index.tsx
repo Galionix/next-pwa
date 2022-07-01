@@ -774,8 +774,8 @@ const Home: NextPage = () => {
                                   >
                                     {task.data.text}
                                   </p>
-                                  {paneIndex !== 0 && (
-                                      <div className={ s.controlButtons}>
+                                  {(paneIndex !==0 || !touchableDevice) && (
+                                    <div className={s.controlButtons}>
                                       <UrgencyPopover
                                         urgency={getUrgencyIndex(
                                           task.data.urgency,
