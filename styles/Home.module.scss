@@ -210,10 +210,11 @@ pointer-events: none;
 			&.checked{
 				background: var(--color-green);
 			}
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-
+			display: grid;
+			// justify-content: space-between;
+			// align-items: center;
+			grid-template-columns: [text] auto [control] 1fr;
+			grid-template-rows: [text] 1fr [description] auto [details] auto;
 			margin-bottom: 5px;
 
 			p {
@@ -239,8 +240,11 @@ pointer-events: none;
 					accent-color: #395faa;
 				}
 			}
-
+			.controlButtons{
+				display: flex;
+			}
 			button{
+				// grid-area: control;
 				font-size: 25px;
 				display: flex;
 				flex-direction: column;
@@ -651,5 +655,7 @@ ul.tasks{
 		border-top-right-radius: 0px;
 		padding-bottom: 0;
 		margin-bottom: 0;
+		grid-column: 1 /-1;
+		// grid-area:
 	}
 }

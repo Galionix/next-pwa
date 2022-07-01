@@ -1,7 +1,7 @@
 // Panel under task Details with dates including start date, archive date and updated date, and elapsed time to archive
 
 // import { format, render, cancel, register } from 'timeago.js';
-
+import { motion } from 'framer-motion';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import ru from 'javascript-time-ago/locale/ru';
@@ -71,7 +71,7 @@ const timeAgo = new TimeAgo(router.locale || '');
   }
 
   return (
-    <div className={s.taskDetails}>
+    <motion.div className={s.taskDetails}>
       <div className={s.date}>
         <span>Создано</span>
         {renderDate(createdDate)}
@@ -99,6 +99,6 @@ const timeAgo = new TimeAgo(router.locale || '');
           {renderTimeAgo(elapsedTime)} */}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };

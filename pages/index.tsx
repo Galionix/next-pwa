@@ -693,6 +693,7 @@ const Home: NextPage = () => {
                         return (
                           <>
                             <li
+                              ref={textAreaRef2}
                               className={cn({
                                 // checked: task.data.checked,
                                 normal: task.data.urgency === 'normal',
@@ -774,7 +775,7 @@ const Home: NextPage = () => {
                                     {task.data.text}
                                   </p>
                                   {paneIndex !== 0 && (
-                                    <>
+                                      <div className={ s.controlButtons}>
                                       <UrgencyPopover
                                         urgency={getUrgencyIndex(
                                           task.data.urgency,
@@ -817,29 +818,32 @@ const Home: NextPage = () => {
                                           <GoNote size={25} />
                                         )}
                                       </button>
-                                    </>
+                                    </div>
                                   )}
                                 </>
                               )}
+
+                              {noteIndexEditing === task.id && (
+                                <>
+                                  <motion.textarea
+                                    key={task.id + 'ta'}
+                                    // ref={textAreaRef2}
+                                    placeholder={t('messages.task_description')}
+                                    name=''
+                                    id=''
+                                    cols={30}
+                                    rows={10}
+                                    value={textareaValue}
+                                    onChange={e => {
+                                      setTextareaValue(e.target.value);
+                                    }}
+                                  ></motion.textarea>
+                                  <TaskDetails
+                                    taskDates={{ ...editingTask!.data }}
+                                  />
+                                </>
+                              )}
                             </li>
-                            {noteIndexEditing === task.id && (
-                              <>
-                                <motion.textarea
-                                  key={task.id + 'ta'}
-                                  ref={textAreaRef2}
-                                  placeholder={t('messages.task_description')}
-                                  name=''
-                                  id=''
-                                  cols={30}
-                                  rows={10}
-                                  value={textareaValue}
-                                  onChange={e => {
-                                    setTextareaValue(e.target.value);
-                                  }}
-                                ></motion.textarea>
-                                <TaskDetails taskDates={{...editingTask!.data}} />
-                              </>
-                            )}
                           </>
                         );
                     })}
@@ -873,46 +877,51 @@ const Home: NextPage = () => {
                               >
                                 {task.data.text}
                               </p>
-                              <button
-                              // onClick={
-                              //   (e) => {
-                              //     e.stopPropagation()
-                              //     switchTextArea(task)
-                              //   }
-                              // }
-                              >
-                                {task.data?.description ? (
-                                  <IoDocumentTextSharp size={25} />
-                                ) : (
-                                  <GoNote size={25} />
-                                )}
-                              </button>
-                              <button
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  onArchive(task.id, false);
-                                }}
-                              >
-                                <RiInboxUnarchiveLine size={25} />
-                              </button>
+                              <div className={s.controlButtons}>
+                                <button
+                                // onClick={
+                                //   (e) => {
+                                //     e.stopPropagation()
+                                //     switchTextArea(task)
+                                //   }
+                                // }
+                                >
+                                  {task.data?.description ? (
+                                    <IoDocumentTextSharp size={25} />
+                                  ) : (
+                                    <GoNote size={25} />
+                                  )}
+                                </button>
+                                <button
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    onArchive(task.id, false);
+                                  }}
+                                >
+                                  <RiInboxUnarchiveLine size={25} />
+                                </button>
+                              </div>
+                              {noteIndexEditing === task.id && (
+                                <>
+                                  <motion.textarea
+                                    ref={textAreaRef}
+                                    placeholder={t('messages.task_description')}
+                                    name=''
+                                    id=''
+                                    cols={30}
+                                    rows={10}
+                                    key={task.id + 'ta2'}
+                                    value={textareaValue}
+                                    onChange={e => {
+                                      setTextareaValue(e.target.value);
+                                    }}
+                                  ></motion.textarea>
+                                  <TaskDetails
+                                    taskDates={{ ...editingTask!.data }}
+                                  />
+                                </>
+                              )}
                             </li>
-                            {noteIndexEditing === task.id && (<>
-                              <motion.textarea
-                                ref={textAreaRef}
-                                placeholder={t('messages.task_description')}
-                                name=''
-                                id=''
-                                cols={30}
-                                rows={10}
-                                key={task.id + 'ta2'}
-                                value={textareaValue}
-                                onChange={e => {
-                                  setTextareaValue(e.target.value);
-                                }}
-                              ></motion.textarea>
-                              <TaskDetails taskDates={{ ...editingTask!.data }} />
-                              </>
-                            )}
                           </>
                         );
                     })}
