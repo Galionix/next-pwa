@@ -3,7 +3,10 @@ import { Badge, Modal } from 'antd';
 import classNames from 'classnames';
 import { AddTasks } from 'components/AddTasks/AddTasks';
 import { fastTransition } from 'components/anims';
-import { urgencies, UrgencyPopover } from 'components/taskActions/UrgencyPopover';
+import {
+  urgencies,
+  UrgencyPopover,
+} from 'components/taskActions/UrgencyPopover';
 import { TaskDetails } from 'components/TaskStats';
 import { motion } from 'framer-motion';
 import useTranslation from 'next-translate/useTranslation';
@@ -29,10 +32,14 @@ import { UploadFile } from 'antd/lib/upload/interface';
 //   );
 // };
 
-export const ImagesRenderer = ({ task, fileList, setFileList }: {
-  task: Itask
-  fileList: UploadFile[]
-  setFileList: Dispatch<SetStateAction<UploadFile<any>[]>>
+export const ImagesRenderer = ({
+  task,
+  fileList,
+  setFileList,
+}: {
+  task: Itask;
+  fileList: UploadFile[];
+  setFileList: Dispatch<SetStateAction<UploadFile<any>[]>>;
 }) => {
   const [previewOpen, setPreviewOpen] = useState(false);
 
@@ -40,9 +47,9 @@ export const ImagesRenderer = ({ task, fileList, setFileList }: {
   const handleCancel = () => setPreviewOpen(false);
 
   // if (task.data.images && task.data.images.length > 0) {
-    return (
-      <div className={s.taskImages}>
-        {/* <Modal
+  return (
+    <div className={s.taskImages}>
+      {/* <Modal
         visible={previewOpen}
         title={previewTitle}
         footer={null}
@@ -50,13 +57,14 @@ export const ImagesRenderer = ({ task, fileList, setFileList }: {
       >
         <img alt='example' style={{ width: '100%' }} src={previewImage} />
       </Modal> */}
-        <Image.PreviewGroup>
-          {/* <Image width={200} src="https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg" />
+      <Image.PreviewGroup>
+        {/* <Image width={200} src="https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg" />
     <Image
       width={200}
       src="https://gw.alipayobjects.com/zos/antfincdn/aPkFc8Sj7n/method-draw-image.svg"
     /> */}
-          {task.data.images && task.data.images.map((image, index) => {
+        {task.data.images &&
+          task.data.images.map((image, index) => {
             const thumb = image.variants.find(src => src.includes('preview'));
             const publicImage = image.variants.find(src =>
               src.includes('public'),
@@ -68,7 +76,9 @@ export const ImagesRenderer = ({ task, fileList, setFileList }: {
                 src={publicImage}
                 alt={image.filename}
                 className={s.taskImage}
-                placeholder={<Image alt={image.filename} preview={false} src={thumb} />}
+                placeholder={
+                  <Image alt={image.filename} preview={false} src={thumb} />
+                }
               />
               // <img
               //   onClick={() => {
@@ -79,10 +89,10 @@ export const ImagesRenderer = ({ task, fileList, setFileList }: {
               // />
             );
           })}
-        </Image.PreviewGroup>
-        <Images visible={true} fileList={fileList} setFileList={setFileList} />
-      </div>
-    );
+      </Image.PreviewGroup>
+      <Images visible={true} fileList={fileList} setFileList={setFileList} />
+    </div>
+  );
   // }
   // return null;
 };
@@ -115,8 +125,8 @@ interface IActiveProps {
   paneIndex: number;
   touchableDevice: boolean;
   getUrgencyIndex: (urgency: string) => number;
-  fileList: UploadFile[]
-  setFileList: Dispatch<SetStateAction<UploadFile<any>[]>>
+  fileList: UploadFile[];
+  setFileList: Dispatch<SetStateAction<UploadFile<any>[]>>;
 }
 
 export const ActiveTab = ({
@@ -141,18 +151,17 @@ export const ActiveTab = ({
   touchableDevice,
   getUrgencyIndex,
   fileList,
-  setFileList
+  setFileList,
 }: IActiveProps) => {
   const { t } = useTranslation('common');
 
   return (
     <motion.ul layout {...fastTransition} className={` ${s.tasks} `} key='1'>
       {!settingNewTaskGroup &&
-        tasks.map((task) => {
-
+        tasks.map(task => {
           if (!task.data.archived)
             return (
-              <div  key={task.id}>
+              <div key={task.id}>
                 <li
                   ref={textAreaRef2}
                   // className={cn({
@@ -249,7 +258,7 @@ export const ActiveTab = ({
                                 id: task.id,
                                 data: {
                                   ...task.data,
-                                   // @ts-ignore
+                                  // @ts-ignore
                                   urgency: urgencies[urgencyIndex],
                                 },
                               })
@@ -267,14 +276,16 @@ export const ActiveTab = ({
                               <IoArchiveOutline size={25} />
                             </button>
                           }
-                          {task.data?.description && <button
-                            key={task.id + 'bt'}
-                          >
-                            <IoDocumentTextSharp size={25} />
-                          </button>}
-                          { task.data.images?.length && <button>
-                              <HiOutlinePhotograph  size={25} />
-                          </button>}
+                          {task.data?.description && (
+                            <button key={task.id + 'bt'}>
+                              <IoDocumentTextSharp size={25} />
+                            </button>
+                          )}
+                          {task.data.images?.length !== 0 ? (
+                            <button>
+                              <HiOutlinePhotograph size={25} />
+                            </button>
+                          ) : null}
                         </div>
                       )}
                     </>
@@ -283,9 +294,10 @@ export const ActiveTab = ({
                   {noteIndexEditing === task.id && (
                     <>
                       <ImagesRenderer
-                      task={task}
-                      fileList={fileList}
-                      setFileList={setFileList} />
+                        task={task}
+                        fileList={fileList}
+                        setFileList={setFileList}
+                      />
 
                       <motion.textarea
                         key={task.id + 'ta'}

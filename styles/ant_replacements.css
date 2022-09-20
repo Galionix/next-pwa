@@ -20,3 +20,8 @@
     grid-row: 1;
     place-self: center;
 }
+
+.ant-tabs-content-holder{
+    height: 100%;
+    overflow-y: scroll;
+}

@@ -169,6 +169,8 @@
 }
   .tasks {
 
+    padding-top: 0 !important;
+    padding-bottom: 30px !important;
     li {
       &.editing {
         border: 1px solid var(--bg-overlay);

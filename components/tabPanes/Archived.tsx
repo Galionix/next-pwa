@@ -15,7 +15,6 @@ import { RiInboxUnarchiveLine } from 'react-icons/ri';
 import { Itask } from 'types/fireTypes';
 import s from '../../styles/Home.module.scss';
 
-
 const cn = classNames.bind(s);
 
 interface IArchivedProps {
@@ -51,7 +50,7 @@ export const ArchivedTab = ({
   editingTask,
   fileList,
   setFileList,
-  longPressEvent
+  longPressEvent,
 }: IArchivedProps) => {
   const { t } = useTranslation('common');
 
@@ -63,7 +62,7 @@ export const ArchivedTab = ({
       className={` ${s.tasks}  ${s.archived_tasks} `}
     >
       {!settingNewTaskGroup &&
-        tasks.map((task) => {
+        tasks.map(task => {
           if (task.data.archived)
             return (
               <div key={task.id}>
@@ -112,11 +111,11 @@ export const ArchivedTab = ({
                         <IoDocumentTextSharp size={25} />
                       </button>
                     )}
-                    {task.data.images?.length && (
+                    {task.data.images?.length !== 0 ? (
                       <button>
                         <HiOutlinePhotograph size={25} />
                       </button>
-                    )}
+                    ) : null}
                     <button
                       onClick={e => {
                         e.stopPropagation();
