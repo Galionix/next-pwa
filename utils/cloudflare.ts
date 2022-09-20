@@ -133,7 +133,6 @@ export const stripImagesData = (images: any): {
   variants: string[]
 }[] => {
 
-  console.log('images: ', images);
   return images.map((image:any) => {
 
     if (!image.response) return {}

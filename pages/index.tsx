@@ -176,6 +176,7 @@ const Home: NextPage = () => {
 
   const onLongPress = (e: any) => {
 
+    // alert('long press');
   };
 
   const longPressOptions = {
@@ -389,9 +390,10 @@ const Home: NextPage = () => {
   const switchTextArea = (task: any) => {
     const taskId = task.id;
 
+
+
     if (noteIndexEditing !== taskId) {
       setNoteIndexEditing(taskId);
-
       setTextareaValue(task.data?.description);
     } else {
       setNoteIndexEditing('');
@@ -735,6 +737,9 @@ const Home: NextPage = () => {
                     textareaValue={textareaValue}
                     setTextareaValue={setTextareaValue}
                     textAreaRef={textAreaRef}
+                    fileList={fileList}
+                    setFileList={setFileList}
+                    longPressEvent={longPressEvent}
                   />
                 </TabPane>
               </Tabs>

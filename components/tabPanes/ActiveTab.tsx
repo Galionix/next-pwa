@@ -29,7 +29,7 @@ import { UploadFile } from 'antd/lib/upload/interface';
 //   );
 // };
 
-const ImagesRenderer = ({ task, fileList, setFileList }: {
+export const ImagesRenderer = ({ task, fileList, setFileList }: {
   task: Itask
   fileList: UploadFile[]
   setFileList: Dispatch<SetStateAction<UploadFile<any>[]>>
@@ -269,22 +269,11 @@ export const ActiveTab = ({
                           }
                           {task.data?.description && <button
                             key={task.id + 'bt'}
-                            // onClick={
-                            //   (e) => {
-                            //     e.stopPropagation()
-                            //     switchTextArea(task)
-                            //   }
-                            // }
                           >
                             <IoDocumentTextSharp size={25} />
                           </button>}
                           { task.data.images?.length && <button>
-                            {/* <Badge
-                              size='small'
-                              count={task.data.images?.length}
-                            > */}
                               <HiOutlinePhotograph  size={25} />
-                            {/* </Badge> */}
                           </button>}
                         </div>
                       )}
