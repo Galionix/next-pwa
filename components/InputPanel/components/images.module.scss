@@ -1,0 +1,18 @@
+@use '../../../styles/_m';
+
+.uploadButton{
+    width: 100%;
+    @include m.interactive;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    color: var(--bg-second);
+    border: 1px dashed var(--bg-overlay);
+    padding: 5px;
+    border-radius: 3px;
+}
+.imagesWrapper{
+    padding: 5px;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+}

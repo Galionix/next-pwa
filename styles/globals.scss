@@ -1,6 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Rubik&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans+Condensed:wght@400&display=swap');
 // font-family: , sans-serif;
+h1,h2,h3,h4,h5{
+  margin: 0;
+}
 html,
 body,#__next {
   scroll-behavior: smooth !important;
@@ -17,7 +20,36 @@ body,#__next {
   --bg-overlay: rgba(126, 126, 126, 0.3);
 
 }
+.ant-tabs-tab-btn,
+.ant-popover-title,
+.ant-divider-inner-text,
+.ant-modal-title
+{
+  color: var(--bg-second) !important;
+}
+.ant-select-selection-item{
+  color: black;
+}
+span{color: var(--bg-second)}
+// button{
+//   background: var(bg-second) !important;
+// }
+// button > span{
+//   color: var(--bg-main)
+// }
+.ant-modal-footer > button:nth-of-type(1) > span{
+  color: black !important
+}
+.ant-popover-inner,.ant-popover-arrow-content{
+	background: var(--bg-main) !important;
 
+}
+.ant-btn.ant-btn-dangerous{
+  span{
+
+    color:var(--color-red)
+  }
+}
 button{
   background: transparent;
   border:none;
@@ -34,7 +66,7 @@ a {
   padding: 0;
     font-family:'Rubik', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-    
+
 }
 img{
   display: block;
@@ -47,7 +79,7 @@ ul{
   }
 }
 input{
- 
+
   font: inherit;
 
   &:focus{
@@ -69,10 +101,10 @@ input{
   --color-tomato:#FF9671;
 
   --accent-bg: linear-gradient(
-    30deg, 
-  #0c3483 0%, 
-  #a2b6df 100%, 
-  #6b8cce 100%, 
+    30deg,
+  #0c3483 0%,
+  #a2b6df 100%,
+  #6b8cce 100%,
   #a2b6df 100%
   );
 
@@ -84,10 +116,10 @@ body,input,textarea{
       *,*::after,*::before {
             // background: var(--bg-main);
   }
-  
+
 }
 p{
- color: var(--bg-second); 
+ color: var(--bg-second);
 }
 .ant-tag-checkable-checked{
 border: 1px solid #ccc !important;
@@ -100,7 +132,7 @@ li{
 .notFound{
   height: 100vh;
 
-  
+
 
   h1{
     grid-row: title;
@@ -136,11 +168,11 @@ li{
     }
   }
   display: grid;
-  grid-template-rows: 1fr 
+  grid-template-rows: 1fr
   [img] auto
   50px
-  [title] auto 
-  100px 
+  [title] auto
+  100px
   [button] auto
   1fr
   ;

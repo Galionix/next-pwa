@@ -183,7 +183,7 @@ export const setTheme = (theme: string) => {
 			.setProperty
 			(
 				'--bg-main',
-				'white'
+				'rgba(255, 255, 255, 0.8)'
 			);
 
 		document
@@ -192,13 +192,13 @@ export const setTheme = (theme: string) => {
 			.setProperty
 			(
 				'--bg-second',
-				'rgba(0, 0, 0, 0.7)'
+				'rgba(0, 0, 0, 0.9)'
 			);
 
 	} else {
 		document.documentElement.style.setProperty
 			('--bg-second',
-				'white'
+			'rgba(255, 255, 255, 0.7)'
 			);
 
 		document.documentElement.style.setProperty

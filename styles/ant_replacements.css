@@ -1,0 +1,22 @@
+.ant-image-preview-operations{
+    background: var(--bg-main);
+}
+
+.ant-image-preview-operations svg{
+    color: var(--bg-second);
+}
+
+.ant-image-preview-img-wrapper::before{
+    height: 0;
+}
+
+.ant-image-preview-img-wrapper{
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+}
+.ant-image-preview-img-wrapper img{
+    grid-column: 1;
+    grid-row: 1;
+    place-self: center;
+}

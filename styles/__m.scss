@@ -1,95 +1,95 @@
 @mixin btn {
-	cursor: pointer;
-	padding: 5px;
-	border: 1px solid #ccc;
-	border-radius: 2px;
-	background: var(--accent-bg);
-	color: snow;
+  cursor: pointer;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  background: var(--accent-bg);
 
-	&:hover {
-		position: relative;
-		svg {
-			opacity: 1;
-		}
+  &:hover {
+    position: relative;
+    svg {
+      opacity: 1;
+    }
 
-		&::after {
-			position: absolute;
+    &::after {
+      position: absolute;
 
-			content: '';
+      content: '';
 
-			background: rgba(180, 180, 180, 0.2);
+      background: rgba(180, 180, 180, 0.2);
 
-			inset: 0;
-		}
-	}
+      inset: 0;
+    }
+  }
 }
+
 @mixin interactive {
-	user-select: none;
-	cursor: pointer;
-color: rgba(0, 0, 0, 0.7);
-&:hover{
-	color: rgb(0, 0, 0);
+  user-select: none;
+  cursor: pointer;
+  color: var(--bg-second);
+  &:hover {
+    color: var(--bg-overlay);
+  }
+  &:active {
+    color: rgba(0, 0, 255, 0.39);
+  }
+}
 
-}
-&:active{
-	color:rgba(0, 0, 255, 0.39);
-}
-}
 @mixin folded {
-		grid-template-columns: [sidebar] 2fr [main] 10fr;
-		 .userPanel{
- 
-			 button{
-				 display: none;
-				}
-			}
-			.control{
-				// height: 35px;
-				justify-content: center;
-				p{
-					display: none;
-				}
-				// svg{
-				// 	width: 100%;
-				// 	height: 100%;
-				// }
-			}
-			.taskGroups{
-				li{
-					svg{
-					}
-					p{
-						white-space: nowrap;
-					}
-				}
-			}
-			.settings p {
-				display: none;
-			}
-			.sidebarControls{
-				padding: 0 10px;
-				padding-bottom: 10px;
-				li > div,button{
-				display: flex;
+  grid-template-columns: [sidebar] 2fr [main] 10fr;
+  .userPanel {
+    button {
+      display: none;
+    }
+  }
+  .control {
+    // height: 35px;
+    justify-content: center;
+    p {
+      display: none;
+    }
+    // svg{
+    // 	width: 100%;
+    // 	height: 100%;
+    // }
+  }
+  .taskGroups {
+    li {
+      svg {
+      }
+      p {
+        white-space: nowrap;
+      }
+    }
+  }
+  .settings p {
+    display: none;
+  }
+  .sidebarControls {
+    padding: 0 10px;
+    padding-bottom: 10px;
+    li > div,
+    button {
+      display: flex;
 
-				flex-direction: column;
-				justify-content: center;
-				}
-			}
+      flex-direction: column;
+      justify-content: center;
+    }
+  }
 }
-@mixin overlay ($index:10) {
-			position: relative;
+@mixin overlay($index: 10) {
+  position: relative;
 
-				&:after{
-					pointer-events: none;
-					content: "";
-					position: absolute;
-					inset:0;
-					background: var(--bg-overlay);
-					z-index: $index;
-					opacity: 0;
-				}
-				&:hover:after{
-					opacity:1;
-				}
+  &:after {
+    pointer-events: none;
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--bg-overlay);
+    z-index: $index;
+    opacity: 0;
+  }
+  &:hover:after {
+    opacity: 1;
+  }
 }

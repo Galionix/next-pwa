@@ -34,6 +34,8 @@ module.exports = withPlugins([
 				'cdn2.thecatapi.com',
 				'lh3.googleusercontent.com',
 				'googleusercontent.com',
+				'webstore.b-cdn.net',
+				'imagedelivery.net'
 			],
 		},
 		i18n: {

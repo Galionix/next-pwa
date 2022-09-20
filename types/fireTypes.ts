@@ -6,6 +6,10 @@ export interface Itask {
     // checked: boolean;
     checkable: boolean;
     text: string;
+    images: {
+      filename: string;
+      variants: string[];
+    }[];
     timestamp: any;
     urgency: 'normal' | 'warning' | 'urgent';
     createdAt: { seconds: number; nanoseconds: number };
