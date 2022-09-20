@@ -15,6 +15,7 @@ import { RiInboxUnarchiveLine } from 'react-icons/ri';
 import { Itask } from 'types/fireTypes';
 import s from '../../styles/Home.module.scss';
 
+
 const cn = classNames.bind(s);
 
 interface IArchivedProps {

@@ -3,7 +3,7 @@ import { Badge, Modal } from 'antd';
 import classNames from 'classnames';
 import { AddTasks } from 'components/AddTasks/AddTasks';
 import { fastTransition } from 'components/anims';
-import { UrgencyPopover } from 'components/taskActions/UrgencyPopover';
+import { urgencies, UrgencyPopover } from 'components/taskActions/UrgencyPopover';
 import { TaskDetails } from 'components/TaskStats';
 import { motion } from 'framer-motion';
 import useTranslation from 'next-translate/useTranslation';
@@ -249,7 +249,7 @@ export const ActiveTab = ({
                                 id: task.id,
                                 data: {
                                   ...task.data,
-                                  // @ts-ignore
+                                   // @ts-ignore
                                   urgency: urgencies[urgencyIndex],
                                 },
                               })
