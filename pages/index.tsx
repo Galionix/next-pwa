@@ -697,7 +697,9 @@ const Home: NextPage = () => {
                   : 1
                 ).toString()}
                 className={` ${s.tasks} `}
-                style={{ overflowY: 'scroll', padding: '10px' }}
+                style={{
+                  // overflowY: 'scroll',
+                padding: '10px' }}
                 animated={{ inkBar: true }}
               >
                 <TabPane tab={t('buttons.active_tasks')} key={'1'}>
