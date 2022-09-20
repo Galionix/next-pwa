@@ -146,13 +146,13 @@ export const ActiveTab = ({
   const { t } = useTranslation('common');
 
   return (
-    <motion.ul layout {...fastTransition} className={` ${s.tasks} `}>
+    <motion.ul layout {...fastTransition} className={` ${s.tasks} `} key='1'>
       {!settingNewTaskGroup &&
-        tasks.map(task => {
+        tasks.map((task) => {
 
           if (!task.data.archived)
             return (
-              <>
+              <div  key={task.id}>
                 <li
                   ref={textAreaRef2}
                   // className={cn({
@@ -304,7 +304,7 @@ export const ActiveTab = ({
                     </>
                   )}
                 </li>
-              </>
+              </div>
             );
         })}
       {tasks.length === 0 && <AddTasks />}

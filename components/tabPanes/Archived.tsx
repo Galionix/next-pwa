@@ -58,13 +58,14 @@ export const ArchivedTab = ({
     <motion.ul
       layout
       {...fastTransition}
+      key='2'
       className={` ${s.tasks}  ${s.archived_tasks} `}
     >
       {!settingNewTaskGroup &&
-        tasks.map(task => {
+        tasks.map((task) => {
           if (task.data.archived)
             return (
-              <>
+              <div key={task.id}>
                 <li
                   // className={cn({
                   //   normal: task.data.urgency === 'normal',
@@ -148,7 +149,7 @@ export const ArchivedTab = ({
                     </>
                   )}
                 </li>
-              </>
+              </div>
             );
         })}
       {tasks.length === 0 && <AddTasks />}
