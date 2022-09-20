@@ -21,7 +21,7 @@ import useTranslation from 'next-translate/useTranslation';
 // import { useRouter } from 'next/dist/client/router'
 import Head from 'next/head';
 import { wrap } from 'popmotion';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { AiFillDelete } from 'react-icons/ai';
 import {
@@ -41,7 +41,10 @@ import {
 import s from '../styles/Home.module.scss';
 import { AddTasks } from './../components/AddTasks/AddTasks';
 import { fastTransition } from './../components/anims';
-import { InputPanel } from '../components/InputPanel/InputPanel';
+import {
+  areAllFilesUploaded,
+  InputPanel,
+} from '../components/InputPanel/InputPanel';
 import { Loader } from './../components/Loader/Loader';
 import { NotLogged } from './../components/NotLogged';
 import { SettingsPanel } from './../components/SettingsPanel';
@@ -66,6 +69,8 @@ import { TaskDetails } from 'components/TaskStats';
 import { ArchivedTab } from 'components/tabPanes/Archived';
 import { ActiveTab } from 'components/tabPanes/ActiveTab';
 import { Itask } from 'types/fireTypes';
+import { UploadFile } from 'antd/lib/upload/interface';
+import { stripImagesData } from '@/utils/cloudflare';
 // import { Itask } from 'types/fireTypes'
 
 const cn = classNames.bind(s);
@@ -74,18 +79,21 @@ const cn = classNames.bind(s);
 const { TabPane } = Tabs;
 
 const getUrgencyForUnarchivedTasks = (task: Itask[]) => {
-  const unarchivedTasks = task.filter((t) => !t.data.archived);
-  const urgentTasks = unarchivedTasks.filter((t) => t.data.urgency === "urgent");
-  const normalTasks = unarchivedTasks.filter((t) => t.data.urgency === "normal");
-  const warningTasks = unarchivedTasks.filter((t) => t.data.urgency === "warning");
+  const unarchivedTasks = task.filter(t => !t.data.archived);
+  const urgentTasks = unarchivedTasks.filter(t => t.data.urgency === 'urgent');
+  const normalTasks = unarchivedTasks.filter(t => t.data.urgency === 'normal');
+  const warningTasks = unarchivedTasks.filter(
+    t => t.data.urgency === 'warning',
+  );
   return {
     urgent: urgentTasks.length > 0,
     placehold: normalTasks.length > 0,
     warning: warningTasks.length > 0,
-  }
-}
+  };
+};
 
 const Home: NextPage = () => {
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
   const { t } = useTranslation('common');
   const [folded, setFolded] = useState(false);
   const [paneIndex, setPaneIndex] = useState(0);
@@ -133,7 +141,7 @@ const Home: NextPage = () => {
   });
 
   // useClickAway(textAreaRef2, (wtf) => {
-  // console.log('%c 4️⃣: Home:NextPage -> wtf ', 'font-size:16px;background-color:#bc0e57;color:white;', wtf)
+  //
   //   const editingTask = tasks.find(task => task.id === noteIndexEditing)
   //   if (editingTask && typeof (textareaValue) !== "undefined")
   //     updateTask({
@@ -167,7 +175,7 @@ const Home: NextPage = () => {
   const session = useSession();
 
   const onLongPress = (e: any) => {
-    console.log(e);
+
   };
 
   const longPressOptions = {
@@ -178,7 +186,7 @@ const Home: NextPage = () => {
   const longPressEvent = useLongPress(onLongPress, longPressOptions);
 
   const swipeHandlers = useSwipeable({
-    // onSwiped: (eventData) => console.log("User Swiped!", eventData),
+    // onSwiped: (eventData) => ,
     onSwipedLeft: eventData => {
       if (wrap(0, 3, paneIndex + 1) === 0) setFolded(false);
       else setFolded(true);
@@ -242,17 +250,53 @@ const Home: NextPage = () => {
     }
   }, [setTasks, taskGroupIndex, taskGroups, user.id]);
 
-  const updateTask = ({ id, data }: { id: string; data: any }) => {
-    f_updateTask(user.id, taskGroups[taskGroupIndex].id, id, data).then(() => {
-      refreshTaskData({
-        userid: user.id,
-        taskGroupIndex,
-        setTaskGroups,
-        setTasks,
-        setGroupsLoading,
-      });
-    });
-  };
+  const updateTask =
+  // useCallback(
+
+    ({ id, data }: { id: string; data: any; }, callBack?:any) => {
+      f_updateTask(user.id, taskGroups[taskGroupIndex].id, id, data).then(
+        () => {
+          callBack && callBack();
+          refreshTaskData({
+            userid: user.id,
+            taskGroupIndex,
+            setTaskGroups,
+            setTasks,
+            setGroupsLoading,
+          });
+        },
+      );
+    }
+    // [
+    //   setGroupsLoading,
+    //   setTaskGroups,
+    //   setTasks,
+    //   taskGroupIndex,
+    //   taskGroups,
+    //   user.id,
+    // ],
+  // );
+
+  useEffect(() => {
+    const editingTask = tasks.find(task => task.id === noteIndexEditing);
+
+    const strippedData = stripImagesData(fileList)
+    if (editingTask && fileList.length > 0 && areAllFilesUploaded(fileList)) {
+      {
+        const images = editingTask.data.images ? [...editingTask.data.images,...strippedData] : [...strippedData]
+        const args = {
+          id: noteIndexEditing,
+          data: {
+            ...editingTask.data,
+            images,
+          },
+        };
+
+        updateTask(args,setFileList([]));
+
+      }
+    }
+  }, [fileList, noteIndexEditing,tasks]);
 
   const onArchive = (id: string, value: boolean) => {
     const task = tasks.find(item => item.id === id);
@@ -552,17 +596,20 @@ const Home: NextPage = () => {
                       />
                     ) : (
                       <>
-                          <p>
-                            {/* {
-                            console.log(group)
-                            } */}
-                            {
+                        <p>
+                          {/* {
 
+                            } */}
+                          {
                             <Badge
                               className={cn({
                                 activeTasks: true,
-                                urgent: getUrgencyForUnarchivedTasks(group.taskArray).urgent,
-                                warning: getUrgencyForUnarchivedTasks(group.taskArray).warning,
+                                urgent: getUrgencyForUnarchivedTasks(
+                                  group.taskArray,
+                                ).urgent,
+                                warning: getUrgencyForUnarchivedTasks(
+                                  group.taskArray,
+                                ).warning,
                                 placehold: group.activeTasks === 0,
                               })}
                               count={group.activeTasks}
@@ -632,66 +679,66 @@ const Home: NextPage = () => {
             </div>
           )}
           {session.status === 'authenticated' ? (
-            <section
-            className={s.tasksWrapper}
-            >
-              <h1>{ taskGroups[taskGroupIndex].data.title}</h1>
-            <Tabs
-              centered
-              size='small'
-              onTabClick={e => {
-                setNoteIndexEditing('');
-                setPaneIndex(parseInt(e));
-                if (window.innerWidth < 800) setFolded(true);
-              }}
-              defaultActiveKey='1'
-              activeKey={(wrap(0, 3, paneIndex) > 0
-                ? wrap(0, 3, paneIndex)
-                : 1
-              ).toString()}
-              className={` ${s.tasks} `}
-              style={{ overflowY: 'scroll', padding: '10px' }}
-              animated={{ inkBar: true }}
-            >
-              <TabPane tab={t('buttons.active_tasks')} key={'1'}>
-                <ActiveTab
-                  settingNewTaskGroup={settingNewTaskGroup}
-                  tasks={tasks}
-                  switchTextArea={switchTextArea}
-                  onArchive={onArchive}
-                  noteIndexEditing={noteIndexEditing}
-                  textAreaRef2={textAreaRef2}
-                  textareaValue={textareaValue}
-                  setTextareaValue={setTextareaValue}
-                  editingTask={editingTask}
-                  longPressEvent={longPressEvent}
-                  settingNewTask={settingNewTask}
-                  editingTaskIndex={editingTaskIndex}
-                  editingTaskText={editingTaskText}
-                  setSettingNewTask={setSettingNewTask}
-                  updateTask={updateTask}
-                  setEditingTaskText={setEditingTaskText}
-                  setEditingTaskIndex={setEditingTaskIndex}
-                  paneIndex={paneIndex}
-                  touchableDevice={touchableDevice}
-                  getUrgencyIndex={getUrgencyIndex}
-                />
-              </TabPane>
-              <TabPane tab={t('buttons.archived_tasks')} key='2'>
-                <ArchivedTab
-                  settingNewTaskGroup={settingNewTaskGroup}
-                  tasks={tasks}
-                  onArchive={onArchive}
-                  switchTextArea={switchTextArea}
-                  noteIndexEditing={noteIndexEditing}
-                  editingTask={editingTask}
-                  textareaValue={textareaValue}
-                  setTextareaValue={setTextareaValue}
-                  textAreaRef={textAreaRef}
-                />
-              </TabPane>
+            <section className={s.tasksWrapper}>
+              <h1>{taskGroups[taskGroupIndex].data.title}</h1>
+              <Tabs
+                centered
+                size='small'
+                onTabClick={e => {
+                  setNoteIndexEditing('');
+                  setPaneIndex(parseInt(e));
+                  if (window.innerWidth < 800) setFolded(true);
+                }}
+                defaultActiveKey='1'
+                activeKey={(wrap(0, 3, paneIndex) > 0
+                  ? wrap(0, 3, paneIndex)
+                  : 1
+                ).toString()}
+                className={` ${s.tasks} `}
+                style={{ overflowY: 'scroll', padding: '10px' }}
+                animated={{ inkBar: true }}
+              >
+                <TabPane tab={t('buttons.active_tasks')} key={'1'}>
+                  <ActiveTab
+                    settingNewTaskGroup={settingNewTaskGroup}
+                    tasks={tasks}
+                    switchTextArea={switchTextArea}
+                    onArchive={onArchive}
+                    noteIndexEditing={noteIndexEditing}
+                    textAreaRef2={textAreaRef2}
+                    textareaValue={textareaValue}
+                    setTextareaValue={setTextareaValue}
+                    editingTask={editingTask}
+                    longPressEvent={longPressEvent}
+                    settingNewTask={settingNewTask}
+                    editingTaskIndex={editingTaskIndex}
+                    editingTaskText={editingTaskText}
+                    setSettingNewTask={setSettingNewTask}
+                    updateTask={updateTask}
+                    setEditingTaskText={setEditingTaskText}
+                    setEditingTaskIndex={setEditingTaskIndex}
+                    paneIndex={paneIndex}
+                    touchableDevice={touchableDevice}
+                    getUrgencyIndex={getUrgencyIndex}
+                    fileList={fileList}
+                    setFileList={setFileList}
+                  />
+                </TabPane>
+                <TabPane tab={t('buttons.archived_tasks')} key='2'>
+                  <ArchivedTab
+                    settingNewTaskGroup={settingNewTaskGroup}
+                    tasks={tasks}
+                    onArchive={onArchive}
+                    switchTextArea={switchTextArea}
+                    noteIndexEditing={noteIndexEditing}
+                    editingTask={editingTask}
+                    textareaValue={textareaValue}
+                    setTextareaValue={setTextareaValue}
+                    textAreaRef={textAreaRef}
+                  />
+                </TabPane>
               </Tabs>
-              </section>
+            </section>
           ) : (
             session.status !== 'loading' && <NotLogged />
           )}

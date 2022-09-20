@@ -76,7 +76,7 @@ export const uploadToCloudFlare = async ({
     const uploadResult = await axios
       .post(uploadURL, formData, config);
 
-    console.log('uploadResult: ', uploadResult);
+
 
     const result = uploadResult.data;
 
@@ -88,7 +88,7 @@ export const uploadToCloudFlare = async ({
     }
     return result.result.variants[2];
   } catch (e) {
-    console.log('error: ', e);
+
   }
 };
 
@@ -132,8 +132,11 @@ export const stripImagesData = (images: any): {
   filename: string
   variants: string[]
 }[] => {
+
   console.log('images: ', images);
   return images.map((image:any) => {
+
+    if (!image.response) return {}
     return {
       filename: image.name,
       variants: image.response.result.variants,

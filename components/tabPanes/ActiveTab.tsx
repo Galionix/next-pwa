@@ -12,8 +12,10 @@ import { IoArchiveOutline, IoDocumentTextSharp } from 'react-icons/io5';
 import { Itask } from 'types/fireTypes';
 import s from '../../styles/Home.module.scss';
 import { HiOutlinePhotograph } from 'react-icons/hi';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { Image } from 'antd';
+import { Images } from 'components/InputPanel/components/Images';
+import { UploadFile } from 'antd/lib/upload/interface';
 
 // const handlePreview = async (file: UploadFile) => {
 //   if (!file.url && !file.preview) {
@@ -27,13 +29,17 @@ import { Image } from 'antd';
 //   );
 // };
 
-const ImagesRenderer = ({ task }: { task: Itask }) => {
+const ImagesRenderer = ({ task, fileList, setFileList }: {
+  task: Itask
+  fileList: UploadFile[]
+  setFileList: Dispatch<SetStateAction<UploadFile<any>[]>>
+}) => {
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewImage, setPreviewImage] = useState('');
+
   const [previewTitle, setPreviewTitle] = useState('');
   const handleCancel = () => setPreviewOpen(false);
 
-  if (task.data.images && task.data.images.length > 0) {
+  // if (task.data.images && task.data.images.length > 0) {
     return (
       <div className={s.taskImages}>
         {/* <Modal
@@ -50,7 +56,7 @@ const ImagesRenderer = ({ task }: { task: Itask }) => {
       width={200}
       src="https://gw.alipayobjects.com/zos/antfincdn/aPkFc8Sj7n/method-draw-image.svg"
     /> */}
-          {task.data.images.map((image, index) => {
+          {task.data.images && task.data.images.map((image, index) => {
             const thumb = image.variants.find(src => src.includes('preview'));
             const publicImage = image.variants.find(src =>
               src.includes('public'),
@@ -74,10 +80,11 @@ const ImagesRenderer = ({ task }: { task: Itask }) => {
             );
           })}
         </Image.PreviewGroup>
+        <Images visible={true} fileList={fileList} setFileList={setFileList} />
       </div>
     );
-  }
-  return null;
+  // }
+  // return null;
 };
 
 const cn = classNames.bind(s);
@@ -108,6 +115,8 @@ interface IActiveProps {
   paneIndex: number;
   touchableDevice: boolean;
   getUrgencyIndex: (urgency: string) => number;
+  fileList: UploadFile[]
+  setFileList: Dispatch<SetStateAction<UploadFile<any>[]>>
 }
 
 export const ActiveTab = ({
@@ -131,13 +140,16 @@ export const ActiveTab = ({
   paneIndex,
   touchableDevice,
   getUrgencyIndex,
+  fileList,
+  setFileList
 }: IActiveProps) => {
   const { t } = useTranslation('common');
+
   return (
     <motion.ul layout {...fastTransition} className={` ${s.tasks} `}>
       {!settingNewTaskGroup &&
         tasks.map(task => {
-          console.log('task: ', task);
+
           if (!task.data.archived)
             return (
               <>
@@ -281,7 +293,11 @@ export const ActiveTab = ({
 
                   {noteIndexEditing === task.id && (
                     <>
-                      <ImagesRenderer task={task} />
+                      <ImagesRenderer
+                      task={task}
+                      fileList={fileList}
+                      setFileList={setFileList} />
+
                       <motion.textarea
                         key={task.id + 'ta'}
                         // ref={textAreaRef2}

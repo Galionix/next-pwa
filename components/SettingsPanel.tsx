@@ -16,7 +16,6 @@ const { Option } = Select;
 
 
 function onChange(checkedValue: CheckboxValueType[]) {
-    console.log('checked = ', checkedValue);
 }
 
 export const SettingsPanel = () => {

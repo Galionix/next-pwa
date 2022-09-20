@@ -21,7 +21,7 @@ interface IImagesProps {
   setFileList: React.Dispatch<React.SetStateAction<UploadFile<any>[]>>;
 }
 export const Images = ({ visible, fileList, setFileList }: IImagesProps) => {
-  console.log('fileList: ', fileList);
+
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
   const [previewTitle, setPreviewTitle] = useState('');

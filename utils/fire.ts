@@ -122,7 +122,6 @@ export const addTask = async (
     urgency: string;
   },
 ) => {
-	console.log(task)
   const docRef = await addDoc(
     collection(db, `users/${userid}/taskGroups/${taskGroup}/tasks`),
     {

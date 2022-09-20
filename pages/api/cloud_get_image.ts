@@ -42,7 +42,6 @@ export default async function handler(
       // 'Access-Control-Allow-Headers': 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers',
     },
   };
-  console.log('config: ', config);
 
   try {
     // Run cors
@@ -56,7 +55,6 @@ export default async function handler(
       config,
     );
 
-      console.log('response: ', response);
 
     res.status(200).json({ res: response.data });
   } catch (e) {

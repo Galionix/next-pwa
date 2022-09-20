@@ -23,7 +23,7 @@ import { UploadFile } from 'antd/lib/upload/interface';
 import { stripImagesData } from '@/utils/cloudflare';
 
 
-const areAllFilesUploaded = (fileList:UploadFile[]) => {
+export const areAllFilesUploaded = (fileList:UploadFile[]) => {
   if(fileList.length === 0) return false;
   return fileList.every(file => {
     return file.status === 'done';
@@ -59,7 +59,7 @@ export const InputPanel = (props: Props['props']) => {
   const { setNewTaskGroupTitle } = props;
 
   const onLongPress = () => {
-    console.log('calls callback after long pressing 300ms');
+
   };
 
   const longPressOptions = {
