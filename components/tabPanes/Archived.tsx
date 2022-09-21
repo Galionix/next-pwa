@@ -54,6 +54,93 @@ export const ArchivedTab = ({
 }: IArchivedProps) => {
   const { t } = useTranslation('common');
 
+  const renderArchivedTask = (task: Itask): JSX.Element | undefined => {
+
+    const liClassname = `${task.data.urgency === 'normal' ? s.normal : ''}
+                    ${task.data.urgency === 'urgent' ? s.urgent : ''}
+                    ${task.data.urgency === 'warning' ? s.warning : ''}
+                    ${noteIndexEditing === task.id ? s.editing : ''}
+                    `;
+
+    if (task.data.archived)
+      return (
+        <div key={task.id}>
+          <li
+            ref={textAreaRef}
+            className={liClassname}
+            key={task.id}
+            {...longPressEvent}
+            onMouseDown={(e: any) => {
+              e.taskId = task.id;
+              longPressEvent.onMouseDown(e);
+            }}
+            onTouchStart={(e: any) => {
+              e.taskId = task.id;
+              longPressEvent.onTouchStart(e);
+            }}
+          >
+            <p
+              onClick={e => {
+                e.stopPropagation();
+                switchTextArea(task);
+              }}
+            >
+              {task.data.text}
+            </p>
+
+            <div className={s.controlButtons}>
+
+              {task.data?.description && (
+                <button key={task.id + 'bt'}>
+                  <IoDocumentTextSharp size={25} />
+                </button>
+              )}
+
+              {task.data.images?.length !== 0 ? (
+                <button>
+                  <HiOutlinePhotograph size={25} />
+                </button>
+              ) : null}
+
+              <button
+                onClick={e => {
+                  e.stopPropagation();
+                  onArchive(task.id, false);
+                }}
+              >
+                <RiInboxUnarchiveLine size={25} />
+              </button>
+
+            </div>
+
+            {noteIndexEditing === task.id && (
+              <>
+                <ImagesRenderer
+                  task={task}
+                  fileList={fileList}
+                  setFileList={setFileList}
+                />
+                <motion.textarea
+                  ref={textAreaRef}
+                  placeholder={t('messages.task_description')}
+                  name=''
+                  id=''
+                  cols={30}
+                  rows={10}
+                  key={task.id + 'ta2'}
+                  value={textareaValue}
+                  onChange={e => {
+                    setTextareaValue(e.target.value);
+                  }}
+                ></motion.textarea>
+                <TaskDetails taskDates={{ ...editingTask!.data }} />
+              </>
+            )}
+          </li>
+        </div>
+      );
+  };
+
   return (
     <motion.ul
       layout
@@ -61,97 +148,7 @@ export const ArchivedTab = ({
       key='2'
       className={` ${s.tasks}  ${s.archived_tasks} `}
     >
-      {!settingNewTaskGroup &&
-        tasks.map(task => {
-          if (task.data.archived)
-            return (
-              <div key={task.id}>
-                <li
-                  // className={cn({
-                  //   normal: task.data.urgency === 'normal',
-                  //   urgent: task.data.urgency === 'urgent',
-                  //   warning: task.data.urgency === 'warning',
-                  // })}
-                  // key={task.id + '12'}
-                  ref={textAreaRef}
-                  // className={cn({
-                  //   // checked: task.data.checked,
-                  //   normal: task.data.urgency === 'normal',
-                  //   urgent: task.data.urgency === 'urgent',
-                  //   warning: task.data.urgency === 'warning',
-                  //   editing: noteIndexEditing === task.id,
-                  // })}
-                  className={`${task.data.urgency === 'normal' ? s.normal : ''}
-                    ${task.data.urgency === 'urgent' ? s.urgent : ''}
-                    ${task.data.urgency === 'warning' ? s.warning : ''}
-                    ${noteIndexEditing === task.id ? s.editing : ''}
-                    `}
-                  key={task.id}
-                  {...longPressEvent}
-                  onMouseDown={(e: any) => {
-                    e.taskId = task.id;
-                    longPressEvent.onMouseDown(e);
-                  }}
-                  onTouchStart={(e: any) => {
-                    e.taskId = task.id;
-                    longPressEvent.onTouchStart(e);
-                  }}
-                >
-                  <p
-                    onClick={e => {
-                      e.stopPropagation();
-                      switchTextArea(task);
-                    }}
-                  >
-                    {task.data.text}
-                  </p>
-                  <div className={s.controlButtons}>
-                    {task.data?.description && (
-                      <button key={task.id + 'bt'}>
-                        <IoDocumentTextSharp size={25} />
-                      </button>
-                    )}
-                    {task.data.images?.length !== 0 ? (
-                      <button>
-                        <HiOutlinePhotograph size={25} />
-                      </button>
-                    ) : null}
-                    <button
-                      onClick={e => {
-                        e.stopPropagation();
-                        onArchive(task.id, false);
-                      }}
-                    >
-                      <RiInboxUnarchiveLine size={25} />
-                    </button>
-                  </div>
-                  {noteIndexEditing === task.id && (
-                    <>
-                      <ImagesRenderer
-                        task={task}
-                        fileList={fileList}
-                        setFileList={setFileList}
-                      />
-                      <motion.textarea
-                        ref={textAreaRef}
-                        placeholder={t('messages.task_description')}
-                        name=''
-                        id=''
-                        cols={30}
-                        rows={10}
-                        key={task.id + 'ta2'}
-                        value={textareaValue}
-                        onChange={e => {
-                          setTextareaValue(e.target.value);
-                        }}
-                      ></motion.textarea>
-                      <TaskDetails taskDates={{ ...editingTask!.data }} />
-                    </>
-                  )}
-                </li>
-              </div>
-            );
-        })}
+      {!settingNewTaskGroup && tasks.map(renderArchivedTask)}
       {tasks.length === 0 && <AddTasks />}
     </motion.ul>
   );
