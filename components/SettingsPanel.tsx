@@ -184,8 +184,9 @@ export const SettingsPanel = ({
   const [deleteModal, setDeleteModal] = useState(false);
 
   const pendingExist = pendingShareInvites ? pendingShareInvites.filter(
-    invite => invite.acceptedAt !== undefined
-  ) : []
+    invite => !invite.acceptedAt
+    ) : []
+    console.log('pendingShareInvites: ', pendingShareInvites);
 
   return (
     <motion.div layout {...fastTransition} className={` ${s.settings} `}>
@@ -198,7 +199,7 @@ export const SettingsPanel = ({
       </button>
       <PendingInvites
         visible={showInvitesModal}
-        pendingShareInvites={pendingShareInvites}
+        pendingShareInvites={pendingExist}
         setVisible={setShowInvitesModal}
       />
       <Modal
