@@ -35,7 +35,8 @@ module.exports = withPlugins([
 				'lh3.googleusercontent.com',
 				'googleusercontent.com',
 				'webstore.b-cdn.net',
-				'imagedelivery.net'
+				'imagedelivery.net',
+				'lh3.googleusercontent.com'
 			],
 		},
 		i18n: {

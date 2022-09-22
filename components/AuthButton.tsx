@@ -27,8 +27,8 @@ export const AuthButton = () => {
                 layout
                 onClick={e => {
                     e.preventDefault()
-                    signOut()
                     reset()
+                    signOut()
                 }}
             >
                 {t('buttons.sign_out')}

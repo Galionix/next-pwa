@@ -1,4 +1,8 @@
 {
+	"accept": "Принять",
+	"decline": "Отклонить",
+	"loading": "Загрузка",
+	"tasks": "Задачи",
 	"user": { "profile": "Профиль" },
 	"buttons": {
 		"auth": "Войти",
@@ -36,11 +40,14 @@
 		"danger_section": "Зона опасности",
 		"task_actions_section": "Быстрые действия задачи",
 		"actions" : {
+			"sentAt": "Отправлено",
 			"Urgency": "Важность",
 			"Delete": "Удалить",
 			"Archive": "Архивировать",
 			"Notification": "Уведомление",
-			"Description": "Описание"
+			"Description": "Описание",
+			"PendingInvites": "Приглашения",
+			"NoPendingInvites": "Нет приглашений"
 		}
 	},
 	"urgency": {

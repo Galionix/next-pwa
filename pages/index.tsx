@@ -7,7 +7,7 @@ import {
   requestNotificationPermission,
   setTheme,
 } from '@/utils/apputils';
-import { initUser } from '@/utils/fire';
+import { getPendingShareInvites, initUser } from '@/utils/fire';
 import { Badge, Tabs } from 'antd';
 
 import classNames from 'classnames/bind';
@@ -68,9 +68,10 @@ import {
 import { TaskDetails } from 'components/TaskStats';
 import { ArchivedTab } from 'components/tabPanes/Archived';
 import { ActiveTab } from 'components/tabPanes/ActiveTab';
-import { Itask } from 'types/fireTypes';
+import { IPendingShareInvite, Itask, IUser } from 'types/fireTypes';
 import { UploadFile } from 'antd/lib/upload/interface';
 import { stripImagesData } from '@/utils/cloudflare';
+import { GroupBar } from 'components/GroupBar/GroupBar';
 // import { Itask } from 'types/fireTypes'
 
 const cn = classNames.bind(s);
@@ -99,6 +100,8 @@ const Home: NextPage = () => {
   const [paneIndex, setPaneIndex] = useState(0);
   const [editingTaskTitle, setEditingTaskTitle] = useState(false);
 
+
+
   const [currentDaySelected, setCurrentDaySelected] = useState(false);
 
   const getUrgencyIndex = (urgency: string) => urgencies.indexOf(urgency);
@@ -115,6 +118,7 @@ const Home: NextPage = () => {
   const [editingTaskIndex, setEditingTaskIndex] = useState('');
   const [editingTaskText, setEditingTaskText] = useState('');
 
+  const [pendingShareInvites, setPendingShareInvites] = useState<IPendingShareInvite[] | undefined>([]);
   const [noteIndexEditing, setNoteIndexEditing] = useState('');
 
   const [textareaValue, setTextareaValue] = useState('');
@@ -128,7 +132,7 @@ const Home: NextPage = () => {
   }, []);
 
   useClickAway(textAreaRef, () => {
-    const editingTask = tasks.find(task => task.id === noteIndexEditing);
+    const editingTask = tasksToShow.find(task => task.id === noteIndexEditing);
     if (editingTask && typeof textareaValue !== 'undefined')
       updateTask({
         id: noteIndexEditing,
@@ -140,22 +144,12 @@ const Home: NextPage = () => {
     setNoteIndexEditing('');
   });
 
-  // useClickAway(textAreaRef2, (wtf) => {
-  //
-  //   const editingTask = tasks.find(task => task.id === noteIndexEditing)
-  //   if (editingTask && typeof (textareaValue) !== "undefined")
-  //     updateTask({
-  //       id: noteIndexEditing,
-  //       data: {
-  //         ...editingTask.data,
-  //         description: textareaValue,
-  //       },
-  //     })
-  //   setNoteIndexEditing("")
-  // });
+
 
   const {
+    externalTaskGroupIndex,
     setTaskGroupIndex,
+    setExternalTaskGroupIndex,
     taskGroupIndex,
     setUser,
     user,
@@ -165,7 +159,30 @@ const Home: NextPage = () => {
     setTasks,
     groupsLoading,
     setGroupsLoading,
+    setExternalTaskGroups,
+    setExternalTasks,
+    externalTaskGroups,
+    setExternalTaskGroupsData,
+    externalTaskGroupsData,
+    externalTasks
   } = useUserStore(state => state);
+
+  const tasksToShow = taskGroupIndex > -1 ? tasks : externalTasks
+
+  useEffect(() => {
+
+    const getPending = async (user:IUser) => {
+
+
+      const pendingShareInvites = await getPendingShareInvites(user.id)
+      setPendingShareInvites(pendingShareInvites)
+
+    }
+    if(user && user.id){
+
+      getPending(user)
+    }
+  }, [user]);
 
   type session_type = {
     data: Session | null;
@@ -175,7 +192,6 @@ const Home: NextPage = () => {
   const session = useSession();
 
   const onLongPress = (e: any) => {
-
     // alert('long press');
   };
 
@@ -210,6 +226,18 @@ const Home: NextPage = () => {
     // rotationAngle: 0,                     // set a rotation angle
   });
 
+  const refreshData = {
+    setExternalTaskGroups,
+    // userid: id,
+    taskGroupIndex,
+    setTaskGroups,
+    setTasks,
+    setGroupsLoading,
+    setExternalTasks,
+    taskGroups,
+    setExternalTaskGroupsData,
+    externalTaskGroupIndex
+  }
   useEffect(() => {
     if (session.status === 'authenticated' && session.data.token != undefined) {
       //@ts-ignore
@@ -218,30 +246,32 @@ const Home: NextPage = () => {
       initUser(name, email, picture).then(async userDoc => {
         const { id } = userDoc;
         const user_document = await getDoc(userDoc);
+
+        // const pendingShareInvites = user_document.data()?.pendingShareInvites;
         //@ts-ignore
         const { data } = user_document.data();
 
+
+
         if (data?.theme !== '' && data?.theme !== undefined)
           setTheme(data.theme);
-        setUser({ name, email, picture, id, data });
+        setUser({ name, email, picture, id, data } as any);
         requestNotificationPermission();
         refreshTaskData({
+          // setExternalTaskGroups,
+          ...refreshData,
           userid: id,
-          taskGroupIndex,
-          setTaskGroups,
-          setTasks,
-          setGroupsLoading,
+          // taskGroupIndex,
+          // setTaskGroups,
+          // setTasks,
+          // setGroupsLoading,
+          // setExternalTasks,
+          // taskGroups,
+          // setExternalTaskGroupsData
         });
       });
     }
-  }, [
-    session,
-    setGroupsLoading,
-    setTaskGroups,
-    setTasks,
-    setUser,
-    taskGroupIndex,
-  ]);
+  }, [session, setExternalTaskGroups, setExternalTasks, setGroupsLoading, setTaskGroups, setTasks, setUser, taskGroupIndex]);
 
   useEffect(() => {
     if (taskGroups.length > 0 && taskGroupIndex > -1) {
@@ -252,39 +282,60 @@ const Home: NextPage = () => {
   }, [setTasks, taskGroupIndex, taskGroups, user.id]);
 
   const updateTask =
-  // useCallback(
+    // useCallback(
 
-    ({ id, data }: { id: string; data: any; }, callBack?:any) => {
-      f_updateTask(user.id, taskGroups[taskGroupIndex].id, id, data).then(
+    ({ id, data }: { id: string; data: any }, callBack?: any) => {
+      const isExternal = taskGroupIndex > -1 ? false : true;
+
+      if(!isExternal){
+      f_updateTask(user.id, taskGroups[taskGroupIndex]?.id, id, data,isExternal).then(
         () => {
           callBack && callBack();
           refreshTaskData({
             userid: user.id,
-            taskGroupIndex,
-            setTaskGroups,
-            setTasks,
-            setGroupsLoading,
+            ...refreshData
           });
         },
-      );
-    }
-    // [
-    //   setGroupsLoading,
-    //   setTaskGroups,
-    //   setTasks,
-    //   taskGroupIndex,
-    //   taskGroups,
-    //   user.id,
-    // ],
+        );
+      }
+      if (isExternal) {
+        const externalTaskGroup = externalTaskGroups[externalTaskGroupIndex];
+        const upadteArgs = {
+          fromUser: externalTaskGroup.fromUser, tgId:`${externalTaskGroups[externalTaskGroupIndex]?.id}`, id, data, isExternal
+        }
+
+        f_updateTask(externalTaskGroup.fromUser, `${externalTaskGroups[externalTaskGroupIndex].taskGroup}`, id, data, isExternal).then(
+          () => {
+            callBack && callBack();
+            refreshTaskData({
+              userid: user.id,
+              ...refreshData
+            });
+          },
+        );
+
+      }
+
+    };
+  // [
+  //   setGroupsLoading,
+  //   setTaskGroups,
+  //   setTasks,
+  //   taskGroupIndex,
+  //   taskGroups,
+  //   user.id,
+  // ],
   // );
 
   useEffect(() => {
-    const editingTask = tasks.find(task => task.id === noteIndexEditing);
+    const editingTask = tasksToShow.find(task => task.id === noteIndexEditing);
 
-    const strippedData = stripImagesData(fileList)
+    const strippedData = stripImagesData(fileList);
     if (editingTask && fileList.length > 0 && areAllFilesUploaded(fileList)) {
       {
-        const images = editingTask.data.images ? [...editingTask.data.images,...strippedData] : [...strippedData]
+        const images = editingTask.data.images
+          ? [...editingTask.data.images, ...strippedData]
+          : [...strippedData];
         const args = {
           id: noteIndexEditing,
           data: {
@@ -293,14 +344,13 @@ const Home: NextPage = () => {
           },
         };
 
-        updateTask(args,setFileList([]));
-
+        updateTask(args, setFileList([]));
       }
     }
-  }, [fileList, noteIndexEditing,tasks]);
+  }, [fileList, noteIndexEditing, tasksToShow]);
 
   const onArchive = (id: string, value: boolean) => {
-    const task = tasks.find(item => item.id === id);
+    const task = tasksToShow.find(item => item.id === id);
     updateTask({
       id,
       data: {
@@ -311,17 +361,16 @@ const Home: NextPage = () => {
     });
     refreshTaskData({
       userid: user.id,
-      taskGroupIndex,
-      setTaskGroups,
-      setTasks,
-      setGroupsLoading,
+      ...refreshData
     });
   };
+
+  const tabIndex = wrap(0, 3, paneIndex - 1);
 
   const allowArchive = () => {
     const isZeroTab = wrap(0, 3, paneIndex - 1) === 0;
     const tasksExist =
-      tasks.filter(
+    tasksToShow.filter(
         task =>
           task.data.checkable &&
           // &&
@@ -337,7 +386,7 @@ const Home: NextPage = () => {
   };
 
   const archiveChecked = () => {
-    const tasksToArchive = tasks.filter(
+    const tasksToArchive = tasksToShow.filter(
       task =>
         task.data.checkable &&
         // &&
@@ -374,10 +423,7 @@ const Home: NextPage = () => {
       newTaskGroup(user.id, tgName).then(() => {
         refreshTaskData({
           userid: user.id,
-          taskGroupIndex,
-          setTaskGroups,
-          setTasks,
-          setGroupsLoading,
+          ...refreshData
         }).then(() => {
           setTaskGroupIndex(0);
         });
@@ -390,8 +436,6 @@ const Home: NextPage = () => {
   const switchTextArea = (task: any) => {
     const taskId = task.id;
 
-
-
     if (noteIndexEditing !== taskId) {
       setNoteIndexEditing(taskId);
       setTextareaValue(task.data?.description);
@@ -401,20 +445,9 @@ const Home: NextPage = () => {
     }
   };
 
-  // const updateTextArea = (task: any, text: string) => {
-  //   setTextareaValue(text)
-  //   updateTask({
-  //     id: task.id,
-  //     data: {
-  //       ...task.data,
-  //       description: text,
-  //     },
-  //   })
-  // }
-
   const [, cancel] = useDebounce(
     () => {
-      const editingTask = tasks.find(task => task.id === noteIndexEditing);
+      const editingTask = tasksToShow.find(task => task.id === noteIndexEditing);
 
       if (editingTask && typeof textareaValue !== 'undefined')
         updateTask({
@@ -428,7 +461,11 @@ const Home: NextPage = () => {
     2000,
     [textareaValue],
   );
-  const editingTask = tasks.find(task => task.id === noteIndexEditing);
+  const editingTask = tasksToShow.find(task => task.id === noteIndexEditing);
+
+  const tgToShow = taskGroupIndex > -1 ? taskGroups[taskGroupIndex] : externalTaskGroupsData[externalTaskGroupIndex]
+
+
 
   return (
     <>
@@ -441,14 +478,6 @@ const Home: NextPage = () => {
           className={`${s.main} ${folded ? s.folded : ''}`}
           {...swipeHandlers}
         >
-          {allowArchive() && (
-            <div className={s.floatingButton} onClick={() => archiveChecked()}>
-              <Button
-                icon={<IoArchiveSharp size={30} />}
-                hint={'Archive all'}
-              />
-            </div>
-          )}
           {session.status === 'authenticated' && <UserPanel />}
 
           {session.status === 'authenticated' && (
@@ -537,6 +566,29 @@ const Home: NextPage = () => {
                 {...fastTransition}
                 className={` ${s.taskGroups} `}
               >
+                 {
+                  externalTaskGroupsData.map((group, index) => (
+                    <li
+
+                      key={group.id}
+
+                      className={externalTaskGroupIndex === index ? s.selected : ''}
+                      onClick={() => {
+                        setPaneIndex(0);
+                        // setUpdateTaskGroupTitle(group.data.title);
+                        // setCurrentDaySelected(false);
+                        setTaskGroupIndex(-1);
+                        // setNoteIndexEditing('');
+                        setExternalTaskGroupIndex(index);
+                      }}
+                      // onDoubleClick={() => {
+                      //   setEditingTaskTitle(true);
+                      // }}
+                    >
+                      {group.data.title}
+                    </li>
+                  ))
+}
                 {taskGroups.map((group, index) => (
                   <li
                     key={group.id}
@@ -547,6 +599,8 @@ const Home: NextPage = () => {
                       setCurrentDaySelected(false);
                       setTaskGroupIndex(index);
                       setNoteIndexEditing('');
+                      // setNoteIndexEditing('');
+                      setExternalTaskGroupIndex(-1);
                     }}
                     onDoubleClick={() => {
                       setEditingTaskTitle(true);
@@ -650,10 +704,7 @@ const Home: NextPage = () => {
 
                                 refreshTaskData({
                                   userid: user.id,
-                                  taskGroupIndex,
-                                  setTaskGroups,
-                                  setTasks,
-                                  setGroupsLoading,
+                                  ...refreshData
                                 });
 
                                 setNewTaskGroupTitle(
@@ -667,6 +718,8 @@ const Home: NextPage = () => {
                     )}
                   </li>
                 ))}
+
+
                 {groupsLoading && (
                   <aside className={` ${s.taskGroupsOverlay} `}>
                     <Image
@@ -682,7 +735,31 @@ const Home: NextPage = () => {
           )}
           {session.status === 'authenticated' ? (
             <section className={s.tasksWrapper}>
-              <h1>{taskGroups[taskGroupIndex].data.title}</h1>
+              <GroupBar
+                tabIndex={tabIndex}
+                folded={folded}
+                taskgroup={
+
+                  tgToShow
+
+                }
+                menuChildren={
+                  <>
+                    {allowArchive() && (
+                      // <div
+                      //   // className={s.floatingButton}
+                      //   onClick={() => archiveChecked()}
+                      // >
+                        <Button
+                          icon={<IoArchiveSharp size={25} />}
+                        hint={'Archive all'}
+                        onClick={archiveChecked}
+                        />
+                      // </div>
+                    )}
+                  </>
+                }
+              />
               <Tabs
                 centered
                 size='small'
@@ -699,13 +776,14 @@ const Home: NextPage = () => {
                 className={` ${s.tasks} `}
                 style={{
                   // overflowY: 'scroll',
-                padding: '10px' }}
+                  padding: '10px',
+                }}
                 animated={{ inkBar: true }}
               >
                 <TabPane tab={t('buttons.active_tasks')} key={'1'}>
                   <ActiveTab
                     settingNewTaskGroup={settingNewTaskGroup}
-                    tasks={tasks}
+                    tasks={tasksToShow}
                     switchTextArea={switchTextArea}
                     onArchive={onArchive}
                     noteIndexEditing={noteIndexEditing}
@@ -731,7 +809,7 @@ const Home: NextPage = () => {
                 <TabPane tab={t('buttons.archived_tasks')} key='2'>
                   <ArchivedTab
                     settingNewTaskGroup={settingNewTaskGroup}
-                    tasks={tasks}
+                    tasks={tasksToShow}
                     onArchive={onArchive}
                     switchTextArea={switchTextArea}
                     noteIndexEditing={noteIndexEditing}
@@ -757,7 +835,7 @@ const Home: NextPage = () => {
                   <InputPanel setNewTaskGroupTitle={setNewTaskGroupTitle} />
                 </div>
               )}
-              <SettingsPanel />
+              <SettingsPanel pendingShareInvites={pendingShareInvites} folded={folded} />
             </>
           )}
         </main>

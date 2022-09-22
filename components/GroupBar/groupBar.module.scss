@@ -1,0 +1,26 @@
+.groupBar{
+display: flex;
+justify-content: space-between;
+h1{
+    padding-left: 20px;
+    width: 100%;
+    text-align: center;
+    color:var(--bg-second)
+}
+
+}
+
+.avatar{
+    border-radius: 50%;
+}
+
+.shareInfo{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-around;
+}
+.groupBar__actions{
+    display: flex;
+    flex-direction: row;
+}

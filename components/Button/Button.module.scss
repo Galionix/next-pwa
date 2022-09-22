@@ -1,8 +1,11 @@
 .button{
+   border:1px solid transparent;
    display: flex;
    gap:10px;
-   align-items: center; 
+   align-items: center;
 	cursor: pointer;
+   width:max-content;
+   padding: 3px;
 //    position: relative;
 // &:hover::after{
 //    position: absolute;
@@ -11,4 +14,9 @@
 //     background: rgba(180, 180, 180, 0.2);
 //     inset: 0;
 // }
+}
+
+.warning{
+   border: 1px dashed var(--color-red);
+   border-radius: 5px;
 }

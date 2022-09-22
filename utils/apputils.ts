@@ -4,7 +4,7 @@ import {
 	orderBy,
 	query,
 } from '@firebase/firestore'
-import { db, user } from './fire'
+import { db, getExternalTasks, getSharedGroups, populateExternalTaskGroups, user } from './fire'
 import { notification } from 'antd'
 import { MutableRefObject, useRef } from 'react'
 import { IconType } from 'antd/lib/notification'
@@ -118,7 +118,8 @@ export const getTaskGroups_old = async (
 
 export const getTasks = async (
 	userid: string,
-	taskGroup: string
+	taskGroup: string,
+	external: boolean=false
 ) => {
 	const tasksRef = collection(
 		db,
@@ -131,10 +132,11 @@ export const getTasks = async (
 	const querySnapshot = await getDocs(
 		q
 	)
-	const res: { id: string; data: any }[] = []
+	const res: { id: string; data: any, external?:boolean }[] = []
 	querySnapshot.forEach(doc => {
 		res.push({
 			id: doc.id,
+			external,
 			data: doc.data(),
 		})
 	})
@@ -241,18 +243,55 @@ export const refreshTaskData = async (
 		taskGroupIndex,
 		setTaskGroups,
 		setTasks,
-		setGroupsLoading
+		setGroupsLoading,
+		setExternalTaskGroups,
+		setExternalTasks,
+		taskGroups,
+		setExternalTaskGroupsData,externalTaskGroupIndex
 	}:
 		{
 			userid: string,
 			taskGroupIndex: number,
+			taskGroups: any[],
 			setTaskGroups: Function,
 			setTasks: Function
 			setGroupsLoading: Function
+			setExternalTaskGroups: Function
+			setExternalTasks: Function
+			setExternalTaskGroupsData: Function
+			externalTaskGroupIndex: number
 		}
 ) => {
+	// const externalGroupId = taskGroupIndex - taskGroups.length
+	//
 	setGroupsLoading(true)
-	getTaskGroups(userid).then(res => {
+
+	getTaskGroups(userid).then(async (res) => {
+		await getSharedGroups(userid).then(async (res) => {
+			// setSharedGroups(res)
+
+
+			setExternalTaskGroups&&setExternalTaskGroups(res)
+			if (res.length > 0) {
+				const populatedData =
+					await populateExternalTaskGroups(res)
+					setExternalTaskGroupsData&&setExternalTaskGroupsData(populatedData)
+				// if (externalTaskGroupIndex > 0) {
+				// 	getExternalTasks()
+				// }
+
+			}
+
+			if (res.length > 0 && externalTaskGroupIndex > -1) {
+				const group= res[externalTaskGroupIndex]
+
+				await getTasks(res[externalTaskGroupIndex].fromUser, `${res[externalTaskGroupIndex].taskGroup}`,true)
+					.then(res => {
+					setExternalTasks(res)
+				})
+			}
+		})
+
 		setTaskGroups(res)
 		if (res.length > 0 && taskGroupIndex > -1) {
 			getTasks(
@@ -267,5 +306,7 @@ export const refreshTaskData = async (
 		else {
 			setGroupsLoading(false);
 		}
-	})
+	});
+
+
 }

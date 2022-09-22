@@ -71,14 +71,37 @@ export const InputPanel = (props: Props['props']) => {
   const {
     setTaskGroupIndex,
     taskGroupIndex,
+    setExternalTaskGroups,
+    setGroupsLoading,
+    externalTaskGroupIndex,
+    externalTaskGroups,
     setUser,
     user,
     taskGroups,
     setTaskGroups,
     setTasks,
     groupsLoading,
-    setGroupsLoading,
+    setExternalTasks,
+    setExternalTaskGroupsData
   } = useUserStore(state => state);
+
+  const refreshData = {
+    setExternalTaskGroups,
+    taskGroupIndex,
+    setTaskGroups,
+    setTasks,
+    setGroupsLoading,
+    setExternalTasks,
+    taskGroups,
+    setExternalTaskGroupsData,
+    externalTaskGroupIndex
+  }
+  const isExternal = taskGroupIndex === -1;
+  const groupIndex = isExternal ? externalTaskGroupIndex : taskGroupIndex;
+  const taskGroup = isExternal ? externalTaskGroups[groupIndex] : taskGroups[groupIndex];
+
+
+  const userId = isExternal ? taskGroup.fromUser : user.id
 
   const urgencies = ['normal', 'urgent', 'warning'];
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -90,14 +113,15 @@ export const InputPanel = (props: Props['props']) => {
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const performAddTask = async () => {
     if (isValidText(newTaskTitle)) {
-      if (taskGroups.length === 0) {
+      if (taskGroup.length === 0) {
         await newTaskGroup(user.id, t('messages.my_first_group'));
-        await setTaskGroupIndex(0);
+        // await setTaskGroupIndex(0);
         await getTaskGroups(user.id).then(res => {
           setTaskGroups(res);
 
           setNewTaskGroupTitle(`Task group ${res.length + 1}`);
-          addTask(user.id, res[0].id, {
+
+          addTask(userId, isExternal? taskGroup.taskGroup : taskGroup.id, {
             text: newTaskTitle,
             images: stripImagesData(fileList),
             checkable: true,
@@ -105,28 +129,22 @@ export const InputPanel = (props: Props['props']) => {
           }).then(() => {
             refreshTaskData({
               userid: user.id,
-              taskGroupIndex,
-              setTaskGroups,
-              setTasks,
-              setGroupsLoading,
+              ...refreshData
             });
             setNewTaskTitle('');
             setFileList([]);
           });
         });
       } else {
-        addTask(user.id, taskGroups[taskGroupIndex].id, {
+        addTask(userId, isExternal? taskGroup.taskGroup :taskGroup.id, {
           text: newTaskTitle,
-          images:stripImagesData(fileList),
+          images: stripImagesData(fileList),
           checkable: true,
           urgency: urgencies[urgency],
         }).then(() => {
           refreshTaskData({
             userid: user.id,
-            taskGroupIndex,
-            setTaskGroups,
-            setTasks,
-            setGroupsLoading,
+            ...refreshData
           });
           setNewTaskTitle('');
           setFileList([]);

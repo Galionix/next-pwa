@@ -1,4 +1,8 @@
 {
+	"accept": "Accept",
+	"decline": "Decline",
+	"loading": "Loading",
+	"tasks": "Tasks",
 	"user": { "profile": "Profile" },
 	"buttons": {
 		"auth": "Sign In",
@@ -35,13 +39,16 @@
 			"cancel": "Keep 😻"
 		},
 		"danger_section": "Danger zone",
-		"task_actions_section": "Task quick actions",		
+		"task_actions_section": "Task quick actions",
 		"actions" : {
+			"sentAt": "Sent at",
 			"Urgency": "Urgency",
 			"Delete": "Delete",
 			"Archive": "Archive",
 			"Notification": "Notification",
-			"Description": "Description"
+			"Description": "Description",
+			"PendingInvites": "Pending Invites",
+			"NoPendingInvites": "No Pending Invites"
 		}
 	},
 	"urgency": {

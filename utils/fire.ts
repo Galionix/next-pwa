@@ -16,7 +16,9 @@ import {
   serverTimestamp,
   enableMultiTabIndexedDbPersistence,
 } from 'firebase/firestore';
-import { Itask } from 'types/fireTypes';
+import uniqid from 'uniqid';
+import { IPendingShareInvite, Itask, ITaskGroup, IUser } from 'types/fireTypes';
+import { getTasks } from '@/utils/apputils';
 // import {
 // 	getDatabase,
 // 	ref,
@@ -122,6 +124,7 @@ export const addTask = async (
     urgency: string;
   },
 ) => {
+
   const docRef = await addDoc(
     collection(db, `users/${userid}/taskGroups/${taskGroup}/tasks`),
     {
@@ -162,6 +165,7 @@ export const f_updateTask = async (
   taskGroupId: string,
   taskId: string,
   data: Itask['data'],
+  isExternal = false,
 ): Promise<any> => {
   return await updateDoc(
     doc(db, `users/${userid}/taskGroups/${taskGroupId}/tasks/${taskId}`),
@@ -186,4 +190,139 @@ export const updateUser = async (id: string, data: any) => {
 
 export const deleteUser = async (id: string) => {
   return await deleteDoc(doc(db, `users/${id}`));
+};
+
+export const getUsersListWithIds = async () => {
+  const usersRef = collection(db, 'users');
+  const snapshot = await getDocs(usersRef);
+  return snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as unknown as IUser[];
+};
+
+// export const getPendingShareInvites = async (userid: string) => {
+//   console.log('userid: ', userid);
+//   const userRef = doc(db, 'users', userid);
+//   const userSnap = await getDoc(userRef);
+//   const user = userSnap.data() as IUser;
+//   console.log('user: ', user);
+//   return user.pendingShareInvites;
+// };
+
+export const getPendingShareInvites = async (userid: string) => {
+  const invites = collection(db, 'users', userid, 'pendingShareInvites');
+  const snapshot = await getDocs(invites);
+  return snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as unknown as IPendingShareInvite[];
+};
+
+export const addPendingShareInvite = async (
+  toUserId: string,
+  fromUserId: string,
+  data: IPendingShareInvite,
+) => {
+  const inviteData = {
+    ...data,
+    toUserId,
+    sendAt: serverTimestamp(),
+    acceptedAt: null,
+  };
+
+  // add invite to sender
+  const added = await addDoc(
+    collection(db, `users/${fromUserId}/sentPendingShareInvites`),
+    inviteData,
+  );
+
+  // add invite to receiver
+  const res = await addDoc(
+    collection(db, `users/${toUserId}/pendingShareInvites`),
+    { ...inviteData, pendingId: added.id },
+  );
+  return res;
+};
+
+// const getPendingInvite = async (userid: string, inviteId: string) => {
+//   const inviteRef = doc(db, 'users', userid, 'pendingShareInvites', inviteId);
+//   const inviteSnap = await getDoc(inviteRef);
+//   return inviteSnap.data() as IPendingShareInvite;
+// };
+
+export const getTaskGroup = async (userid: string, groupId: string) => {
+  const querySnapshot = await getDoc(
+    doc(db, `users/${userid}/taskGroups/${groupId}`),
+  );
+  const res = querySnapshot.data() as ITaskGroup;
+  return res;
+};
+export const acceptShareInvite = async ({
+  toUserId,
+  invite,
+}: {
+  toUserId: string;
+  invite: IPendingShareInvite;
+  }) => {
+
+
+  const docRef = await addDoc(
+    collection(db, `users/${toUserId}/sharedGroups`),
+    {...invite, acceptedAt: serverTimestamp(),},
+  );
+
+  // const existingInvites = await getPendingShareInvites(toUserId);
+
+  // console.log('existingInvites: ', existingInvites);
+
+  await updateDoc(
+    doc(
+      db,
+      `users/${invite.fromUser}/sentPendingShareInvites/${invite.pendingId}`,
+    ),
+    {
+      acceptedAt: serverTimestamp(),
+    },
+  );
+
+  return await updateDoc(
+    doc(db, `users/${toUserId}/pendingShareInvites/${invite.id}`),
+    {
+      acceptedAt: serverTimestamp(),
+    },
+  );
+};
+
+export const getSharedGroups = async (userid: string) => {
+  const invites = collection(db, 'users', userid, 'sharedGroups');
+  const snapshot = await getDocs(invites);
+  return snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as unknown as IPendingShareInvite[];
+};
+
+export interface IExternalPopulatedTaskGroup extends IPendingShareInvite {
+  // tasks: Itask[];
+}
+export const populateExternalTaskGroups = async (groups: IPendingShareInvite[]) => {
+
+  const promises = groups.map(async group => {
+    const data = await getTaskGroup(group.fromUser, group.taskGroup);
+
+    // get tasks
+    // const tasks = await getTasks(group.fromUser, group.taskGroup);
+
+    return { ...group, data} as IExternalPopulatedTaskGroup;
+  });
+  return await Promise.all(promises);
+}
+export const getExternalTasks = async (userid: string, groupId: string) => {
+  const tasks = collection(db, 'users', userid, 'taskGroups', groupId, 'tasks');
+  const snapshot = await getDocs(tasks);
+  return snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as unknown as Itask[];
 };

@@ -39,7 +39,7 @@ export const TaskDetails = ({ taskDates }: TaskDetailsPanelProps) => {
   const router = useRouter();
 
   moment.locale(router.locale);
-  // register(router.locale);
+
 const timeAgo = new TimeAgo(router.locale || '');
 
   const { createdAt, archivedAt, updatedAt, timestamp } = taskDates;

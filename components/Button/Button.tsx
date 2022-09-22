@@ -29,7 +29,9 @@ export const Button = ({ type, title, hint, hintPosition, disabled, icon, onClic
                 disabled,
                 icon: !!icon
             })} ${className && className}`}
-            onClick={onClick && onClick()}
+            onClick={(e) => {
+                onClick && onClick(e)
+            }}
         // title={title ? title : ''}
         >
             {icon ? icon : null}

@@ -19,6 +19,7 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import { Image } from 'antd';
 import { Images } from 'components/InputPanel/components/Images';
 import { UploadFile } from 'antd/lib/upload/interface';
+import { useUserStore } from '@/utils/store';
 
 // const handlePreview = async (file: UploadFile) => {
 //   if (!file.url && !file.preview) {
@@ -154,6 +155,7 @@ export const ActiveTab = ({
   setFileList,
 }: IActiveProps) => {
   const { t } = useTranslation('common');
+  const {externalTasks,externalTaskGroupIndex} = useUserStore()
 
   return (
     <motion.ul layout {...fastTransition} className={` ${s.tasks} `} key='1'>

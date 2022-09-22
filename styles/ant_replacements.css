@@ -25,3 +25,7 @@
     min-height: 100%;
     overflow-y: auto;
 }
+
+.ant-select-selection-item{
+    height: 100% !important;
+}

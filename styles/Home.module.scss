@@ -698,3 +698,25 @@ ul.tasks {
     // grid-area:
   }
 }
+
+.pendingInvite{
+
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+  .pendingInvite__info{
+    display: flex;
+    flex-direction: column;
+    img{
+      height: 90px;
+      width: 90px;
+      border-radius:50%;
+    }
+  }
+  .pendingInvite__actions{
+    span{
+      color: var(--bg-main) !important;
+    }
+  }
+}
