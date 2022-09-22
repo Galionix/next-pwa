@@ -14,9 +14,13 @@
 //     background: rgba(180, 180, 180, 0.2);
 //     inset: 0;
 // }
+border-radius: 5px;
 }
 
 .warning{
    border: 1px dashed var(--color-red);
-   border-radius: 5px;
+}
+
+.success{
+   border: 1px dashed var(--color-green);
 }

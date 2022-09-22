@@ -41,14 +41,18 @@
 		"danger_section": "Danger zone",
 		"task_actions_section": "Task quick actions",
 		"actions" : {
+			"Invites": "Coop invites",
 			"sentAt": "Sent at",
+			"acceptedAt": "Accepted at",
 			"Urgency": "Urgency",
 			"Delete": "Delete",
 			"Archive": "Archive",
 			"Notification": "Notification",
 			"Description": "Description",
-			"PendingInvites": "Pending Invites",
-			"NoPendingInvites": "No Pending Invites"
+			"PendingInvites": "New Pending Invites",
+			"NoPendingInvites": "No Pending Invites",
+			"AcceptedInvites": "Accepted Invites",
+			"SentInvites": "Yours Sent Invites"
 		}
 	},
 	"urgency": {
@@ -56,5 +60,14 @@
 		"normal": "Normal",
 		"urgent":"Urgent",
 		"warning":"Warning"
+	},
+	"invites":{
+		"sent":"Request sent to",
+		"noUserSelected": "No user selected",
+		"fromUser": "From",
+		"toUser": "To",
+		"willBeSharedWith": "will be shared with",
+		"share": "Share task group",
+		"inviteTerms": "This users will be granted permissions to edit this task group, as well as changing its tasks."
 	}
 }

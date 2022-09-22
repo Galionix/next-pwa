@@ -3,23 +3,29 @@ import { CheckboxValueType } from 'antd/lib/checkbox/Group';
 import { motion } from 'framer-motion';
 import { signOut } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
-import React, { useEffect, useState } from 'react';
-import { AiOutlineUserSwitch } from 'react-icons/ai';
+import { useEffect, useState } from 'react';
+import {
+  AiOutlineArrowRight,
+  AiOutlineUserAdd,
+  AiOutlineUserSwitch,
+} from 'react-icons/ai';
 import { IoSettings } from 'react-icons/io5';
-import { IPendingShareInvite, Itask, ITaskGroup, IUser } from 'types/fireTypes';
+import { IPendingShareInvite, Itask, IUser } from 'types/fireTypes';
 import { useUserStore } from 'utils/store';
+import { Button as EButton } from '../components/Button/Button';
 import s from '../styles/Home.module.scss';
 import { getTasks, setTheme } from './../utils/apputils';
 import {
   acceptShareInvite,
   deleteUser,
+  getSentShareInvites,
   getTaskGroup,
   getUsersListWithIds,
   updateUser,
 } from './../utils/fire';
 import { fastTransition } from './anims';
-import { Button as EButton } from '../components/Button/Button';
-import { useRouter } from 'next/dist/client/router';
+
+import { BiUserCheck } from 'react-icons/bi';
 
 const { Option } = Select;
 
@@ -51,6 +57,7 @@ const InviteRenderer = ({
   const { t } = useTranslation('common');
 
   const fromUser = usersList?.find(user => user.id === invite.fromUser);
+  const toUser = usersList?.find(user => user.id === invite.toUserId);
 
   const [taskGroup, setTaskGroup] = useState<{ title: string } | undefined>(
     undefined,
@@ -59,24 +66,27 @@ const InviteRenderer = ({
   const [tasks, setTasks] = useState<Itask[] | undefined>(undefined);
 
   const sentDate = new Date(invite.sendAt ? invite.sendAt.seconds * 1000 : 0);
+  const acceptedDate = new Date(
+    invite.acceptedAt ? invite.acceptedAt.seconds * 1000 : 0,
+  );
+
+  const acceptedDateString = `${acceptedDate.toLocaleDateString()} ${acceptedDate.toLocaleTimeString()}`;
 
   const dateString = `${sentDate.toLocaleDateString()} ${sentDate.toLocaleTimeString()}`;
 
   const [acceptLoading, setAcceptLoading] = useState(false);
+
   useEffect(() => {
     if (fromUser) {
       getTaskGroup(fromUser.id, invite.taskGroup).then(taskGroup => {
-
         setTaskGroup(taskGroup as any);
       });
 
       getTasks(fromUser.id, invite.taskGroup).then(tasks => {
-
         setTasks(tasks);
       });
     }
   }, [fromUser, invite.taskGroup]);
-
 
   if (!fromUser || !taskGroup || !tasks) return null;
 
@@ -85,9 +95,28 @@ const InviteRenderer = ({
       <div className={s.pendingInvite__info}>
         <h2>{taskGroup?.title}</h2>
         <span>{`${t('tasks')}: ${tasks.length}`}</span>
-        <span>{`${t('settings.actions.sentAt')}: ${dateString}`}</span>
-        <span>{fromUser?.name}</span>
-        <img src={fromUser?.imageUrl} alt='user' />
+        <div className={s.pendingInvite__info__date}>
+          <span>{`${t('settings.actions.sentAt')}: ${dateString}`}</span>
+          <span>{`${t(
+            'settings.actions.acceptedAt',
+          )}: ${acceptedDateString}`}</span>
+        </div>
+
+        <div className={s.pendingInvite__fromUser}>
+          <span>{t('invites.fromUser')}</span>
+          <span>{fromUser?.name}</span>
+          <img
+            src={fromUser?.imageUrl}
+            alt='user'
+            referrerPolicy='no-referrer'
+          />
+        </div>
+        <AiOutlineArrowRight size={25} />
+        <div className={s.pendingInvite__toUser}>
+          <span>{t('invites.toUser')}</span>
+          <span>{toUser?.name}</span>
+          <img src={toUser?.imageUrl} alt='user' referrerPolicy='no-referrer' />
+        </div>
       </div>
       <div className={s.pendingInvite__actions}>
         <Button
@@ -97,7 +126,7 @@ const InviteRenderer = ({
             setAcceptLoading(true);
             await acceptShareInvite({
               toUserId: localUser.id,
-              invite
+              invite,
             });
             setAcceptLoading(false);
           }}
@@ -117,7 +146,6 @@ export const PendingInvites = ({
   visible,
   setVisible,
 }: IPendingProps) => {
-
   const { t } = useTranslation('common');
   const [usersList, setUsersList] = useState<IUser[]>();
 
@@ -134,6 +162,7 @@ export const PendingInvites = ({
 
   return (
     <Modal
+      wrapClassName={`${s.invites_modal}`}
       visible={visible}
       onOk={() => setVisible(false)}
       onCancel={() => setVisible(false)}
@@ -144,15 +173,125 @@ export const PendingInvites = ({
         {!pendingShareInvites?.length && (
           <p>{t('settings.actions.NoPendingInvites')}</p>
         )}
-        {pendingShareInvites?.map((invite, index) => {
-          return (
-            <InviteRenderer
-              invite={invite}
-              usersList={usersList}
-              key={`${index} ${invite.fromUser} ${invite.taskGroup}`}
-            />
-          );
-        })}
+        <div className={s.pendingInvites__list}>
+          {pendingShareInvites?.map((invite, index) => {
+            return (
+              <InviteRenderer
+                invite={invite}
+                usersList={usersList}
+                key={invite.id}
+              />
+            );
+          })}
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
+interface IAcceptedProps {
+  visible: boolean;
+  acceptedShareInvites: IPendingShareInvite[] | undefined;
+  setVisible: (visible: boolean) => void;
+}
+
+const AcceptedInvites = ({
+  acceptedShareInvites,
+  visible,
+  setVisible,
+}: IAcceptedProps) => {
+  const { t } = useTranslation('common');
+  const [usersList, setUsersList] = useState<IUser[]>();
+
+  const { user } = useUserStore();
+
+  useEffect(() => {
+    getUsersListWithIds().then(data => {
+      setUsersList(data);
+      // setOptions
+    });
+  }, []);
+
+  if (!usersList) return <p>{t('loading')}</p>;
+
+  return (
+    <Modal
+      wrapClassName={`${s.invites_modal}`}
+      visible={visible}
+      onOk={() => setVisible(false)}
+      onCancel={() => setVisible(false)}
+    >
+      <div className={s.pendingInvites}>
+        <h3>{t('settings.actions.AcceptedInvites')}</h3>
+        <Divider />
+        {!acceptedShareInvites?.length && (
+          <p>{t('settings.actions.NoAcceptedInvites')}</p>
+        )}
+        <div className={s.pendingInvites__list}>
+          {acceptedShareInvites?.map((invite, index) => {
+            return (
+              <InviteRenderer
+                invite={invite}
+                usersList={usersList}
+                key={invite.id}
+              />
+            );
+          })}
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
+interface ISentShareInvitesProps {
+  visible: boolean;
+  sentShareInvites: IPendingShareInvite[] | undefined;
+  setVisible: (visible: boolean) => void;
+}
+
+const SentInvites = ({
+  sentShareInvites,
+  visible,
+  setVisible,
+}: ISentShareInvitesProps) => {
+  const { t } = useTranslation('common');
+  const [usersList, setUsersList] = useState<IUser[]>();
+
+  const { user } = useUserStore();
+
+  useEffect(() => {
+    getUsersListWithIds().then(data => {
+      setUsersList(data);
+      // setOptions
+    });
+  }, []);
+
+  if (!usersList) return <p>{t('loading')}</p>;
+
+  return (
+    <Modal
+      wrapClassName={`${s.invites_modal}`}
+      visible={visible}
+      onOk={() => setVisible(false)}
+      onCancel={() => setVisible(false)}
+    >
+      <div className={s.pendingInvites}>
+        <h3>{t('settings.actions.SentInvites')}</h3>
+        <Divider />
+        {!sentShareInvites?.length && (
+          <p>{t('settings.actions.NoAcceptedInvites')}</p>
+        )}
+        <div className={s.pendingInvites__list}>
+          {sentShareInvites?.map((invite, index) => {
+            return (
+              <InviteRenderer
+                invite={invite}
+                usersList={usersList}
+                key={invite.id}
+              />
+            );
+          })}
+        </div>
       </div>
     </Modal>
   );
@@ -163,6 +302,17 @@ export const SettingsPanel = ({
   folded,
 }: ISettingsPanelProps) => {
   const { reset, setUser, user } = useUserStore(state => state);
+
+  const [sentShareInvites, setSentShareInvites] = useState<
+    IPendingShareInvite[]
+  >([]);
+  useEffect(() => {
+    if (user && user.id) {
+      getSentShareInvites(user.id).then(data => {
+        setSentShareInvites(data);
+      });
+    }
+  }, [user]);
 
   const [showInvitesModal, setShowInvitesModal] = useState(false);
   const do_user = async (data: any) => {
@@ -182,15 +332,21 @@ export const SettingsPanel = ({
 
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [showAcceptedInvitesModal, setShowAcceptedInvitesModal] =
+    useState(false);
+  const [sentInvitesOpen, setSentInvitesOpen] = useState(false);
 
-  const pendingExist = pendingShareInvites ? pendingShareInvites.filter(
-    invite => !invite.acceptedAt
-    ) : []
-    console.log('pendingShareInvites: ', pendingShareInvites);
+  const pendingExist = pendingShareInvites
+    ? pendingShareInvites.filter(invite => !invite.acceptedAt)
+    : [];
+
+  const acceptedExist = pendingShareInvites
+    ? pendingShareInvites.filter(invite => invite.acceptedAt)
+    : [];
 
   return (
     <motion.div layout {...fastTransition} className={` ${s.settings} `}>
-      <button onClick={() => setModalOpen(true)}>
+      <button onClick={() => setModalOpen(true)} className={s.settingsGear}>
         <Badge count={pendingExist?.length} offset={[0, 0]}>
           <IoSettings size={30} />
         </Badge>
@@ -202,6 +358,17 @@ export const SettingsPanel = ({
         pendingShareInvites={pendingExist}
         setVisible={setShowInvitesModal}
       />
+      <AcceptedInvites
+        visible={showAcceptedInvitesModal}
+        acceptedShareInvites={acceptedExist}
+        setVisible={setShowAcceptedInvitesModal}
+      />
+      <SentInvites
+        visible={sentInvitesOpen}
+        sentShareInvites={sentShareInvites}
+        setVisible={setSentInvitesOpen}
+      />
+
       <Modal
         wrapClassName={`${s.settings_modal}`}
         okText={t('messages.ok')}
@@ -213,18 +380,47 @@ export const SettingsPanel = ({
         onCancel={() => setModalOpen(false)}
       >
         <>
-          {pendingExist?.length > 0 && (
-            <div className={s.pendingInvites}>
-              <EButton
-                type='warning'
-                title={`${t('settings.actions.PendingInvites')} + ${
-                  pendingShareInvites?.length
-                }`}
-                icon={<AiOutlineUserSwitch size={25} />}
-                onClick={() => setShowInvitesModal(true)}
-              />
-            </div>
-          )}
+          <section className={s.settings_modal__invites}>
+            <h3>{t('settings.actions.Invites')}</h3>
+
+            {pendingExist?.length > 0 && (
+              <div className={s.pendingInvites}>
+                <EButton
+                  type='warning'
+                  title={`${t('settings.actions.PendingInvites')} + ${
+                    pendingExist?.length
+                  }`}
+                  icon={<AiOutlineUserAdd size={25} />}
+                  onClick={() => setShowInvitesModal(true)}
+                />
+              </div>
+            )}
+
+            {acceptedExist?.length > 0 && (
+              <div className={s.pendingInvites}>
+                <EButton
+                  type='success'
+                  title={`${t('settings.actions.AcceptedInvites')} : ${
+                    acceptedExist?.length
+                  }`}
+                  icon={<BiUserCheck size={25} />}
+                  onClick={() => setShowAcceptedInvitesModal(true)}
+                />
+              </div>
+            )}
+            {sentShareInvites?.length > 0 && (
+              <div className={s.pendingInvites}>
+                <EButton
+                  type='info'
+                  title={`${t('settings.actions.SentInvites')} : ${
+                    sentShareInvites?.length
+                  }`}
+                  icon={<AiOutlineUserSwitch size={25} />}
+                  onClick={() => setSentInvitesOpen(true)}
+                />
+              </div>
+            )}
+          </section>
           <section>
             <div>
               <p>{t('settings.theme')}</p>

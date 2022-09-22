@@ -201,15 +201,6 @@ export const getUsersListWithIds = async () => {
   })) as unknown as IUser[];
 };
 
-// export const getPendingShareInvites = async (userid: string) => {
-//   console.log('userid: ', userid);
-//   const userRef = doc(db, 'users', userid);
-//   const userSnap = await getDoc(userRef);
-//   const user = userSnap.data() as IUser;
-//   console.log('user: ', user);
-//   return user.pendingShareInvites;
-// };
-
 export const getPendingShareInvites = async (userid: string) => {
   const invites = collection(db, 'users', userid, 'pendingShareInvites');
   const snapshot = await getDocs(invites);
@@ -325,4 +316,16 @@ export const getExternalTasks = async (userid: string, groupId: string) => {
     id: doc.id,
     ...doc.data(),
   })) as unknown as Itask[];
+};
+
+export const getSentShareInvites = async (userid: string) => {
+  const invites = collection(db, 'users',
+    userid, 'sentPendingShareInvites');
+  const snapshot = await getDocs(invites);
+
+  return snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data(),
+
+  })) as unknown as IPendingShareInvite[];
 };

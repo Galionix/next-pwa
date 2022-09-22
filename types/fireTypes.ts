@@ -32,6 +32,7 @@ export interface ITaskGroup {
 export interface IPendingShareInvite{
   id?: string;
   fromUser: string;
+  toUserId?: string;
   pendingId?: string;
 
     taskGroup: string;
