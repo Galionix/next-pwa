@@ -162,6 +162,7 @@ export const SettingsPanel = ({
   pendingShareInvites,
   folded,
 }: ISettingsPanelProps) => {
+  console.log('pendingShareInvites: ', pendingShareInvites);
   const { reset, setUser, user } = useUserStore(state => state);
 
   const [showInvitesModal, setShowInvitesModal] = useState(false);
@@ -184,7 +185,7 @@ export const SettingsPanel = ({
   const [deleteModal, setDeleteModal] = useState(false);
 
   const pendingExist = pendingShareInvites ? pendingShareInvites.filter(
-    invite => invite.acceptedAt === undefined
+    invite => invite.acceptedAt !== undefined
   ) : []
 
   return (
