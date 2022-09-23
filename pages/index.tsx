@@ -7,44 +7,48 @@ import {
   requestNotificationPermission,
   setTheme,
 } from '@/utils/apputils';
-import { getPendingShareInvites, initUser } from '@/utils/fire';
+import {
+  getExternalTasks,
+  getPendingShareInvites,
+  initUser,
+} from '@/utils/fire';
 import { Badge, Tabs } from 'antd';
 
 import classNames from 'classnames/bind';
 import { getDoc, serverTimestamp } from 'firebase/firestore';
-import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { NextPage } from 'next';
 import { Session } from 'next-auth';
 import { useSession } from 'next-auth/react';
 import useTranslation from 'next-translate/useTranslation';
+import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 // import { useRouter } from 'next/dist/client/router'
 import Head from 'next/head';
 import { wrap } from 'popmotion';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
+import { GrGroup } from 'react-icons/gr';
+
+import { stripImagesData } from '@/utils/cloudflare';
+import { Tooltip } from 'antd';
+import { UploadFile } from 'antd/lib/upload/interface';
+import { GroupBar } from 'components/GroupBar/GroupBar';
+import { ActiveTab } from 'components/tabPanes/ActiveTab';
+import { ArchivedTab } from 'components/tabPanes/Archived';
+import { urgencies } from 'components/taskActions/UrgencyPopover';
+import Image from 'next/image';
 import { AiFillDelete } from 'react-icons/ai';
-import {
-  IoAddCircleOutline,
-  IoArchiveOutline,
-  IoArchiveSharp,
-  IoDocumentTextSharp,
-} from 'react-icons/io5';
-import { RiInboxUnarchiveLine } from 'react-icons/ri';
+import { IoAddCircleOutline, IoArchiveSharp } from 'react-icons/io5';
 import { useSwipeable } from 'react-swipeable';
-import {
-  useClickAway,
-  useDebounce,
-  useLongPress,
-  useWindowSize,
-} from 'react-use';
-import s from '../styles/Home.module.scss';
-import { AddTasks } from './../components/AddTasks/AddTasks';
-import { fastTransition } from './../components/anims';
+import { useClickAway, useDebounce, useLongPress } from 'react-use';
+import { Itask, IUser } from 'types/fireTypes';
 import {
   areAllFilesUploaded,
   InputPanel,
 } from '../components/InputPanel/InputPanel';
+import s from '../styles/Home.module.scss';
+import { fastTransition } from './../components/anims';
+import { Button } from './../components/Button/Button';
 import { Loader } from './../components/Loader/Loader';
 import { NotLogged } from './../components/NotLogged';
 import { SettingsPanel } from './../components/SettingsPanel';
@@ -57,21 +61,6 @@ import {
   newTaskGroup,
 } from './../utils/fire';
 import { useUserStore } from './../utils/store';
-import { Button } from './../components/Button/Button';
-import { Tooltip } from 'antd';
-import Image from 'next/image';
-import { GoNote } from 'react-icons/go';
-import {
-  urgencies,
-  UrgencyPopover,
-} from 'components/taskActions/UrgencyPopover';
-import { TaskDetails } from 'components/TaskStats';
-import { ArchivedTab } from 'components/tabPanes/Archived';
-import { ActiveTab } from 'components/tabPanes/ActiveTab';
-import { IPendingShareInvite, Itask, IUser } from 'types/fireTypes';
-import { UploadFile } from 'antd/lib/upload/interface';
-import { stripImagesData } from '@/utils/cloudflare';
-import { GroupBar } from 'components/GroupBar/GroupBar';
 // import { Itask } from 'types/fireTypes'
 
 const cn = classNames.bind(s);
@@ -94,13 +83,34 @@ const getUrgencyForUnarchivedTasks = (task: Itask[]) => {
 };
 
 const Home: NextPage = () => {
+  const {
+    externalTaskGroupIndex,
+    setTaskGroupIndex,
+    setExternalTaskGroupIndex,
+    taskGroupIndex,
+    setUser,
+    user,
+    taskGroups,
+    setTaskGroups,
+    tasks,
+    setTasks,
+    groupsLoading,
+    setGroupsLoading,
+    setExternalTaskGroups,
+    setExternalTasks,
+    externalTaskGroups,
+    setExternalTaskGroupsData,
+    externalTaskGroupsData,
+    externalTasks,
+    pendingShareInvites,
+    setPendingShareInvites,
+  } = useUserStore(state => state);
+
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const { t } = useTranslation('common');
   const [folded, setFolded] = useState(false);
   const [paneIndex, setPaneIndex] = useState(0);
   const [editingTaskTitle, setEditingTaskTitle] = useState(false);
-
-
 
   const [currentDaySelected, setCurrentDaySelected] = useState(false);
 
@@ -118,7 +128,10 @@ const Home: NextPage = () => {
   const [editingTaskIndex, setEditingTaskIndex] = useState('');
   const [editingTaskText, setEditingTaskText] = useState('');
 
-  const [pendingShareInvites, setPendingShareInvites] = useState<IPendingShareInvite[] | undefined>([]);
+  // const [pendingShareInvites, setPendingShareInvites] = useState<
+  // IPendingShareInvite[] | undefined
+  // >([]);
+
   const [noteIndexEditing, setNoteIndexEditing] = useState('');
 
   const [textareaValue, setTextareaValue] = useState('');
@@ -144,43 +157,15 @@ const Home: NextPage = () => {
     setNoteIndexEditing('');
   });
 
-
-
-  const {
-    externalTaskGroupIndex,
-    setTaskGroupIndex,
-    setExternalTaskGroupIndex,
-    taskGroupIndex,
-    setUser,
-    user,
-    taskGroups,
-    setTaskGroups,
-    tasks,
-    setTasks,
-    groupsLoading,
-    setGroupsLoading,
-    setExternalTaskGroups,
-    setExternalTasks,
-    externalTaskGroups,
-    setExternalTaskGroupsData,
-    externalTaskGroupsData,
-    externalTasks
-  } = useUserStore(state => state);
-
-  const tasksToShow = taskGroupIndex > -1 ? tasks : externalTasks
+  const tasksToShow = taskGroupIndex > -1 ? tasks : externalTasks;
 
   useEffect(() => {
-
-    const getPending = async (user:IUser) => {
-
-
-      const pendingShareInvites = await getPendingShareInvites(user.id)
-      setPendingShareInvites(pendingShareInvites)
-
-    }
-    if(user && user.id){
-
-      getPending(user)
+    const getPending = async (user: IUser) => {
+      const pendingShareInvites = await getPendingShareInvites(user.id);
+      setPendingShareInvites(pendingShareInvites);
+    };
+    if (user && user.id) {
+      getPending(user);
     }
   }, [user]);
 
@@ -236,8 +221,9 @@ const Home: NextPage = () => {
     setExternalTasks,
     taskGroups,
     setExternalTaskGroupsData,
-    externalTaskGroupIndex
-  }
+    externalTaskGroupIndex,
+  };
+
   useEffect(() => {
     if (session.status === 'authenticated' && session.data.token != undefined) {
       //@ts-ignore
@@ -251,35 +237,51 @@ const Home: NextPage = () => {
         //@ts-ignore
         const { data } = user_document.data();
 
-
-
         if (data?.theme !== '' && data?.theme !== undefined)
           setTheme(data.theme);
         setUser({ name, email, picture, id, data } as any);
         requestNotificationPermission();
         refreshTaskData({
-          // setExternalTaskGroups,
           ...refreshData,
           userid: id,
-          // taskGroupIndex,
-          // setTaskGroups,
-          // setTasks,
-          // setGroupsLoading,
-          // setExternalTasks,
-          // taskGroups,
-          // setExternalTaskGroupsData
         });
       });
     }
-  }, [session, setExternalTaskGroups, setExternalTasks, setGroupsLoading, setTaskGroups, setTasks, setUser, taskGroupIndex]);
+  }, [
+    session,
+    setExternalTaskGroups,
+    setExternalTasks,
+    setGroupsLoading,
+    setTaskGroups,
+    setTasks,
+    setUser,
+    taskGroupIndex,
+  ]);
+
+  // useEffect(() => {
+  //   if (taskGroups.length > 0 && taskGroupIndex > -1) {
+  //     getTasks(user.id, taskGroups[taskGroupIndex].id)
+  //       .then(res => {
+  //       setTasks(res);
+  //     });
+  //   }
+  //   if(taskGroupIndex < 0 && externalTaskGroups.length > 0 && externalTaskGroupIndex > -1) {
+
+  //     // refreshTaskData({
+  //     //   userid:user.id,
+  //     //   ...refreshData,
+  //     // })
+  //   }
+  // }, [setTasks, taskGroupIndex, taskGroups, user.id,externalTaskGroupIndex,externalTaskGroups.length]);
 
   useEffect(() => {
-    if (taskGroups.length > 0 && taskGroupIndex > -1) {
-      getTasks(user.id, taskGroups[taskGroupIndex].id).then(res => {
-        setTasks(res);
+    if (user?.id)
+      refreshTaskData({
+        userid: user.id,
+        ...refreshData,
       });
-    }
-  }, [setTasks, taskGroupIndex, taskGroups, user.id]);
+
+  }, [taskGroupIndex, externalTaskGroupIndex, user.id]);
 
   const updateTask =
     // useCallback(
@@ -287,35 +289,45 @@ const Home: NextPage = () => {
     ({ id, data }: { id: string; data: any }, callBack?: any) => {
       const isExternal = taskGroupIndex > -1 ? false : true;
 
-      if(!isExternal){
-      f_updateTask(user.id, taskGroups[taskGroupIndex]?.id, id, data,isExternal).then(
-        () => {
+      if (!isExternal) {
+        f_updateTask(
+          user.id,
+          taskGroups[taskGroupIndex]?.id,
+          id,
+          data,
+          isExternal,
+        ).then(() => {
           callBack && callBack();
           refreshTaskData({
             userid: user.id,
-            ...refreshData
+            ...refreshData,
           });
-        },
-        );
+        });
       }
       if (isExternal) {
         const externalTaskGroup = externalTaskGroups[externalTaskGroupIndex];
         const upadteArgs = {
-          fromUser: externalTaskGroup.fromUser, tgId:`${externalTaskGroups[externalTaskGroupIndex]?.id}`, id, data, isExternal
-        }
+          fromUser: externalTaskGroup.fromUser,
+          tgId: `${externalTaskGroups[externalTaskGroupIndex]?.id}`,
+          id,
+          data,
+          isExternal,
+        };
 
-        f_updateTask(externalTaskGroup.fromUser, `${externalTaskGroups[externalTaskGroupIndex].taskGroup}`, id, data, isExternal).then(
-          () => {
-            callBack && callBack();
-            refreshTaskData({
-              userid: user.id,
-              ...refreshData
-            });
-          },
-        );
-
+        f_updateTask(
+          externalTaskGroup.fromUser,
+          `${externalTaskGroups[externalTaskGroupIndex].taskGroup}`,
+          id,
+          data,
+          isExternal,
+        ).then(() => {
+          callBack && callBack();
+          refreshTaskData({
+            userid: user.id,
+            ...refreshData,
+          });
+        });
       }
-
     };
   // [
   //   setGroupsLoading,
@@ -361,7 +373,7 @@ const Home: NextPage = () => {
     });
     refreshTaskData({
       userid: user.id,
-      ...refreshData
+      ...refreshData,
     });
   };
 
@@ -370,7 +382,7 @@ const Home: NextPage = () => {
   const allowArchive = () => {
     const isZeroTab = wrap(0, 3, paneIndex - 1) === 0;
     const tasksExist =
-    tasksToShow.filter(
+      tasksToShow.filter(
         task =>
           task.data.checkable &&
           // &&
@@ -423,7 +435,7 @@ const Home: NextPage = () => {
       newTaskGroup(user.id, tgName).then(() => {
         refreshTaskData({
           userid: user.id,
-          ...refreshData
+          ...refreshData,
         }).then(() => {
           setTaskGroupIndex(0);
         });
@@ -447,7 +459,9 @@ const Home: NextPage = () => {
 
   const [, cancel] = useDebounce(
     () => {
-      const editingTask = tasksToShow.find(task => task.id === noteIndexEditing);
+      const editingTask = tasksToShow.find(
+        task => task.id === noteIndexEditing,
+      );
 
       if (editingTask && typeof textareaValue !== 'undefined')
         updateTask({
@@ -463,9 +477,10 @@ const Home: NextPage = () => {
   );
   const editingTask = tasksToShow.find(task => task.id === noteIndexEditing);
 
-  const tgToShow = taskGroupIndex > -1 ? taskGroups[taskGroupIndex] : externalTaskGroupsData[externalTaskGroupIndex]
-
-
+  const tgToShow =
+    taskGroupIndex > -1
+      ? taskGroups[taskGroupIndex]
+      : externalTaskGroupsData[externalTaskGroupIndex];
 
   return (
     <>
@@ -566,29 +581,32 @@ const Home: NextPage = () => {
                 {...fastTransition}
                 className={` ${s.taskGroups} `}
               >
-                 {
-                  externalTaskGroupsData.map((group, index) => (
-                    <li
-
-                      key={group.id}
-
-                      className={externalTaskGroupIndex === index ? s.selected : ''}
-                      onClick={() => {
-                        setPaneIndex(0);
-                        // setUpdateTaskGroupTitle(group.data.title);
-                        // setCurrentDaySelected(false);
-                        setTaskGroupIndex(-1);
-                        // setNoteIndexEditing('');
-                        setExternalTaskGroupIndex(index);
-                      }}
-                      // onDoubleClick={() => {
-                      //   setEditingTaskTitle(true);
-                      // }}
-                    >
-                      {group.data.title}
-                    </li>
-                  ))
-}
+                {externalTaskGroupsData.map((group, index) => (
+                  <li
+                    key={group.id}
+                    className={
+                      externalTaskGroupIndex === index ? s.selected : ''
+                    }
+                    onClick={() => {
+                      setPaneIndex(0);
+                      setUpdateTaskGroupTitle(group.data.title);
+                      setCurrentDaySelected(false);
+                      setTaskGroupIndex(-1);
+                      setNoteIndexEditing('');
+                      setExternalTaskGroupIndex(index);
+                    }}
+                    // onDoubleClick={() => {
+                    //   setEditingTaskTitle(true);
+                    // }}
+                  >
+                    {`${
+                      folded
+                        ? extractCapitals(group.data.title)
+                        : group.data.title
+                    }`}
+                    <GrGroup />
+                  </li>
+                ))}
                 {taskGroups.map((group, index) => (
                   <li
                     key={group.id}
@@ -653,9 +671,6 @@ const Home: NextPage = () => {
                     ) : (
                       <>
                         <p>
-                          {/* {
-
-                            } */}
                           {
                             <Badge
                               className={cn({
@@ -670,17 +685,7 @@ const Home: NextPage = () => {
                               })}
                               count={group.activeTasks}
                             />
-                            // <span
-                            //   className={cn({
-                            //     activeTasks: true,
-                            //     urgent: group.urgentTasks > 0,
-                            //     warning: group.warningTasks > 0,
-                            //     placehold: group.activeTasks === 0,
-                            //   })}
-                            // >
-                            //   {group.activeTasks}
-                            // </span>
-                          }{' '}
+                          }
                           {`${
                             folded
                               ? extractCapitals(group.data.title)
@@ -704,7 +709,7 @@ const Home: NextPage = () => {
 
                                 refreshTaskData({
                                   userid: user.id,
-                                  ...refreshData
+                                  ...refreshData,
                                 });
 
                                 setNewTaskGroupTitle(
@@ -718,7 +723,6 @@ const Home: NextPage = () => {
                     )}
                   </li>
                 ))}
-
 
                 {groupsLoading && (
                   <aside className={` ${s.taskGroupsOverlay} `}>
@@ -738,24 +742,15 @@ const Home: NextPage = () => {
               <GroupBar
                 tabIndex={tabIndex}
                 folded={folded}
-                taskgroup={
-
-                  tgToShow
-
-                }
+                taskgroup={tgToShow}
                 menuChildren={
                   <>
                     {allowArchive() && (
-                      // <div
-                      //   // className={s.floatingButton}
-                      //   onClick={() => archiveChecked()}
-                      // >
-                        <Button
-                          icon={<IoArchiveSharp size={25} />}
+                      <Button
+                        icon={<IoArchiveSharp size={25} />}
                         hint={'Archive all'}
                         onClick={archiveChecked}
-                        />
-                      // </div>
+                      />
                     )}
                   </>
                 }
@@ -775,7 +770,6 @@ const Home: NextPage = () => {
                 ).toString()}
                 className={` ${s.tasks} `}
                 style={{
-                  // overflowY: 'scroll',
                   padding: '10px',
                 }}
                 animated={{ inkBar: true }}
@@ -835,7 +829,10 @@ const Home: NextPage = () => {
                   <InputPanel setNewTaskGroupTitle={setNewTaskGroupTitle} />
                 </div>
               )}
-              <SettingsPanel pendingShareInvites={pendingShareInvites} folded={folded} />
+              <SettingsPanel
+                // pendingShareInvites={pendingShareInvites}
+                folded={folded}
+              />
             </>
           )}
         </main>

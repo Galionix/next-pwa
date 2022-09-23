@@ -40,6 +40,7 @@
 		"danger_section": "Зона опасности",
 		"task_actions_section": "Быстрые действия задачи",
 		"actions" : {
+			"declinedAt": "Отклонено",
 			"Invites": "Приглашения",
 			"sentAt": "Отправлено",
 			"acceptedAt": "Принято",
@@ -48,7 +49,7 @@
 			"Archive": "Архивировать",
 			"Notification": "Уведомление",
 			"Description": "Описание",
-			"PendingInvites": "Новые риглашения",
+			"PendingInvites": "Новые приглашения",
 			"NoPendingInvites": "Нет приглашений",
 			"AcceptedInvites": "Принятые приглашения",
 			"SentInvites": "Ваши отправленные приглашения"
@@ -61,6 +62,10 @@
 		"warning":"Срочно"
 	},
 	"invites":{
+		"invite-declined": "Приглашение отклонено",
+		"invite-accept-error": "Вы уже приняли это приглашение",
+		"invite-accepted": "Приглашение принято",
+		"alreadyInvited": "Вы уже отправили приглашение пользователю",
 		"sent":"Запрос отправлен пользователю",
 		"noUserSelected": "Пользователь не выбран",
 		"fromUser": "От",

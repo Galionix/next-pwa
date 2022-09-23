@@ -40,6 +40,10 @@ export interface Store {
 		externalTaskGroupIndex: number
 	) => void
 
+	pendingShareInvites: IPendingShareInvite[],
+	setPendingShareInvites: (
+		pendingShareInvites: IPendingShareInvite[]
+	) => void
 
 }
 
@@ -47,6 +51,8 @@ export interface Store {
 export const useUserStore = create<Store>(
 	persist(
 		set => ({
+			pendingShareInvites: [],
+			setPendingShareInvites: (pendingShareInvites: IPendingShareInvite[]) => set({ pendingShareInvites }),
 			externalTaskGroupIndex: -1,
 			setExternalTaskGroupIndex: (externalTaskGroupIndex: number) => set({ externalTaskGroupIndex }),
 			externalTaskGroupsData: [],
@@ -92,5 +98,3 @@ export const useUserStore = create<Store>(
 		}
 	)
 )
-
-

@@ -14,9 +14,10 @@ import { IPendingShareInvite, Itask, IUser } from 'types/fireTypes';
 import { useUserStore } from 'utils/store';
 import { Button as EButton } from '../components/Button/Button';
 import s from '../styles/Home.module.scss';
-import { getTasks, setTheme } from './../utils/apputils';
+import { getTasks, notif, refreshTaskData, setTheme } from './../utils/apputils';
 import {
   acceptShareInvite,
+  declinePendingShareInvite,
   deleteUser,
   getSentShareInvites,
   getTaskGroup,
@@ -26,19 +27,21 @@ import {
 import { fastTransition } from './anims';
 
 import { BiUserCheck } from 'react-icons/bi';
+import { Avatar } from 'components/Avatar/Avatar';
 
 const { Option } = Select;
 
 function onChange(checkedValue: CheckboxValueType[]) {}
 
 interface ISettingsPanelProps {
-  pendingShareInvites: IPendingShareInvite[] | undefined;
+  // pendingShareInvites: IPendingShareInvite[] | undefined;
   folded: boolean;
 }
 interface IPendingProps {
   visible: boolean;
   pendingShareInvites: IPendingShareInvite[] | undefined;
   setVisible: (visible: boolean) => void;
+  updateInvites: () => void;
 }
 
 const renderDate = (date: Date) => {
@@ -49,11 +52,47 @@ const renderDate = (date: Date) => {
 const InviteRenderer = ({
   usersList,
   invite,
+  updateInvites,
+  type,
 }: {
+  type: 'accepted' | 'pending' | 'sent';
   usersList: IUser[];
   invite: IPendingShareInvite;
+  updateInvites: () => void;
 }) => {
-  const { user: localUser } = useUserStore();
+  const {
+    user: localUser,
+    externalTaskGroupIndex,
+
+    taskGroupIndex,
+    setUser,
+    user,
+    taskGroups,
+    setTasks: refrSetTasks,
+    setTaskGroups,
+    groupsLoading,
+    setGroupsLoading,
+    setExternalTaskGroups,
+    setExternalTasks,
+    externalTaskGroups,
+    setExternalTaskGroupsData,
+    externalTaskGroupsData,
+    externalTasks,
+  } = useUserStore();
+
+  const refreshData = {
+    setExternalTaskGroups,
+    // userid: id,
+    taskGroupIndex,
+    setTaskGroups,
+    setTasks: refrSetTasks,
+    setGroupsLoading,
+    setExternalTasks,
+    taskGroups,
+    setExternalTaskGroupsData,
+    externalTaskGroupIndex,
+  };
+
   const { t } = useTranslation('common');
 
   const fromUser = usersList?.find(user => user.id === invite.fromUser);
@@ -69,6 +108,11 @@ const InviteRenderer = ({
   const acceptedDate = new Date(
     invite.acceptedAt ? invite.acceptedAt.seconds * 1000 : 0,
   );
+  const declinedDate = new Date(
+    invite.declinedAt ? invite.declinedAt.seconds * 1000 : 0,
+  );
+
+  const declinedDateString = `${declinedDate.toLocaleDateString()} ${declinedDate.toLocaleTimeString()}`;
 
   const acceptedDateString = `${acceptedDate.toLocaleDateString()} ${acceptedDate.toLocaleTimeString()}`;
 
@@ -90,6 +134,115 @@ const InviteRenderer = ({
 
   if (!fromUser || !taskGroup || !tasks) return null;
 
+  const pendingActions = () => {
+    return (
+      <div className={s.pendingInvite__actions}>
+        <Button
+          loading={acceptLoading}
+          type='primary'
+          onClick={async () => {
+
+            setAcceptLoading(true);
+
+            const res = await acceptShareInvite({
+              toUserId: localUser.id,
+              invite,
+            });
+
+            if (res) {
+              notif({
+                type: 'success',
+                message: t('invites.invite-accepted'),
+
+              })
+            }
+            else {
+              notif({
+                type: 'error',
+                message: t('invites.invite-accept-error'),
+
+              })
+            }
+            updateInvites();
+
+            refreshTaskData({
+              userid: localUser.id,
+              ...refreshData,
+            });
+
+            setAcceptLoading(false);
+          }}
+        >
+          {t('accept')}
+        </Button>
+        <Button type='primary' danger onClick={async () => {
+
+
+          setAcceptLoading(true);
+          await declinePendingShareInvite({toUserId:localUser.id,invite});
+
+
+            notif({
+              type: 'success',
+              message: t('invites.invite-declined'),
+
+            })
+
+          updateInvites();
+
+          refreshTaskData({
+            userid: localUser.id,
+            ...refreshData,
+          });
+
+          setAcceptLoading(false);
+
+        }}>
+          {t('decline')}
+        </Button>
+      </div>
+    );
+  };
+  const acceptedActions = () => {
+
+    return (
+
+      <div className={s.pendingInvite__actions}>
+        <Button
+          loading={acceptLoading}
+          type='primary'
+          danger
+          onClick={async () => {
+
+            setAcceptLoading(true);
+            await declinePendingShareInvite({toUserId:localUser.id,invite});
+
+
+              notif({
+                type: 'success',
+                message: t('invites.invite-declined'),
+
+              })
+
+            updateInvites();
+
+            refreshTaskData({
+              userid: localUser.id,
+              ...refreshData,
+            });
+
+            setAcceptLoading(false);
+          }}
+        >
+          {t('decline')}
+        </Button>
+        {/* <Button type='primary' danger onClick={() => {}}>
+          {t('decline')}
+        </Button> */}
+      </div>
+    )
+  }
+
   return (
     <div className={s.pendingInvite} key={invite.id}>
       <div className={s.pendingInvite__info}>
@@ -100,9 +253,13 @@ const InviteRenderer = ({
           <span>{`${t(
             'settings.actions.acceptedAt',
           )}: ${acceptedDateString}`}</span>
+          <span>{`${t(
+            'settings.actions.declinedAt',
+          )}: ${declinedDateString}`}</span>
         </div>
 
-        <div className={s.pendingInvite__fromUser}>
+        <Avatar userId={fromUser?.id } />
+        {/* <div className={s.pendingInvite__fromUser}>
           <span>{t('invites.fromUser')}</span>
           <span>{fromUser?.name}</span>
           <img
@@ -110,33 +267,17 @@ const InviteRenderer = ({
             alt='user'
             referrerPolicy='no-referrer'
           />
-        </div>
+        </div> */}
         <AiOutlineArrowRight size={25} />
-        <div className={s.pendingInvite__toUser}>
+        <Avatar userId={toUser?.id } />
+        {/* <div className={s.pendingInvite__toUser}>
           <span>{t('invites.toUser')}</span>
           <span>{toUser?.name}</span>
           <img src={toUser?.imageUrl} alt='user' referrerPolicy='no-referrer' />
-        </div>
+        </div> */}
       </div>
-      <div className={s.pendingInvite__actions}>
-        <Button
-          loading={acceptLoading}
-          type='primary'
-          onClick={async () => {
-            setAcceptLoading(true);
-            await acceptShareInvite({
-              toUserId: localUser.id,
-              invite,
-            });
-            setAcceptLoading(false);
-          }}
-        >
-          {t('accept')}
-        </Button>
-        <Button type='primary' danger onClick={() => {}}>
-          {t('decline')}
-        </Button>
-      </div>
+      {type === 'pending' ? pendingActions() : null}
+      {type === 'accepted' ? acceptedActions() : null}
     </div>
   );
 };
@@ -145,6 +286,7 @@ export const PendingInvites = ({
   pendingShareInvites,
   visible,
   setVisible,
+  updateInvites,
 }: IPendingProps) => {
   const { t } = useTranslation('common');
   const [usersList, setUsersList] = useState<IUser[]>();
@@ -177,9 +319,11 @@ export const PendingInvites = ({
           {pendingShareInvites?.map((invite, index) => {
             return (
               <InviteRenderer
+                type='pending'
                 invite={invite}
                 usersList={usersList}
                 key={invite.id}
+                updateInvites={updateInvites}
               />
             );
           })}
@@ -193,12 +337,14 @@ interface IAcceptedProps {
   visible: boolean;
   acceptedShareInvites: IPendingShareInvite[] | undefined;
   setVisible: (visible: boolean) => void;
+  updateInvites: () => void;
 }
 
 const AcceptedInvites = ({
   acceptedShareInvites,
   visible,
   setVisible,
+  updateInvites,
 }: IAcceptedProps) => {
   const { t } = useTranslation('common');
   const [usersList, setUsersList] = useState<IUser[]>();
@@ -234,6 +380,8 @@ const AcceptedInvites = ({
                 invite={invite}
                 usersList={usersList}
                 key={invite.id}
+                updateInvites={updateInvites}
+                type='accepted'
               />
             );
           })}
@@ -247,12 +395,14 @@ interface ISentShareInvitesProps {
   visible: boolean;
   sentShareInvites: IPendingShareInvite[] | undefined;
   setVisible: (visible: boolean) => void;
+  updateInvites: () => void;
 }
 
 const SentInvites = ({
   sentShareInvites,
   visible,
   setVisible,
+  updateInvites,
 }: ISentShareInvitesProps) => {
   const { t } = useTranslation('common');
   const [usersList, setUsersList] = useState<IUser[]>();
@@ -285,9 +435,11 @@ const SentInvites = ({
           {sentShareInvites?.map((invite, index) => {
             return (
               <InviteRenderer
+                type='sent'
                 invite={invite}
                 usersList={usersList}
                 key={invite.id}
+                updateInvites={updateInvites}
               />
             );
           })}
@@ -298,20 +450,27 @@ const SentInvites = ({
 };
 
 export const SettingsPanel = ({
-  pendingShareInvites,
+  // pendingShareInvites,
   folded,
 }: ISettingsPanelProps) => {
-  const { reset, setUser, user } = useUserStore(state => state);
+  const { reset, setUser, user, pendingShareInvites } = useUserStore(
+    state => state,
+  );
 
   const [sentShareInvites, setSentShareInvites] = useState<
     IPendingShareInvite[]
   >([]);
-  useEffect(() => {
+
+  const updateInvites = async () => {
     if (user && user.id) {
-      getSentShareInvites(user.id).then(data => {
+      await getSentShareInvites(user.id).then(data => {
         setSentShareInvites(data);
       });
     }
+  };
+
+  useEffect(() => {
+    updateInvites();
   }, [user]);
 
   const [showInvitesModal, setShowInvitesModal] = useState(false);
@@ -337,8 +496,9 @@ export const SettingsPanel = ({
   const [sentInvitesOpen, setSentInvitesOpen] = useState(false);
 
   const pendingExist = pendingShareInvites
-    ? pendingShareInvites.filter(invite => !invite.acceptedAt)
-    : [];
+  ? pendingShareInvites.filter(invite => !invite.acceptedAt && !invite.declinedAt)
+  : [];
+
 
   const acceptedExist = pendingShareInvites
     ? pendingShareInvites.filter(invite => invite.acceptedAt)
@@ -354,16 +514,19 @@ export const SettingsPanel = ({
         <p>{t('settings.title')}</p>
       </button>
       <PendingInvites
+        updateInvites={updateInvites}
         visible={showInvitesModal}
         pendingShareInvites={pendingExist}
         setVisible={setShowInvitesModal}
       />
       <AcceptedInvites
+        updateInvites={updateInvites}
         visible={showAcceptedInvitesModal}
         acceptedShareInvites={acceptedExist}
         setVisible={setShowAcceptedInvitesModal}
       />
       <SentInvites
+        updateInvites={updateInvites}
         visible={sentInvitesOpen}
         sentShareInvites={sentShareInvites}
         setVisible={setSentInvitesOpen}

@@ -23,6 +23,7 @@ export interface Itask {
 
 export interface ITaskGroup {
   id: string;
+  fromUser?: string;
   data: {
     title: string;
     timestamp: Date;

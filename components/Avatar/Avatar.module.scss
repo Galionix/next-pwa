@@ -1,0 +1,57 @@
+.avatar {
+  display: grid;
+  img {
+    border-radius: 50%;
+    aspect-ratio: 1 / 1;
+  }
+}
+.large {
+  grid-template-columns: 96px 1fr;
+  gap: 3px;
+  align-items: end;
+  span {
+    font-size: 16px;
+  }
+}
+.compact {
+  grid-template-columns: auto auto;
+  img {
+    width: 100%;
+    height: 100%;
+    max-width: 50px;
+  }
+  img,
+  span {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  span {
+    place-self: end start;
+    padding: 2px;
+    border-radius: 5px;
+    grid-column: 1 / span 2;
+    white-space: nowrap;
+    background: var(--bg-main);
+    color: var(--bg-second);
+  }
+}
+
+.small {
+  width: 50px;
+  img,
+  span {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  span {
+    width: 100%;
+    background: var(--bg-main);
+    color: var(--bg-second);
+    height: max-content;
+    place-self: end center;
+    border-radius: 3px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+}

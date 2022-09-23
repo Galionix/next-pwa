@@ -41,6 +41,7 @@
 		"danger_section": "Danger zone",
 		"task_actions_section": "Task quick actions",
 		"actions" : {
+			"declinedAt": "Declined",
 			"Invites": "Coop invites",
 			"sentAt": "Sent at",
 			"acceptedAt": "Accepted at",
@@ -62,6 +63,10 @@
 		"warning":"Warning"
 	},
 	"invites":{
+		"invite-declined": "Invite declined",
+		"invite-accept-error": "You have already accepted this invite",
+		"invite-accepted": "Invitation accepted",
+		"alreadyInvited": "You have already invited user",
 		"sent":"Request sent to",
 		"noUserSelected": "No user selected",
 		"fromUser": "From",
