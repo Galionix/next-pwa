@@ -28,6 +28,7 @@ import { fastTransition } from './anims';
 
 import { BiUserCheck } from 'react-icons/bi';
 import { Avatar } from 'components/Avatar/Avatar';
+import Link from 'next/link';
 
 const { Option } = Select;
 
@@ -623,6 +624,25 @@ export const SettingsPanel = ({
               </Button>
             </div>
           </section>
+          <section
+            style={{
+
+              display: 'flex',
+              gap: '10px',
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+
+          }}
+          >
+            <span>{"developer's nest"}</span>
+            <span>
+
+            <Link href='https://thedimas.com'>
+              <a target='_blank'>thedimas.com</a>
+            </Link>
+            </span>
+          </section>
         </>
       </Modal>
       <Modal
@@ -642,6 +662,7 @@ export const SettingsPanel = ({
         okButtonProps={{ danger: true }}
       >
         <p>{t('settings.delete_modal.message')}</p>
+
       </Modal>
     </motion.div>
   );
